@@ -63,7 +63,7 @@ func NewError(code, message string, status int) *AppError {
 		Message: message,
 		Status:  status,
 	}
-}
+}	
 
 func (e *AppError) AddField(field, message string) *AppError {
 	e.Fields = append(e.Fields, FieldError{
