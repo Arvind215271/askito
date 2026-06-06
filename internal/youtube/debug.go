@@ -121,7 +121,7 @@ func DebugYouTube(
 		
 	)
 
-	fmt.Println("\n================ SAMPLE =================\n")
+	fmt.Printf("\n================ SAMPLE =================\n")
 
 	if len(playlistVideos) > 0 {
 
@@ -180,7 +180,7 @@ func DebugYouTube(
 		// -----------------------------
 		// VERIFY PLAYLIST FIELDS
 		// -----------------------------
-		fmt.Println("\n================ PLAYLIST FIELDS =================\n")
+		fmt.Printf("\n================ PLAYLIST FIELDS =================\n")
 
 		fmt.Println("Playlist Title      :", exportData["title"])
 		fmt.Println("Playlist Channel    :", exportData["channel_title"])
@@ -189,7 +189,7 @@ func DebugYouTube(
 		// -----------------------------
 		// VERIFY VIDEO FILTERING
 		// -----------------------------
-		fmt.Println("\n================ VIDEO SAMPLE =================\n")
+		fmt.Printf("\n================ VIDEO SAMPLE =================\n")
 
 		if vids, ok := exportData["videos"].([]any); ok && len(vids) > 0 {
 
@@ -216,7 +216,7 @@ func DebugYouTube(
 			)
 		} else {
 
-			fmt.Println("\n================ EXPORT =================\n")
+			fmt.Printf("\n================ EXPORT =================\n")
 
 			fmt.Println(string(exportJSON))
 

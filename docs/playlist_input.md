@@ -25,19 +25,19 @@
 
 ## Phase 2: Add Single Video Support
 
-- [ ] Accept a single YouTube video URL  
+- [x] Accept a single YouTube video URL  
   Extend input handling to support individual video links.
 
-- [ ] Detect video type from URL  
+- [x] Detect video type from URL  
   Identify video URLs using patterns like `watch?v=` or `youtu.be`.
 
-- [ ] Extract video ID  
+- [x] Extract video ID  
   Get the unique video identifier for processing.
 
-- [ ] Extend normalization structure  
+- [x] Extend normalization structure  
   Support both video and playlist in the same internal format.
 
-- [ ] Keep type distinction intact  
+- [x] Keep type distinction intact  
   Ensure system knows whether input is a video or playlist after normalization.
 
 ---
