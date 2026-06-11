@@ -33,19 +33,25 @@
 
 ## Phase 2: Chapter Extraction
 
-- [ ] Research available chapter sources
+- [x] Research available chapter sources
   Determine whether chapters can be obtained from the YouTube API or require alternative extraction methods.
+  Currently, there is no option to get Chapters from Youtube API.
+  We can use yt-dlp to get those... which be a little expensive to call for each video. (But single user can do that with their device)
+  So... We might not be able to extract chapter for a full playlist. But we can do it for single videos. Because we might need more data to process a single video than it is for full video. That is all. 
+  The simplest thing would be to give ADMIN the right to do everything they want... They can perform the most expensive operation.
+  For normal user... they won't have everything they want here. That is all.    
 
-- [ ] Extract chapter information
-  Retrieve chapter titles and timestamps for videos that provide them.
+- [x] Extract chapter information
+  Retrieve chapter titles and timestamps for videos that provide them. 
+  We are going to use description to get those chapter. 
 
-- [ ] Attach chapters to video metadata
+- [x] Attach chapters to video metadata
   Merge chapter information into the existing video structure.
 
-- [ ] Handle videos without chapters
+- [x] Handle videos without chapters
   Ensure missing chapter data does not break the pipeline.
 
-- [ ] Pass enriched metadata to processing layer
+- [x] Pass enriched metadata to processing layer
   Continue using the same processing flow with additional chapter information.
 
 ---

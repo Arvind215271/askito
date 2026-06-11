@@ -2,27 +2,36 @@
 
 ## Phase 1: Description Extraction
 
-- [ ] Extract raw description content
+- [x] Extract raw description content
   Store the original video description without modification.
 
-- [ ] Preserve original formatting
+- [x] Preserve original formatting
   Retain line breaks and structure for future processing.
 
 ---
 
 ## Phase 2: Chapter Detection
 
-- [ ] Detect timestamp patterns
+- [x] Detect timestamp patterns
   Identify timestamps that may represent chapter markers.
+  There is a page on stackoverflow. Which is what i have used for reference as there were a lot of peps guiding on how they solved this problem. Most of it was extracting stuff using regex normally. 
+  Because, it was done by peps. They must have already tested most of it as well with it.     
 
-- [ ] Extract chapter candidates
+- [x] Extract chapter candidates
   Pair timestamps with surrounding text to create chapter entries.
+  For this, we can simply extract the video line by line instead.
+  We might miss detail that might be present if the timeline had breaks and spaces or like multiline.
+  But currently the simplest thing is to use regex per line. 
 
-- [ ] Validate chapter sequence
+- [x] Validate chapter sequence
   Ensure extracted chapters follow a valid chronological order.
+  Aka the time must be incresaing.
+  Also other stuff we can add is that atlesat 3 chapter must exist per youtube video.
+  We cannot be sure if we extracted actual chapter or what. But whatever... 
 
 - [ ] Attach detected chapters to video metadata
   Include description-derived chapters in the normalized structure.
+  
 
 ---
 

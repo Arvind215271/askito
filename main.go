@@ -48,7 +48,7 @@ func main() {
 	// context to be used by youtube API
 	ctx := context.Background()
 
-	youtubeClient, err := youtube.NewClient(
+	_, err := youtube.NewClient(
 		ctx,
 		config.YouTubeAPIKey,
 	)
@@ -63,11 +63,14 @@ func main() {
 
 	// only run debug in development
 	if config.Env == "development" {
-		youtube.DebugYouTube(
-			ctx,
-			logger,
-			youtubeClient,
-		)
+		
+		// youtube.DebugYouTube(
+		// 	ctx,
+		// 	logger,
+		// 	youtubeClient,
+		// )
+
+		
 	}
 	
 	e.HTTPErrorHandler = errorHandler.Handle

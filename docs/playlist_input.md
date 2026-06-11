@@ -30,6 +30,7 @@
 
 - [x] Detect video type from URL  
   Identify video URLs using patterns like `watch?v=` or `youtu.be`.
+  Also one more thing, YT shorts can also be used with watch?v=.
 
 - [x] Extract video ID  
   Get the unique video identifier for processing.
