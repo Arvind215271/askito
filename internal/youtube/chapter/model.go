@@ -1,4 +1,4 @@
-package youtube	
+package chapter	
 
 type Chapter struct {
 	Title     string

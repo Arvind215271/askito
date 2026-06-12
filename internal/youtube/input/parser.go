@@ -1,34 +1,32 @@
-// ./internal/youtube/input.go
-package youtube
+package youtubeurl
 
 import (
 	"net/url"
 	"strings"
+
+	"github.com/Arvind215271/askito/internal/youtube"
 )
 
-type Input struct{}
-
-var Inputs = Input{}
 
 // ParseURL validates a YouTube URL,
 // extracts the resource ID,
 // and returns a normalized YouTube input.
-func (Input) ParseURL(raw string) (*YouTubeInput, error) {
+func Parse(raw string) (*YouTubeInput, error) {
 	// get the raw URL and  trim it... because there might be some extra sspace around that would create problem if not in proper form
 	raw = strings.TrimSpace(raw)
 
 	if raw == "" {
-		return nil, Err.Playlist.InvalidURL()
+		return nil, youtube.Err.URL.EmptyURL()
 	}
 
 	u, err := url.Parse(raw)
 	// here it will parse the url into  different object like way. Like it will have stuff like u.query, u.params,etc, that any url contain. So then we can easily extract infromatoin from it.
 	if err != nil {
-		return nil, Err.Playlist.InvalidURL().Wrap(err)
+		return nil, youtube.Err.URL.InvalidURL().Wrap(err)
 	}
 
 	if !isYouTubeHost(u.Host) {
-		return nil, Err.Playlist.InvalidDomain()
+		return nil, youtube.Err.URL.InvalidDomain()
 	}
 
 	// first check for video URLs.
@@ -58,7 +56,7 @@ func (Input) ParseURL(raw string) (*YouTubeInput, error) {
 		}, nil
 	}
 
-	return nil, Err.Playlist.MissingID()
+	return nil, youtube.Err.URL.MissingID()
 }
 
 // extractVideoID extracts a video ID from supported YouTube URL formats.

@@ -1,5 +1,4 @@
-// ./internal/youtube/input/input_model.go
-package youtube
+package youtubeurl 	
 
 type InputType string
 

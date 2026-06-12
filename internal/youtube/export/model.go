@@ -1,4 +1,6 @@
-package youtube
+package export
+
+
 
 type Format string
 
@@ -25,3 +27,4 @@ type ExportResponse struct {
 	Format        Format     `json:"format"`
 	Data          ExportData `json:"data"`
 }
+

@@ -11,17 +11,22 @@ type Errors struct {
 	Playlist PlaylistErrors
 	Video    VideoErrors
 	Export   ExportErrors
+	URL 	URLErrors
 }
 
 var Err = Errors{
 	Playlist: PlaylistErrors{},
 	Video:    VideoErrors{},
 	Export:   ExportErrors{},
+	URL: URLErrors{},	
 }
 
 type PlaylistErrors struct{}
 type VideoErrors struct{}
 type ExportErrors struct{}
+type URLErrors struct{}
+
+
 
 // Playlist Errors
 
@@ -116,4 +121,39 @@ func (ExportErrors) InvalidField() *api.AppError {
 		"One or more export fields are invalid",
 		http.StatusBadRequest,
 	)
+}
+
+
+
+// URL Errors
+func (URLErrors) EmptyURL() *api.AppError {
+    return api.NewError(
+        "YOUTUBE_EMPTY_URL",
+        "URL cannot be empty",
+        http.StatusBadRequest,
+    )
+}
+
+func (URLErrors) InvalidURL() *api.AppError {
+    return api.NewError(
+        "YOUTUBE_INVALID_URL",
+        "Invalid YouTube URL",
+        http.StatusBadRequest,
+    )
+}
+
+func (URLErrors) InvalidDomain() *api.AppError {
+    return api.NewError(
+        "YOUTUBE_INVALID_DOMAIN",
+        "URL must be a YouTube URL",
+        http.StatusBadRequest,
+    )
+}
+
+func (URLErrors) MissingID() *api.AppError {
+    return api.NewError(
+        "YOUTUBE_MISSING_ID",
+        "Could not extract a YouTube resource ID from URL",
+        http.StatusBadRequest,
+    )
 }

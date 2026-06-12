@@ -58,22 +58,31 @@
 
 ## Phase 3: Transcript Extraction
 
-- [ ] Research transcript availability
+- [x] Research transcript availability
   Determine the most reliable method for obtaining subtitles or transcripts.
+  Youtube API gives us the  method to fetch captions. but the cost is 50 per file. Which is too much to do.
+  The other way is by using YTDLP instead of it.
+  So, we can simply use that to get us subtitle.
+  But as this is heavy operation, I have decided to use this for a single video for nomral user. 
+  Admin can do this for playlist as well (but haven't applied ADMIN system yet) 
 
-- [ ] Extract transcript content
+- [x] Extract transcript content
   Retrieve subtitle or transcript text for supported videos.
+  Use YT-DLP and make call to extract the subtitle for that video which will be used as transcript.
 
-- [ ] Extract transcript metadata
+- [x] Extract transcript metadata
   Capture information such as transcript language and availability.
+  Currently, we are using eng for askking for transcript.
 
-- [ ] Attach transcripts to video metadata
+- [x] Attach transcripts to video metadata
   Include transcript content within the normalized structure.
+  Currently we are not havinng any change in model for video. but we have a model for transcript. Whcih we are going to import or use ig... 
 
-- [ ] Handle unavailable transcripts
+- [x] Handle unavailable transcripts
   Gracefully continue processing when transcripts are disabled or unavailable.
+  Simply return the call... that is the current solutoin and nothing more. 
 
-- [ ] Pass enriched metadata to processing layer
+- [x] Pass enriched metadata to processing layer
   Continue pipeline processing with transcript support enabled.
 
 ---

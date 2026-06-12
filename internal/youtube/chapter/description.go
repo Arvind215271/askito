@@ -1,8 +1,6 @@
-// ./internal/youtube/descriptoin_chapter.go
-
 // reference: https://stackoverflow.com/questions/63821605/how-do-i-get-info-about-a-youtube-videos-chapters-from-the-api
 
-package youtube
+package chapter
 
 import (
 	"regexp"
@@ -88,60 +86,6 @@ func parseTimestamp(ts string) int {
 	}
 
 	return 0
-}
-
-
-
-func ValidateChapters(chapters []Chapter) bool {
-	// YouTube requires at least 3 chapters
-	if len(chapters) < 3 {
-		return false
-	}
-
-	// First chapter must start at 0
-	if chapters[0].Seconds != 0 {
-		return false
-	}
-
-	// Timestamps must be strictly increasing
-	for i := 1; i < len(chapters); i++ {
-		if chapters[i].Seconds <= chapters[i-1].Seconds {
-			return false
-		}
-	}
-
-	return true
-}
-
-
-// ChaptersToText converts chapters into a plain text representation.
-//
-// Example:
-//
-//	0:00 Intro
-//	2:14 Invoked Mechaba
-//	3:23 Utopia the Lightning
-func ChaptersToText(chapters []Chapter) string {
-	if len(chapters) == 0 {
-		return ""
-	}
-
-	var builder strings.Builder
-
-	for i, chapter := range chapters {
-		builder.WriteString(chapter.Timestamp)
-
-		if chapter.Title != "" {
-			builder.WriteString(" ")
-			builder.WriteString(chapter.Title)
-		}
-
-		if i < len(chapters)-1 {
-			builder.WriteString("\n")
-		}
-	}
-
-	return builder.String()
 }
 
 

@@ -1,5 +1,4 @@
-// ./internal/youtube/transcript_model.go
-package youtube
+package transcript
 
 type TranscriptSource string
 
