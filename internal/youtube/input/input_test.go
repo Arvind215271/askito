@@ -175,3 +175,178 @@ func TestParse(t *testing.T) {
 		})
 	}
 }
+
+
+type wantItem struct {
+	id    string
+	err   bool
+}
+
+func TestParseMany(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected []wantItem
+	}{
+		{
+            name:  "mixed valid and invalid with comma + space + newline",
+            input: "https://youtu.be/a1, invalid-url\nhttps://youtube.com/watch?v=b2 https://youtu.be/c3",
+            expected: []wantItem{
+                {id: "a1", err: false},
+                {id: "b2", err: false},
+                {id: "c3", err: false},
+            },
+        },
+        {
+            name:  "only valid urls with newlines",
+            input: "https://youtu.be/a\nhttps://youtu.be/b",
+            expected: []wantItem{
+                {id: "a"},
+                {id: "b"},
+            },
+        },
+        {
+             
+            // In an extractor pattern, pure text noise is ignored entirely.
+            name:     "all invalid noise text",
+            input:    "bad1 bad2",
+            expected: []wantItem{}, // Expected empty because no URL entities were found
+        },
+        {
+            name:     "empty input",
+            input:    "   \n   ",
+            expected: []wantItem{},
+        },
+        {
+            name:  "multiple separators together (comma + newline + spaces)",
+            input: "https://youtu.be/a1,,\n   https://youtu.be/b2   https://youtu.be/c3",
+            expected: []wantItem{
+                {id: "a1"},
+                {id: "b2"},
+                {id: "c3"},
+            },
+        },
+        {
+            name:  "trailing commas and spaces",
+            input: "https://youtu.be/a1, https://youtu.be/b2,   ",
+            expected: []wantItem{
+                {id: "a1"},
+                {id: "b2"},
+            },
+        },
+        {
+            // Only the actual URL entities are extracted and parsed.
+            name:  "mixed garbage text and valid urls",
+            input: "hello world https://youtu.be/a1 random text https://youtu.be/b2",
+            expected: []wantItem{
+                {id: "a1"},
+                {id: "b2"},
+            },
+        },
+        {
+            name:  "duplicate urls",
+            input: "https://youtu.be/a https://youtu.be/a https://youtu.be/b",
+            expected: []wantItem{
+                {id: "a"},
+                {id: "a"},
+                {id: "b"},
+            },
+        },
+        {
+            name:  "empty tokens between separators",
+            input: "https://youtu.be/a1,,,   , https://youtu.be/b2",
+            expected: []wantItem{
+                {id: "a1"},
+                {id: "b2"},
+            },
+        },
+        {
+            name:  "mixed video and playlist inputs",
+            input: "https://youtu.be/a1 https://youtube.com/playlist?list=PL123 https://youtu.be/b2",
+            expected: []wantItem{
+                {id: "a1"},
+                {id: "PL123"},
+                {id: "b2"},
+            },
+        },
+        {
+            name:  "shorts and playlist mixed",
+            input: "https://youtube.com/shorts/a1 https://youtu.be/b2 https://youtube.com/playlist?list=PL999",
+            expected: []wantItem{
+                {id: "a1"},
+                {id: "b2"},
+                {id: "PL999"},
+            },
+        },
+        {
+            // CHANGED: Complete noise is ignored instead of filling up the error array with ghost items.
+            name:     "completely invalid noise input",
+            input:    "@@@ ### ??? hello world",
+            expected: []wantItem{}, // Evaluates to nothing found
+        },
+        {
+            name:  "urls with tracking params",
+            input: "https://youtu.be/a1?si=123 https://youtube.com/watch?v=b2&ab_channel=test",
+            expected: []wantItem{
+                {id: "a1"},
+                {id: "b2"},
+            },
+        },
+        {
+            // CHANGED: Conversational junk text around the URLs is completely stripped 
+            // out by the regex, leaving only the 4 true YouTube entities to be parsed.
+            name:  "real world messy paste scenario",
+            input: `
+        Hey check these videos:
+        https://youtu.be/a1,     https://youtube.com/watch?v=b2
+
+        also this playlist: https://youtube.com/playlist?list=PL123
+
+        ignore this junk -> random text here https://youtu.be/c3
+        `,
+            expected: []wantItem{
+                {id: "a1"},
+                {id: "b2"},
+                {id: "PL123"},
+                {id: "c3"},
+            },
+        },
+    }
+
+		for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got := ParseMany(tt.input)
+
+			if len(got) != len(tt.expected) {
+				t.Fatalf("expected %d results, got %d", len(tt.expected), len(got))
+			}
+
+			for i, exp := range tt.expected {
+				item := got[i]
+
+				if exp.err {
+					if item.Error == nil {
+						t.Fatalf("expected error at index %d", i)
+					}
+					continue
+				}
+
+				if item.Error != nil {
+					t.Fatalf("unexpected error at index %d: %v", i, item.Error)
+				}
+
+				if item.Input == nil {
+					t.Fatalf("expected input at index %d", i)
+				}
+
+				if item.Input.ID != exp.id {
+					t.Fatalf(
+						"expected id %s at index %d, got %s",
+						exp.id, i, item.Input.ID,
+					)
+				}
+			}
+		})
+	}
+}

@@ -13,3 +13,16 @@ type YouTubeInput struct {
 	OriginalURL  string
 	NormalizedURL string
 }
+
+type ParseItemResult struct {
+	Input *YouTubeInput
+	Error error
+	Raw   string
+}
+
+type LineResult struct {
+	Line   int
+	Raw    string
+	Input  *YouTubeInput
+	Error  error
+}

@@ -45,20 +45,30 @@
 
 ## Phase 3: Multiple URL Support
 
-- [ ] Accept multiple YouTube URLs in one request  
+- [x] Accept multiple YouTube URLs in one request  
   Allow users to submit multiple inputs at once.
+  Current method is to find url from the text and skip words that are not url.
+  Then after finding those URL. Simply  parse and get those that are youtube URl and belong to video, short or playlist and take those.
+  Problem is there is no error if some youtube Link is broken. As one of them will become invalid URL.
+  The other one will be a valid URL.
 
 - [ ] Support newline-separated input format  
   Each line represents one URL for simple parsing.
+  This is what i am thinking of not making  currently.
+  This one is for strict URL check. Aka all the URL should be good and not broken.
+  If any one of them is broken. Return that line and tell the user to check for error and fix it..
 
-- [ ] Process mixed inputs (video + playlist)  
+- [x] Process mixed inputs (video + playlist)  
   Handle combinations of both types in a single request.
+  This is already done... 
+  The only extra thing is. A video from playlist is taken as video and not playlist.
 
-- [ ] Apply same validation rules per input  
+- [x] Apply same validation rules per input  
   Each URL is validated and processed independently.
+  This is already done by above logic
 
-- [ ] Normalize all inputs into a single list  
+- [x] Normalize all inputs into a single list  
   Final output becomes a unified structured list of video and playlist items.
 
-- [ ] Preserve type metadata for each item  
+- [x] Preserve type metadata for each item  
   Ensure pipeline can distinguish how each item should be processed.
