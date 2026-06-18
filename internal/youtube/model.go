@@ -2,7 +2,11 @@
 
 package youtube
 
-import "time"
+import (
+	"time"
+	transcript "github.com/Arvind215271/askito/internal/youtube/transcript"
+	chapter "github.com/Arvind215271/askito/internal/youtube/chapter"
+)
 
 type Playlist struct {
 	ID string `json:"id"`
@@ -42,6 +46,11 @@ type Video struct {
 
 	Title       string `json:"title"`
 	Description string `json:"description"`
+
+	Chapters chapter.Chapters `json:"chapters,omitempty"`
+
+	Transcript *transcript.Transcript `json:"transcript,omitempty"`
+	
 
 	ChannelID    string `json:"channel_id"`
 	ChannelTitle string `json:"channel_title"`

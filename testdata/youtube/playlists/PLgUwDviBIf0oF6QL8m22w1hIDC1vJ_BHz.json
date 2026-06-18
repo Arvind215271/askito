@@ -1,0 +1,1592 @@
+{
+  "schema_version": "1.0",
+  "format": "json",
+  "data": {
+    "channel_id": "UCJskGeByzRRSvmOyZOz61ig",
+    "channel_title": "take U forward",
+    "description": "This playlist is not in C++ or Java or Python, it covers DSA and we write pseudocode, only one video is in C++, for the basics, but apart from that we cover everything in depth. \n\nFollow the website takeuforward.org for a structured learning, and not the playlist.",
+    "id": "PLgUwDviBIf0oF6QL8m22w1hIDC1vJ_BHz",
+    "item_count": 316,
+    "privacy_status": "public",
+    "published_at": "2022-12-19T06:28:50.719644Z",
+    "thumbnail_url": "https://i.ytimg.com/vi/0bHoB32fuj0/hqdefault.jpg",
+    "title": "Strivers A2Z-DSA Course | DSA Playlist | Placements",
+    "videos": [
+      {
+        "added_at": "2024-02-29T03:32:07Z",
+        "position": 0,
+        "title": "Don't watch my A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-09-27T07:01:51Z",
+        "position": 1,
+        "title": "How to setup VS code for DSA and CP | Input / Output split format"
+      },
+      {
+        "added_at": "2022-12-19T06:28:57Z",
+        "position": 2,
+        "title": "C++ Basics in One Shot - Strivers A2Z DSA Course - L1"
+      },
+      {
+        "added_at": "2022-12-31T18:09:07Z",
+        "position": 3,
+        "title": "Time and Space Complexity - Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-01-02T16:49:46Z",
+        "position": 4,
+        "title": "Solve any Pattern Question - Trick Explained | 22 Patterns in 1 Shot | Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-01-03T20:21:07Z",
+        "position": 5,
+        "title": "Complete C++ STL in 1 Video | Time Complexity and Notes"
+      },
+      {
+        "added_at": "2023-01-08T15:44:34Z",
+        "position": 6,
+        "title": "Basic Maths for DSA | Euclidean Algorithm | Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-01-08T16:13:27Z",
+        "position": 7,
+        "title": "Re 1. Introduction to Recursion | Recursion Tree | Stack Space | Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-01-08T16:13:32Z",
+        "position": 8,
+        "title": "Re 2. Problems on Recursion | Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-01-08T16:13:38Z",
+        "position": 9,
+        "title": "Re 3. Parameterised and Functional Recursion | Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-01-08T16:13:45Z",
+        "position": 10,
+        "title": "Re 4. Problems on Functional Recursion | Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-01-08T16:13:49Z",
+        "position": 11,
+        "title": "Re 5. Multiple Recursion Calls | Problems | Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-01-20T12:13:28Z",
+        "position": 12,
+        "title": "Hashing | Maps | Time Complexity | Collisions | Division Rule of Hashing | Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-01-28T21:00:09Z",
+        "position": 13,
+        "title": "Sorting - Part 1 | Selection Sort, Bubble Sort, Insertion Sort | Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-02-08T10:25:03Z",
+        "position": 14,
+        "title": "Merge Sort | Algorithm | Pseudocode | Dry Run | Code | Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-03-04T11:23:01Z",
+        "position": 15,
+        "title": "Quick Sort For Beginners | Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-03-01T14:49:19Z",
+        "position": 16,
+        "title": "Find Second Largest Element in Array | Remove duplicates from Sorted Array | Arrays Intro Video"
+      },
+      {
+        "added_at": "2023-03-05T09:52:17Z",
+        "position": 17,
+        "title": "Rotate Array by K places | Union, Intersection of Sorted Arrays | Move Zeros to End | Arrays Part-2"
+      },
+      {
+        "added_at": "2023-03-10T20:59:50Z",
+        "position": 18,
+        "title": "Find element that appears once | Find missing number | Max Consecutive number of 1's | Arrays Part-3"
+      },
+      {
+        "added_at": "2023-03-13T09:55:21Z",
+        "position": 19,
+        "title": "Longest Subarray with sum K | Brute - Better - Optimal | Generate Subarrays"
+      },
+      {
+        "added_at": "2023-03-14T08:06:04Z",
+        "position": 20,
+        "title": "2 Sum Problem | 2 types of the same problem for Interviews | Brute-Better-Optimal"
+      },
+      {
+        "added_at": "2023-03-15T07:55:19Z",
+        "position": 21,
+        "title": "Sort an array of 0's 1's \u0026 2's | Intuition of Algo🔥 | C++ Java Python | Brute-Better-Optimal"
+      },
+      {
+        "added_at": "2023-03-16T10:00:51Z",
+        "position": 22,
+        "title": "Majority Element I | Brute-Better-Optimal | Moore's Voting Algorithm | Intuition 🔥|Brute to Optimal"
+      },
+      {
+        "added_at": "2023-03-17T20:43:02Z",
+        "position": 23,
+        "title": "Kadane's Algorithm | Maximum Subarray Sum | Finding and Printing"
+      },
+      {
+        "added_at": "2023-03-18T17:43:53Z",
+        "position": 24,
+        "title": "DP 35. Best Time to Buy and Sell Stock | DP on Stocks 🔥"
+      },
+      {
+        "added_at": "2023-03-18T17:27:20Z",
+        "position": 25,
+        "title": "Rearrange Array Elements by Sign | 2 Varieties of same Problem"
+      },
+      {
+        "added_at": "2023-03-23T07:52:54Z",
+        "position": 26,
+        "title": "Next Permutation - Intuition in Detail 🔥 | Brute to Optimal"
+      },
+      {
+        "added_at": "2023-03-24T21:46:13Z",
+        "position": 27,
+        "title": "Leaders in an Array | Brute - Optimal | Strivers A2Z DSA Course"
+      },
+      {
+        "added_at": "2023-03-27T00:39:41Z",
+        "position": 28,
+        "title": "Longest Consecutive Sequence | Google Interview Question | Brute Better Optimal"
+      },
+      {
+        "added_at": "2023-03-28T09:22:56Z",
+        "position": 29,
+        "title": "Set Matrix Zeroes | O(1) Space Approach | Brute - Better - Optimal"
+      },
+      {
+        "added_at": "2023-03-30T06:41:19Z",
+        "position": 30,
+        "title": "Rotate Matrix/Image by 90 Degrees | Brute - Optimal"
+      },
+      {
+        "added_at": "2023-04-02T12:23:35Z",
+        "position": 31,
+        "title": "Spiral Traversal of a Matrix | Spiral Matrix"
+      },
+      {
+        "added_at": "2023-04-03T06:52:23Z",
+        "position": 32,
+        "title": "Count Subarray sum Equals K | Brute - Better -Optimal"
+      },
+      {
+        "added_at": "2023-04-05T06:50:43Z",
+        "position": 33,
+        "title": "Pascal Triangle | Finding nCr in minimal time"
+      },
+      {
+        "added_at": "2023-04-14T07:09:04Z",
+        "position": 34,
+        "title": "Majority Element II | Brute-Better-Optimal"
+      },
+      {
+        "added_at": "2023-04-17T06:47:35Z",
+        "position": 35,
+        "title": "3 Sum | Brute -  Better - Optimal with Codes"
+      },
+      {
+        "added_at": "2023-04-18T15:10:34Z",
+        "position": 36,
+        "title": "4 Sum | Brute - Better - Optimal with Codes"
+      },
+      {
+        "added_at": "2023-04-25T06:38:59Z",
+        "position": 37,
+        "title": "Number of Subarrays with xor K | Brute - Better - Optimal"
+      },
+      {
+        "added_at": "2023-04-25T06:44:59Z",
+        "position": 38,
+        "title": "Merge Overlapping Intervals | Brute, Optimal with Precise TC analysis"
+      },
+      {
+        "added_at": "2023-04-27T10:46:26Z",
+        "position": 39,
+        "title": "Merge Sorted Arrays Without Extra Space | 2 Optimal Solution"
+      },
+      {
+        "added_at": "2023-04-29T15:49:08Z",
+        "position": 40,
+        "title": "Find the Missing and Repeating Number | 4 Approaches 🔥"
+      },
+      {
+        "added_at": "2023-05-08T08:15:37Z",
+        "position": 41,
+        "title": "Count Inversions in an Array | Brute and Optimal"
+      },
+      {
+        "added_at": "2023-05-08T08:22:10Z",
+        "position": 42,
+        "title": "Reverse Pairs | Hard Interview Question"
+      },
+      {
+        "added_at": "2023-05-10T07:15:05Z",
+        "position": 43,
+        "title": "Maximum Product Subarray - Best Intuitive Approach Discussed"
+      },
+      {
+        "added_at": "2023-06-20T05:54:30Z",
+        "position": 44,
+        "title": "BS-1. Binary Search Introduction | Real Life Example | Iterative | Recursive | Overflow Cases"
+      },
+      {
+        "added_at": "2023-06-20T05:54:44Z",
+        "position": 45,
+        "title": "BS-2. Implement Lower Bound and Upper Bound | Search Insert Position | Floor and Ceil"
+      },
+      {
+        "added_at": "2023-06-20T06:00:41Z",
+        "position": 46,
+        "title": "BS-3. First and Last Occurrences in Array | Count occurrences in Array"
+      },
+      {
+        "added_at": "2023-06-20T06:01:13Z",
+        "position": 47,
+        "title": "BS-4. Search Element in Rotated Sorted Array - I"
+      },
+      {
+        "added_at": "2023-06-20T06:02:22Z",
+        "position": 48,
+        "title": "BS-5. Search Element in Rotated Sorted Array II"
+      },
+      {
+        "added_at": "2023-06-20T06:02:35Z",
+        "position": 49,
+        "title": "BS-6. Minimum in Rotated Sorted Array"
+      },
+      {
+        "added_at": "2023-06-20T06:02:56Z",
+        "position": 50,
+        "title": "BS-7. Find out how many times array has been rotated"
+      },
+      {
+        "added_at": "2023-06-20T06:03:57Z",
+        "position": 51,
+        "title": "BS-8. Single Element in Sorted Array"
+      },
+      {
+        "added_at": "2023-06-20T06:05:05Z",
+        "position": 52,
+        "title": "BS-9. Find Peak Element"
+      },
+      {
+        "added_at": "2023-06-20T06:05:26Z",
+        "position": 53,
+        "title": "BS-10. Finding Sqrt of a number using Binary Search"
+      },
+      {
+        "added_at": "2023-06-21T10:24:57Z",
+        "position": 54,
+        "title": "BS-11. Find the Nth root of an Integer"
+      },
+      {
+        "added_at": "2023-06-21T10:27:25Z",
+        "position": 55,
+        "title": "BS-12. Koko Eating Bananas"
+      },
+      {
+        "added_at": "2023-06-22T11:55:36Z",
+        "position": 56,
+        "title": "BS-13. Minimum days to make M bouquets | Binary Search"
+      },
+      {
+        "added_at": "2023-06-22T11:58:16Z",
+        "position": 57,
+        "title": "BS-14. Find the Smallest Divisor Given a Threshold | Binary Search"
+      },
+      {
+        "added_at": "2023-06-23T13:09:16Z",
+        "position": 58,
+        "title": "BS-15. Capacity to Ship Packages within D Days"
+      },
+      {
+        "added_at": "2023-06-23T13:14:51Z",
+        "position": 59,
+        "title": "BS-16. Kth Missing Positive Number | Maths + Binary Search"
+      },
+      {
+        "added_at": "2023-06-27T07:17:29Z",
+        "position": 60,
+        "title": "BS-17. Aggressive Cows | Binary Search Hard"
+      },
+      {
+        "added_at": "2023-06-27T07:21:32Z",
+        "position": 61,
+        "title": "BS-18. Allocate Books or Book Allocation | Hard Binary Search"
+      },
+      {
+        "added_at": "2023-07-12T13:58:17Z",
+        "position": 62,
+        "title": "BS 19. Painter's Partition and Split Array - Largest Sum"
+      },
+      {
+        "added_at": "2023-07-16T15:29:08Z",
+        "position": 63,
+        "title": "BS-20. Minimise Maximum Distance between Gas Stations | 3 Approaches | Heap | Binary Search"
+      },
+      {
+        "added_at": "2023-08-13T08:03:09Z",
+        "position": 64,
+        "title": "BS 21: Median of two Sorted Arrays of Different Sizes | Brute and Better Approach"
+      },
+      {
+        "added_at": "2023-08-13T08:05:14Z",
+        "position": 65,
+        "title": "BS-21. Median of two Sorted Arrays of Different Sizes | Binary Search Approach With Intuition"
+      },
+      {
+        "added_at": "2023-08-13T08:09:59Z",
+        "position": 66,
+        "title": "Bs-22. K-th element of two sorted arrays | Binary Search Approach"
+      },
+      {
+        "added_at": "2023-08-13T08:11:45Z",
+        "position": 67,
+        "title": "BS 23. Row with maximum number of 1s | Binary Search on 2D Arrays"
+      },
+      {
+        "added_at": "2023-08-13T08:18:16Z",
+        "position": 68,
+        "title": "BS-24. Search in a 2D Matrix - I | Binary Search of 2D"
+      },
+      {
+        "added_at": "2023-08-13T08:26:43Z",
+        "position": 69,
+        "title": "BS-25. Search in a 2D Matrix - II  |  Binary Search on 2D"
+      },
+      {
+        "added_at": "2023-09-12T07:08:20Z",
+        "position": 70,
+        "title": "BS-26. Find Peak Element-II | Binary Search"
+      },
+      {
+        "added_at": "2023-09-13T06:53:57Z",
+        "position": 71,
+        "title": "BS-27. Median in a Row Wise Sorted Matrix"
+      },
+      {
+        "added_at": "2023-09-16T17:37:50Z",
+        "position": 72,
+        "title": "L1. Introduction to Trees | Types of Trees"
+      },
+      {
+        "added_at": "2023-09-16T17:38:08Z",
+        "position": 73,
+        "title": "L2. Binary Tree Representation in C++"
+      },
+      {
+        "added_at": "2023-09-16T18:31:32Z",
+        "position": 74,
+        "title": "L3. Binary Tree Representation in Java"
+      },
+      {
+        "added_at": "2023-09-16T18:32:45Z",
+        "position": 75,
+        "title": "L4. Binary Tree Traversals in Binary Tree | BFS | DFS"
+      },
+      {
+        "added_at": "2023-09-16T18:33:40Z",
+        "position": 76,
+        "title": "L5. Preorder Traversal of Binary Tree | C++ | Java | Code Explanation"
+      },
+      {
+        "added_at": "2023-09-16T18:34:36Z",
+        "position": 77,
+        "title": "L6. Inorder Traversal of Binary Tree | C++ | Java | Code Explanation"
+      },
+      {
+        "added_at": "2023-09-16T18:37:48Z",
+        "position": 78,
+        "title": "L7. Postorder Traversal of Binary Tree | C++ | Java | Code Explanation"
+      },
+      {
+        "added_at": "2023-09-16T18:38:58Z",
+        "position": 79,
+        "title": "L8. Level Order Traversal of Binary Tree | BFS | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:39:57Z",
+        "position": 80,
+        "title": "L9. Iterative Preorder Traversal in Binary Tree | C++ | Java | Stack"
+      },
+      {
+        "added_at": "2023-09-16T18:40:46Z",
+        "position": 81,
+        "title": "L10. iterative Inorder Traversal in Binary Tree | C++ | Java | Stack"
+      },
+      {
+        "added_at": "2023-09-16T18:41:40Z",
+        "position": 82,
+        "title": "L11. Iterative Postorder Traversal using 2 Stack | C++ | Java | Binary Tree"
+      },
+      {
+        "added_at": "2023-09-16T18:42:48Z",
+        "position": 83,
+        "title": "L12. Iterative Postorder Traversal using 1 Stack | C++ | Java | Binary Trees"
+      },
+      {
+        "added_at": "2023-09-16T18:43:37Z",
+        "position": 84,
+        "title": "L13. Preorder Inorder Postorder Traversals in One Traversal | C++ | Java | Stack | Binary Trees"
+      },
+      {
+        "added_at": "2023-09-16T18:44:32Z",
+        "position": 85,
+        "title": "L14. Maximum Depth in Binary Tree | Height of Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:45:17Z",
+        "position": 86,
+        "title": "L15. Check for Balanced Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:48:00Z",
+        "position": 87,
+        "title": "L16. Diameter of Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:48:45Z",
+        "position": 88,
+        "title": "L17. Maximum Path Sum in Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:49:30Z",
+        "position": 89,
+        "title": "L18. Check it two trees are Identical or Not | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:50:41Z",
+        "position": 90,
+        "title": "L19. Zig-Zag or Spiral Traversal in Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:51:32Z",
+        "position": 91,
+        "title": "L20. Boundary Traversal in Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:52:09Z",
+        "position": 92,
+        "title": "L21. Vertical Order Traversal of Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:52:48Z",
+        "position": 93,
+        "title": "L22. Top View of Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:53:22Z",
+        "position": 94,
+        "title": "L23. Bottom View of Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:54:26Z",
+        "position": 95,
+        "title": "L24. Right/Left View of Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:55:00Z",
+        "position": 96,
+        "title": "L25. Check for Symmetrical Binary Trees | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:55:51Z",
+        "position": 97,
+        "title": "L26. Print Root to Node Path in Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:56:28Z",
+        "position": 98,
+        "title": "L27. Lowest Common Ancestor in Binary Tree | LCA | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:57:04Z",
+        "position": 99,
+        "title": "L28. Maximum Width of Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:57:38Z",
+        "position": 100,
+        "title": "L29. Children Sum Property in Binary Tree | O(N) Approach | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:58:15Z",
+        "position": 101,
+        "title": "L30. Print all the Nodes at a distance of K in Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:58:58Z",
+        "position": 102,
+        "title": "L31. Minimum time taken to BURN the Binary Tree from a Node | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T18:59:31Z",
+        "position": 103,
+        "title": "L32. Count total Nodes in a COMPLETE Binary Tree | O(Log^2 N) Approach | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:00:10Z",
+        "position": 104,
+        "title": "L33. Requirements needed to construct a Unique Binary Tree | Theory"
+      },
+      {
+        "added_at": "2023-09-16T19:00:53Z",
+        "position": 105,
+        "title": "L34. Construct a Binary Tree from Preorder and Inorder Traversal | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:01:34Z",
+        "position": 106,
+        "title": "L35. Construct the Binary Tree from Postorder and Inorder Traversal | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:02:09Z",
+        "position": 107,
+        "title": "L36. Serialize and De-serialize Binary Tree | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:02:42Z",
+        "position": 108,
+        "title": "L37. Morris Traversal | Preorder | Inorder | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:03:17Z",
+        "position": 109,
+        "title": "L38. Flatten a Binary Tree to Linked List | 3 Approaches | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:03:51Z",
+        "position": 110,
+        "title": "L39. Introduction to Binary Search Tree | BST"
+      },
+      {
+        "added_at": "2023-09-16T19:04:25Z",
+        "position": 111,
+        "title": "L40. Search in a Binary Search Tree | BST | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:05:01Z",
+        "position": 112,
+        "title": "L41. Ceil in a Binary Search Tree | BST | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:05:39Z",
+        "position": 113,
+        "title": "L42. Floor in a Binary Search Tree | BST | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:06:23Z",
+        "position": 114,
+        "title": "L43. Insert a given Node in Binary Search Tree | BST | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:06:56Z",
+        "position": 115,
+        "title": "L44. Delete a Node in Binary Search Tree | BST | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:07:35Z",
+        "position": 116,
+        "title": "L45. K-th Smallest/Largest Element in BST"
+      },
+      {
+        "added_at": "2023-09-16T19:08:06Z",
+        "position": 117,
+        "title": "L46. Check if a tree is a BST or BT | Validate a BST"
+      },
+      {
+        "added_at": "2023-09-16T19:08:36Z",
+        "position": 118,
+        "title": "L47. LCA in Binary Search Tree"
+      },
+      {
+        "added_at": "2023-09-16T19:09:09Z",
+        "position": 119,
+        "title": "L48. Construct a BST from a preorder traversal | 3 Methods"
+      },
+      {
+        "added_at": "2023-09-16T19:09:42Z",
+        "position": 120,
+        "title": "L49. Inorder Successor/Predecessor in BST | 3 Methods"
+      },
+      {
+        "added_at": "2023-09-16T19:10:14Z",
+        "position": 121,
+        "title": "L50. Binary Search Tree Iterator | BST | O(H) Space"
+      },
+      {
+        "added_at": "2023-09-16T19:10:38Z",
+        "position": 122,
+        "title": "L51. Two Sum In BST | Check if there exists a pair with Sum K"
+      },
+      {
+        "added_at": "2023-09-16T19:11:05Z",
+        "position": 123,
+        "title": "L52. Recover BST | Correct BST with two nodes swapped"
+      },
+      {
+        "added_at": "2023-09-16T19:11:46Z",
+        "position": 124,
+        "title": "L53. Largest BST in Binary Tree"
+      },
+      {
+        "added_at": "2023-09-16T20:27:07Z",
+        "position": 125,
+        "title": "G-1. Introduction to Graph | Types | Different Conventions Used"
+      },
+      {
+        "added_at": "2023-09-16T19:15:27Z",
+        "position": 126,
+        "title": "G-2. Graph Representation in C++ | Two Ways to Represent"
+      },
+      {
+        "added_at": "2023-09-16T19:16:53Z",
+        "position": 127,
+        "title": "G-3. Graph Representation in Java | Two Ways to Represent"
+      },
+      {
+        "added_at": "2023-09-16T19:17:23Z",
+        "position": 128,
+        "title": "G-4. What are Connected Components ?"
+      },
+      {
+        "added_at": "2023-09-16T19:17:58Z",
+        "position": 129,
+        "title": "G-5. Breadth-First Search (BFS) | C++ and Java | Traversal Technique in Graphs"
+      },
+      {
+        "added_at": "2023-09-16T19:18:33Z",
+        "position": 130,
+        "title": "G-6. Depth-First Search (DFS) | C++ and Java | Traversal Technique in Graphs"
+      },
+      {
+        "added_at": "2023-09-16T19:18:57Z",
+        "position": 131,
+        "title": "G-7. Number of Provinces | C++ | Java | Connected Components"
+      },
+      {
+        "added_at": "2023-09-16T19:19:25Z",
+        "position": 132,
+        "title": "G-8. Number of Islands | Number of Connected Components in Matrix | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:19:53Z",
+        "position": 133,
+        "title": "G-9. Flood Fill Algorithm | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:20:27Z",
+        "position": 134,
+        "title": "G-10. Rotten Oranges | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:20:58Z",
+        "position": 135,
+        "title": "G-11. Detect a Cycle in an Undirected Graph using BFS | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:21:33Z",
+        "position": 136,
+        "title": "G-12. Detect a Cycle in an Undirected Graph using DFS | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:22:10Z",
+        "position": 137,
+        "title": "G-13. Distance of nearest cell having 1 | 0/1 Matrix | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:22:44Z",
+        "position": 138,
+        "title": "G-14. Surrounded Regions | Replace O's with X's | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:23:15Z",
+        "position": 139,
+        "title": "G-15. Number of Enclaves | Multi-source BFS | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:23:43Z",
+        "position": 140,
+        "title": "G-16. Number of Distinct Islands | Constructive Thinking + DFS | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:24:13Z",
+        "position": 141,
+        "title": "G-17. Bipartite Graph | BFS | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:25:01Z",
+        "position": 142,
+        "title": "G-18. Bipartite Graph | DFS | C++ | Java"
+      },
+      {
+        "added_at": "2023-09-16T19:25:28Z",
+        "position": 143,
+        "title": "G-19. Detect cycle in a directed graph using DFS | Java | C++"
+      },
+      {
+        "added_at": "2023-09-16T19:25:58Z",
+        "position": 144,
+        "title": "G-20. Find Eventual Safe States - DFS"
+      },
+      {
+        "added_at": "2023-09-16T19:26:28Z",
+        "position": 145,
+        "title": "G-21. Topological Sort Algorithm | DFS"
+      },
+      {
+        "added_at": "2023-09-16T19:26:57Z",
+        "position": 146,
+        "title": "G-22. Kahn's Algorithm | Topological Sort Algorithm | BFS"
+      },
+      {
+        "added_at": "2023-09-16T19:27:26Z",
+        "position": 147,
+        "title": "G-23. Detect a Cycle in Directed Graph | Topological Sort | Kahn's Algorithm | BFS"
+      },
+      {
+        "added_at": "2023-09-16T19:27:58Z",
+        "position": 148,
+        "title": "G-24. Course Schedule I and II | Pre-requisite Tasks | Topological Sort"
+      },
+      {
+        "added_at": "2023-09-16T19:28:30Z",
+        "position": 149,
+        "title": "G-25. Find Eventual Safe States - BFS - Topological Sort"
+      },
+      {
+        "added_at": "2023-09-16T19:28:57Z",
+        "position": 150,
+        "title": "G-26. Alien Dictionary - Topological Sort"
+      },
+      {
+        "added_at": "2023-09-16T19:29:28Z",
+        "position": 151,
+        "title": "G-27. Shortest Path in Directed Acyclic Graph - Topological Sort"
+      },
+      {
+        "added_at": "2023-09-16T19:29:58Z",
+        "position": 152,
+        "title": "G-28. Shortest Path in Undirected Graph with Unit Weights"
+      },
+      {
+        "added_at": "2023-09-16T19:30:27Z",
+        "position": 153,
+        "title": "G-29. Word Ladder - I | Shortest Paths"
+      },
+      {
+        "added_at": "2023-09-16T19:30:55Z",
+        "position": 154,
+        "title": "G-30. Word Ladder - 2 | Shortest Paths"
+      },
+      {
+        "added_at": "2023-09-16T19:31:25Z",
+        "position": 155,
+        "title": "G-31. Word Ladder - 2 | Optimised Approach for Leetcode"
+      },
+      {
+        "added_at": "2023-09-16T19:31:52Z",
+        "position": 156,
+        "title": "G-32. Dijkstra's Algorithm - Using Priority Queue - C++ and Java - Part 1"
+      },
+      {
+        "added_at": "2023-09-16T19:32:19Z",
+        "position": 157,
+        "title": "G-33. Dijkstra's Algorithm - Using Set - Part 2"
+      },
+      {
+        "added_at": "2023-09-16T19:32:51Z",
+        "position": 158,
+        "title": "G-34. Dijkstra's Algorithm - Why PQ and not Q, Intuition, Time Complexity Derivation - Part 3"
+      },
+      {
+        "added_at": "2023-09-16T19:33:22Z",
+        "position": 159,
+        "title": "G-35. Print Shortest Path - Dijkstra's Algorithm"
+      },
+      {
+        "added_at": "2023-09-16T19:33:51Z",
+        "position": 160,
+        "title": "G-36. Shortest Distance in a Binary Maze"
+      },
+      {
+        "added_at": "2023-09-16T19:34:20Z",
+        "position": 161,
+        "title": "G-37. Path With Minimum Effort"
+      },
+      {
+        "added_at": "2023-09-16T19:34:51Z",
+        "position": 162,
+        "title": "G-38. Cheapest Flights Within K Stops"
+      },
+      {
+        "added_at": "2023-09-16T19:35:27Z",
+        "position": 163,
+        "title": "G-39. Minimum Multiplications to Reach End"
+      },
+      {
+        "added_at": "2023-09-16T19:36:00Z",
+        "position": 164,
+        "title": "G-40. Number of Ways to Arrive at Destination"
+      },
+      {
+        "added_at": "2023-09-16T19:36:33Z",
+        "position": 165,
+        "title": "G-41. Bellman Ford Algorithm"
+      },
+      {
+        "added_at": "2023-09-16T19:37:02Z",
+        "position": 166,
+        "title": "G-42. Floyd Warshall Algorithm"
+      },
+      {
+        "added_at": "2023-09-16T19:37:30Z",
+        "position": 167,
+        "title": "G-43. Find the City With the Smallest Number of Neighbours at a Threshold Distance"
+      },
+      {
+        "added_at": "2023-09-16T19:37:58Z",
+        "position": 168,
+        "title": "G-44. Minimum Spanning Tree - Theory"
+      },
+      {
+        "added_at": "2023-09-16T19:38:28Z",
+        "position": 169,
+        "title": "G-45. Prim's Algorithm - Minimum Spanning Tree - C++ and Java"
+      },
+      {
+        "added_at": "2023-09-16T19:39:43Z",
+        "position": 170,
+        "title": "G-46. Disjoint Set | Union by Rank | Union by Size | Path Compression"
+      },
+      {
+        "added_at": "2023-09-16T19:40:16Z",
+        "position": 171,
+        "title": "G-47. Kruskal's Algorithm - Minimum Spanning Tree - C++ and Java"
+      },
+      {
+        "added_at": "2023-09-16T19:40:45Z",
+        "position": 172,
+        "title": "G-48. Number of Provinces - Disjoint Set"
+      },
+      {
+        "added_at": "2023-09-16T19:41:17Z",
+        "position": 173,
+        "title": "G-49. Number of Operations to Make Network Connected - DSU"
+      },
+      {
+        "added_at": "2023-09-16T19:41:47Z",
+        "position": 174,
+        "title": "G-50. Accounts Merge - DSU"
+      },
+      {
+        "added_at": "2023-09-16T19:42:15Z",
+        "position": 175,
+        "title": "G-51. Number of Islands - II - Online Queries - DSU"
+      },
+      {
+        "added_at": "2023-09-16T19:42:43Z",
+        "position": 176,
+        "title": "G-52. Making a Large Island - DSU"
+      },
+      {
+        "added_at": "2023-09-16T19:43:15Z",
+        "position": 177,
+        "title": "G-53. Most Stones Removed with Same Row or Column - DSU"
+      },
+      {
+        "added_at": "2023-09-16T19:43:46Z",
+        "position": 178,
+        "title": "G-54. Strongly Connected Components - Kosaraju's Algorithm"
+      },
+      {
+        "added_at": "2023-09-16T19:44:16Z",
+        "position": 179,
+        "title": "G-55. Bridges in Graph - Using Tarjan's Algorithm of time in and low time"
+      },
+      {
+        "added_at": "2023-09-16T19:44:44Z",
+        "position": 180,
+        "title": "G-56. Articulation Point in Graph"
+      },
+      {
+        "added_at": "2023-09-16T20:25:08Z",
+        "position": 181,
+        "title": "DP 1. Introduction to Dynamic Programming | Memoization | Tabulation | Space Optimization Techniques"
+      },
+      {
+        "added_at": "2023-09-16T19:46:59Z",
+        "position": 182,
+        "title": "DP 2. Climbing Stairs | Learn How to Write 1D Recurrence Relations"
+      },
+      {
+        "added_at": "2023-09-16T19:47:35Z",
+        "position": 183,
+        "title": "DP 3. Frog Jump | Dynamic Programming | Learn to write 1D DP"
+      },
+      {
+        "added_at": "2023-09-16T19:48:13Z",
+        "position": 184,
+        "title": "DP 4. Frog Jump with K Distance | Lecture 3 Follow Up Question"
+      },
+      {
+        "added_at": "2023-09-16T19:48:51Z",
+        "position": 185,
+        "title": "DP 5. Maximum Sum of Non-Adjacent Elements | House Robber | 1-D | DP on Subsequences"
+      },
+      {
+        "added_at": "2023-09-16T19:49:28Z",
+        "position": 186,
+        "title": "DP 6. House Robber 2 | 1D DP | DP on Subsequences"
+      },
+      {
+        "added_at": "2023-09-16T19:50:11Z",
+        "position": 187,
+        "title": "DP 7. Ninja's Training | MUST WATCH for 2D CONCEPTS 🔥 | Vacation | Atcoder | 2D DP |"
+      },
+      {
+        "added_at": "2023-09-16T19:50:46Z",
+        "position": 188,
+        "title": "DP 8. Grid Unique Paths | Learn Everything about DP on Grids | ALL TECHNIQUES 🔥"
+      },
+      {
+        "added_at": "2023-09-16T19:51:38Z",
+        "position": 189,
+        "title": "DP 9. Unique Paths 2 | DP on Grid with Maze Obstacles"
+      },
+      {
+        "added_at": "2023-09-16T19:52:14Z",
+        "position": 190,
+        "title": "DP 10. Minimum Path Sum in Grid | Asked to me In Microsoft Internship Interview | DP on GRIDS"
+      },
+      {
+        "added_at": "2023-09-16T19:52:48Z",
+        "position": 191,
+        "title": "DP 11. Triangle | Fixed Starting Point and Variable Ending Point | DP on GRIDS"
+      },
+      {
+        "added_at": "2023-09-16T19:53:26Z",
+        "position": 192,
+        "title": "DP 12. Minimum/Maximum Falling Path Sum | Variable Starting and Ending Points | DP on Grids"
+      },
+      {
+        "added_at": "2023-09-16T19:54:03Z",
+        "position": 193,
+        "title": "DP 13. Cherry Pickup II | 3D DP Made Easy | DP On Grids"
+      },
+      {
+        "added_at": "2023-09-16T19:54:40Z",
+        "position": 194,
+        "title": "DP 14. Subset Sum Equals to Target | Identify DP on Subsequences and Ways to Solve them"
+      },
+      {
+        "added_at": "2023-09-16T19:55:13Z",
+        "position": 195,
+        "title": "DP 15. Partition Equal Subset Sum | DP on Subsequences"
+      },
+      {
+        "added_at": "2023-09-16T19:56:00Z",
+        "position": 196,
+        "title": "Dp 16. Partition A Set Into Two Subsets With Minimum Absolute Sum Difference | DP on Subsequences"
+      },
+      {
+        "added_at": "2023-09-16T19:56:33Z",
+        "position": 197,
+        "title": "DP 17. Counts Subsets with Sum K | Dp on Subsequences"
+      },
+      {
+        "added_at": "2023-09-16T19:57:06Z",
+        "position": 198,
+        "title": "DP 18. Count Partitions With Given Difference | Dp on Subsequences"
+      },
+      {
+        "added_at": "2023-09-16T19:57:39Z",
+        "position": 199,
+        "title": "DP 19. 0/1 Knapsack | Recursion to Single Array Space Optimised Approach | DP on Subsequences"
+      },
+      {
+        "added_at": "2023-09-16T19:58:15Z",
+        "position": 200,
+        "title": "DP 20. Minimum Coins | DP on Subsequences | Infinite Supplies Pattern"
+      },
+      {
+        "added_at": "2023-09-16T19:58:48Z",
+        "position": 201,
+        "title": "DP 21. Target Sum | DP on Subsequences"
+      },
+      {
+        "added_at": "2023-09-16T19:59:26Z",
+        "position": 202,
+        "title": "DP 22. Coin Change 2 | Infinite Supply Problems  | DP on Subsequences"
+      },
+      {
+        "added_at": "2023-09-16T20:00:06Z",
+        "position": 203,
+        "title": "DP 23. Unbounded Knapsack | 1-D Array Space Optimised Approach"
+      },
+      {
+        "added_at": "2023-09-16T20:00:44Z",
+        "position": 204,
+        "title": "DP 24. Rod Cutting Problem | 1D Array Space Optimised Approach"
+      },
+      {
+        "added_at": "2023-09-16T20:01:20Z",
+        "position": 205,
+        "title": "Dp 25. Longest Common Subsequence | Top Down | Bottom-Up | Space Optimised | DP on Strings"
+      },
+      {
+        "added_at": "2023-09-16T20:01:56Z",
+        "position": 206,
+        "title": "DP 26. Print Longest Common Subsequence | Dp on Strings"
+      },
+      {
+        "added_at": "2023-09-16T20:02:30Z",
+        "position": 207,
+        "title": "DP 27. Longest Common Substring | DP on Strings 🔥"
+      },
+      {
+        "added_at": "2023-09-16T20:03:12Z",
+        "position": 208,
+        "title": "DP 28. Longest Palindromic Subsequence"
+      },
+      {
+        "added_at": "2023-09-16T20:03:47Z",
+        "position": 209,
+        "title": "DP 29. Minimum Insertions to Make String Palindrome"
+      },
+      {
+        "added_at": "2023-09-16T20:04:24Z",
+        "position": 210,
+        "title": "DP 30. Minimum Insertions/Deletions to Convert String A to String B"
+      },
+      {
+        "added_at": "2023-09-16T20:05:00Z",
+        "position": 211,
+        "title": "DP 31. Shortest Common Supersequence | DP on Strings"
+      },
+      {
+        "added_at": "2023-09-16T20:05:48Z",
+        "position": 212,
+        "title": "DP 32. Distinct Subsequences | 1D Array Optimisation Technique 🔥"
+      },
+      {
+        "added_at": "2023-09-16T20:06:27Z",
+        "position": 213,
+        "title": "DP 33. Edit Distance | Recursive to 1D Array Optimised Solution 🔥"
+      },
+      {
+        "added_at": "2023-09-16T20:07:06Z",
+        "position": 214,
+        "title": "DP 34. Wildcard Matching | Recursive to 1D Array Optimisation 🔥"
+      },
+      {
+        "added_at": "2023-09-16T20:08:21Z",
+        "position": 215,
+        "title": "DP 36. Buy and Sell Stock - II | Recursion to Space Optimisation"
+      },
+      {
+        "added_at": "2023-09-16T20:08:58Z",
+        "position": 216,
+        "title": "DP 37. Buy and Sell Stocks III | Recursion to Space Optimisation"
+      },
+      {
+        "added_at": "2023-09-16T20:09:36Z",
+        "position": 217,
+        "title": "DP 38. Buy and Stock Sell IV | Recursion to Space Optimisation"
+      },
+      {
+        "added_at": "2023-09-16T20:10:13Z",
+        "position": 218,
+        "title": "DP 39. Buy and Sell Stocks With Cooldown | Recursion to Space Optimisation"
+      },
+      {
+        "added_at": "2023-09-16T20:10:47Z",
+        "position": 219,
+        "title": "DP 40. Buy and Sell Stocks With Transaction Fee | Recursion to Space Optimisation"
+      },
+      {
+        "added_at": "2023-09-16T20:11:30Z",
+        "position": 220,
+        "title": "DP 41. Longest Increasing Subsequence | Memoization"
+      },
+      {
+        "added_at": "2023-09-16T20:12:07Z",
+        "position": 221,
+        "title": "DP 42. Printing Longest Increasing Subsequence | Tabulation | Algorithm"
+      },
+      {
+        "added_at": "2023-09-16T20:12:41Z",
+        "position": 222,
+        "title": "DP 43. Longest Increasing Subsequence | Binary Search | Intuition"
+      },
+      {
+        "added_at": "2023-09-16T20:13:19Z",
+        "position": 223,
+        "title": "DP 44. Largest Divisible Subset | Longest Increasing Subsequence"
+      },
+      {
+        "added_at": "2023-09-16T20:13:59Z",
+        "position": 224,
+        "title": "DP 45. Longest String Chain | Longest Increasing Subsequence | LIS"
+      },
+      {
+        "added_at": "2023-09-16T20:14:36Z",
+        "position": 225,
+        "title": "DP 46. Longest Bitonic Subsequence | LIS"
+      },
+      {
+        "added_at": "2023-09-16T20:15:11Z",
+        "position": 226,
+        "title": "DP 47. Number of Longest Increasing Subsequences"
+      },
+      {
+        "added_at": "2023-09-16T20:15:50Z",
+        "position": 227,
+        "title": "DP 48. Matrix Chain Multiplication | MCM | Partition DP Starts 🔥"
+      },
+      {
+        "added_at": "2023-09-16T20:16:39Z",
+        "position": 228,
+        "title": "DP 49. Matrix Chain Multiplication | Bottom-Up | Tabulation"
+      },
+      {
+        "added_at": "2023-09-16T20:17:20Z",
+        "position": 229,
+        "title": "DP 50. Minimum Cost to Cut the Stick"
+      },
+      {
+        "added_at": "2023-09-16T20:17:52Z",
+        "position": 230,
+        "title": "DP 51. Burst Balloons | Partition DP | Interactive G-Meet Session Update"
+      },
+      {
+        "added_at": "2023-09-16T20:18:24Z",
+        "position": 231,
+        "title": "DP 52. Evaluate Boolean Expression to True | Partition DP"
+      },
+      {
+        "added_at": "2023-09-16T20:19:01Z",
+        "position": 232,
+        "title": "DP 53. Palindrome Partitioning - II | Front Partition 🔥"
+      },
+      {
+        "added_at": "2023-09-16T20:19:37Z",
+        "position": 233,
+        "title": "DP 54. Partition Array for Maximum Sum | Front Partition 🔥"
+      },
+      {
+        "added_at": "2023-09-16T20:20:14Z",
+        "position": 234,
+        "title": "DP 55. Maximum Rectangle Area with all 1's | DP on Rectangles"
+      },
+      {
+        "added_at": "2023-09-16T20:21:19Z",
+        "position": 235,
+        "title": "DP 56. Count Square Submatrices with All Ones | DP on Rectangles 🔥"
+      },
+      {
+        "added_at": "2023-11-25T18:41:00Z",
+        "position": 236,
+        "title": "L1. Introduction to LinkedList | Traversal | Length | Search an Element"
+      },
+      {
+        "added_at": "2023-11-26T06:22:18Z",
+        "position": 237,
+        "title": "L2. Deletion and Insertion in LL | 8 Problems"
+      },
+      {
+        "added_at": "2023-11-26T06:31:00Z",
+        "position": 238,
+        "title": "L3. Introduction to Doubly LinkedList | Insertions and Deletions"
+      },
+      {
+        "added_at": "2023-11-26T14:59:56Z",
+        "position": 239,
+        "title": "L4. Reverse a DLL | Multiple Approaches"
+      },
+      {
+        "added_at": "2023-11-26T16:25:28Z",
+        "position": 240,
+        "title": "L5. Add 2 numbers in LinkedList | Dummy Node Approach"
+      },
+      {
+        "added_at": "2023-11-26T16:34:52Z",
+        "position": 241,
+        "title": "L6. Odd Even Linked List | Multiple Approaches"
+      },
+      {
+        "added_at": "2023-11-26T16:36:52Z",
+        "position": 242,
+        "title": "L7. Sort a LinkedList of 0's, 1's and 2's | Multiple Approaches"
+      },
+      {
+        "added_at": "2023-11-26T17:05:00Z",
+        "position": 243,
+        "title": "L8. Remove Nth Node from the end of the LinkedList | Multiple Approaches"
+      },
+      {
+        "added_at": "2023-11-26T17:18:59Z",
+        "position": 244,
+        "title": "L9. Reverse a LinkedList | Iterative and Recursive"
+      },
+      {
+        "added_at": "2023-11-26T17:22:39Z",
+        "position": 245,
+        "title": "L10. Check if a LinkedList is Palindrome or Not | Multiple Approaches"
+      },
+      {
+        "added_at": "2023-11-29T13:22:57Z",
+        "position": 246,
+        "title": "L11. Add 1 to a number represented by LinkedList"
+      },
+      {
+        "added_at": "2023-11-29T13:24:59Z",
+        "position": 247,
+        "title": "L12. Find the intersection point of Y LinkedList"
+      },
+      {
+        "added_at": "2023-11-29T13:49:09Z",
+        "position": 248,
+        "title": "L13. Find the middle element of the LinkedList | Multiple Approaches"
+      },
+      {
+        "added_at": "2023-11-29T13:52:56Z",
+        "position": 249,
+        "title": "L14. Detect a loop or cycle in LinkedList | With proof and Intuition"
+      },
+      {
+        "added_at": "2023-11-29T14:03:33Z",
+        "position": 250,
+        "title": "L15. Find the length of the Loop in LinkedList"
+      },
+      {
+        "added_at": "2023-11-29T14:31:45Z",
+        "position": 251,
+        "title": "L16. Delete the middle node of the LinkedList"
+      },
+      {
+        "added_at": "2023-11-29T15:24:04Z",
+        "position": 252,
+        "title": "L17. Find the starting point of the Loop/Cycle in LinkedList | Multiple Approaches"
+      },
+      {
+        "added_at": "2023-11-30T07:30:51Z",
+        "position": 253,
+        "title": "L18. Delete all occurrences of a Key in DLL"
+      },
+      {
+        "added_at": "2023-11-30T07:33:20Z",
+        "position": 254,
+        "title": "L19. Find all Pairs with given Sum in DLL"
+      },
+      {
+        "added_at": "2023-11-30T07:35:06Z",
+        "position": 255,
+        "title": "L20. Remove duplicates from sorted DLL"
+      },
+      {
+        "added_at": "2023-11-30T07:37:45Z",
+        "position": 256,
+        "title": "L21. Reverse Nodes in K Group Size of LinkedList"
+      },
+      {
+        "added_at": "2023-11-30T07:40:53Z",
+        "position": 257,
+        "title": "L22. Rotate a LinkedList"
+      },
+      {
+        "added_at": "2023-12-31T06:24:10Z",
+        "position": 258,
+        "title": "L23. Merge two sorted Linked Lists"
+      },
+      {
+        "added_at": "2023-12-31T06:28:54Z",
+        "position": 259,
+        "title": "L24. Flattening a LinkedList | Multiple Approaches with Dry Run"
+      },
+      {
+        "added_at": "2023-12-31T06:31:24Z",
+        "position": 260,
+        "title": "L25. Merge K Sorted Lists | Multiple Approaches"
+      },
+      {
+        "added_at": "2023-12-31T06:33:55Z",
+        "position": 261,
+        "title": "L26. Sort a Linked List | Merge Sort and Brute Force"
+      },
+      {
+        "added_at": "2023-12-31T06:35:43Z",
+        "position": 262,
+        "title": "L27. Clone a LinkedList with Next and Random Pointers | Copy List with Random Pointers"
+      },
+      {
+        "added_at": "2023-12-31T06:37:44Z",
+        "position": 263,
+        "title": "L28. Design a Browser History | LinkedList Implementation"
+      },
+      {
+        "added_at": "2024-03-17T17:39:07Z",
+        "position": 264,
+        "title": "L2. Print all Divisors of a Number | Maths Playlist"
+      },
+      {
+        "added_at": "2024-03-17T17:42:48Z",
+        "position": 265,
+        "title": "L3. Check if a Number if Prime or not | Maths Playlist"
+      },
+      {
+        "added_at": "2024-03-17T17:44:52Z",
+        "position": 266,
+        "title": "L4. Print all prime factors of a Number | Maths Playlist"
+      },
+      {
+        "added_at": "2024-03-17T17:47:50Z",
+        "position": 267,
+        "title": "L5. Power Exponentiation | Maths Playlist"
+      },
+      {
+        "added_at": "2024-03-17T17:51:37Z",
+        "position": 268,
+        "title": "L6. Sieve of Eratosthenes | Maths Playlist"
+      },
+      {
+        "added_at": "2024-03-17T17:54:22Z",
+        "position": 269,
+        "title": "L7. Count Prime in a range L-R | Maths Playlist"
+      },
+      {
+        "added_at": "2024-03-17T17:58:04Z",
+        "position": 270,
+        "title": "L8. Smallest Prime Factor (SPF) | Prime Factorisation | Query Based Problem | Maths Playlist"
+      },
+      {
+        "added_at": "2024-03-26T17:58:26Z",
+        "position": 271,
+        "title": "L1. Introduction to Sliding Window and 2 Pointers | Templates | Patterns"
+      },
+      {
+        "added_at": "2024-03-26T18:03:41Z",
+        "position": 272,
+        "title": "L2. Maximum Points You Can Obtain from Cards | 2 Pointers and Sliding Window Playlist"
+      },
+      {
+        "added_at": "2024-03-26T18:08:42Z",
+        "position": 273,
+        "title": "L3. Longest Substring Without Repeating Characters | 2 Pointers and Sliding Window Playlist"
+      },
+      {
+        "added_at": "2024-03-26T18:10:10Z",
+        "position": 274,
+        "title": "L4. Max Consecutive Ones III | 2 Pointers and Sliding Window Playlist"
+      },
+      {
+        "added_at": "2024-03-26T18:11:44Z",
+        "position": 275,
+        "title": "L5. Fruit Into Baskets | 2 Pointers and Sliding Window Playlist"
+      },
+      {
+        "added_at": "2024-03-26T18:14:38Z",
+        "position": 276,
+        "title": "L6. Longest Substring With At Most K Distinct Characters | 2 Pointers and Sliding Window Playlist"
+      },
+      {
+        "added_at": "2024-03-26T18:17:35Z",
+        "position": 277,
+        "title": "L7. Number of Substrings Containing All Three Characters | 2 Pointers and Sliding Window Playlist"
+      },
+      {
+        "added_at": "2024-03-26T18:19:42Z",
+        "position": 278,
+        "title": "L8. Longest Repeating Character Replacement | 2 Pointers and Sliding Window Playlist"
+      },
+      {
+        "added_at": "2024-03-26T18:21:55Z",
+        "position": 279,
+        "title": "L9. Binary Subarrays With Sum | 2 Pointers and Sliding Window Playlist"
+      },
+      {
+        "added_at": "2024-03-26T18:23:38Z",
+        "position": 280,
+        "title": "L10. Count number of Nice subarrays | 2 Pointers and Sliding Window Playlist"
+      },
+      {
+        "added_at": "2024-03-26T18:25:12Z",
+        "position": 281,
+        "title": "L11. Subarray with k different integers | 2 Pointers and Sliding Window Playlist"
+      },
+      {
+        "added_at": "2024-03-26T18:26:48Z",
+        "position": 282,
+        "title": "L12. Minimum Window Substring | 2 Pointers and Sliding Window Playlist"
+      },
+      {
+        "added_at": "2024-05-22T02:40:46Z",
+        "position": 283,
+        "title": "L1. Assign Cookies | Greedy Algorithm Playlist"
+      },
+      {
+        "added_at": "2024-05-22T02:45:59Z",
+        "position": 284,
+        "title": "L3. Shortest Job First (or SJF) CPU Scheduling"
+      },
+      {
+        "added_at": "2024-05-22T02:46:10Z",
+        "position": 285,
+        "title": "L2. Lemonade Change | Greedy Algorithm Playlist"
+      },
+      {
+        "added_at": "2024-05-22T02:48:14Z",
+        "position": 286,
+        "title": "L4. Jump Game - I | Greedy Algorithm Playlist"
+      },
+      {
+        "added_at": "2024-05-22T02:49:31Z",
+        "position": 287,
+        "title": "L5. Jump Game - II | Greedy Algorithm Playlist"
+      },
+      {
+        "added_at": "2024-05-27T04:32:50Z",
+        "position": 288,
+        "title": "L6. Job Sequencing Problem | Greedy Algorithm Playlist"
+      },
+      {
+        "added_at": "2024-05-27T04:35:45Z",
+        "position": 289,
+        "title": "L7. N Meeting in One Room | Greedy Algorithms Playlist"
+      },
+      {
+        "added_at": "2024-05-27T04:38:35Z",
+        "position": 290,
+        "title": "L8. Non Overlapping Intervals | Greedy Algorithms Playlist"
+      },
+      {
+        "added_at": "2024-05-27T04:44:57Z",
+        "position": 291,
+        "title": "L9. Insert Intervals | Greedy Algorithms Playlist"
+      },
+      {
+        "added_at": "2024-05-27T04:46:48Z",
+        "position": 292,
+        "title": "L10. Minimum number of platforms required in a railway station"
+      },
+      {
+        "added_at": "2024-05-27T04:49:34Z",
+        "position": 293,
+        "title": "L11. Valid Parenthesis String | Multiple Approaches"
+      },
+      {
+        "added_at": "2024-05-27T04:54:33Z",
+        "position": 294,
+        "title": "L13. Fractional Knapsack Algorithm"
+      },
+      {
+        "added_at": "2024-05-27T04:56:58Z",
+        "position": 295,
+        "title": "L12. Candy | Slope Approach Intuition Based"
+      },
+      {
+        "added_at": "2024-07-16T16:45:05Z",
+        "position": 296,
+        "title": "L1. Introduction to Stack and Queue | Implementation using Data Structures"
+      },
+      {
+        "added_at": "2024-07-16T16:53:42Z",
+        "position": 297,
+        "title": "L2. Check for Balanced Parentheses | Stack and Queue"
+      },
+      {
+        "added_at": "2024-07-16T16:48:30Z",
+        "position": 298,
+        "title": "L3. Prefix, Infix, and Postfix Conversion | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T16:59:41Z",
+        "position": 299,
+        "title": "L4. Implement Min Stack | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:00:35Z",
+        "position": 300,
+        "title": "L5. Next Greater Element | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:01:11Z",
+        "position": 301,
+        "title": "L6. Next Greater Element - II | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:03:54Z",
+        "position": 302,
+        "title": "L7. Previous Smaller Element | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:07:01Z",
+        "position": 303,
+        "title": "L8. Trapping Rainwater | 2 Approaches | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:09:47Z",
+        "position": 304,
+        "title": "L9. Sum of Subarray Minimum | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:11:20Z",
+        "position": 305,
+        "title": "L10. Sum of subarray ranges | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:13:16Z",
+        "position": 306,
+        "title": "L11. Aestroid Collisions | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:15:15Z",
+        "position": 307,
+        "title": "L12. Largest Rectangle in Histogram | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:16:03Z",
+        "position": 308,
+        "title": "L13. Maximal Rectangle | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:18:00Z",
+        "position": 309,
+        "title": "L14. Remove K Digits | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:19:49Z",
+        "position": 310,
+        "title": "L15. Stock Span Problem | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:23:14Z",
+        "position": 311,
+        "title": "L16. Sliding Window Maximum | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:26:11Z",
+        "position": 312,
+        "title": "L17. The Celebrity Problem | Stack and Queue Playlist"
+      },
+      {
+        "added_at": "2024-07-16T17:27:04Z",
+        "position": 313,
+        "title": "L18. Implement LRU Cache"
+      },
+      {
+        "added_at": "2024-07-17T11:13:38Z",
+        "position": 314,
+        "title": "Implement LFU cache in C++/Java  | Leetcode(Hard)"
+      }
+    ]
+  }
+}

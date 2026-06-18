@@ -8,10 +8,10 @@ type Provider interface {
     GetPlaylist(
         ctx context.Context,
         playlistID string,
-    ) (*Playlist, error)
+    ) (Playlist, error)
 
     GetVideo(
         ctx context.Context,
         videoID string,
-    ) (*Video, error)
+    ) (Video, error)
 }

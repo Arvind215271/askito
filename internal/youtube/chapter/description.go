@@ -15,18 +15,14 @@ var chapterRegex = regexp.MustCompile(
 )
 
 
-func ExtractChapters(description string) []Chapter {
-	
-	var chapters []Chapter
-	
-	// if descriptoin is nill... return empty chapter
+func ExtractChapters(description string) Chapters {
 	if description == "" {
-		return chapters
+		return Chapters{}
 	}
 
-	// split lines to be processed independently.
+	var list []Chapter
+
 	lines := strings.Split(description, "\n")
-	
 
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
@@ -39,10 +35,8 @@ func ExtractChapters(description string) []Chapter {
 			continue
 		}
 
-		// get the timestamp for the it...
 		timestamp := match[2]
 
-		// get the title as well
 		title := strings.TrimSpace(
 			strings.ReplaceAll(
 				strings.ReplaceAll(line, timestamp, ""),
@@ -52,18 +46,18 @@ func ExtractChapters(description string) []Chapter {
 
 		title = strings.Trim(title, "-:|[]() ")
 
-		chapters = append(chapters, Chapter{
+		list = append(list, Chapter{
 			Title:     title,
 			Timestamp: timestamp,
 			Seconds:   parseTimestamp(timestamp),
 		})
 	}
 
-	if !ValidateChapters(chapters) {
-		return nil
+	return Chapters{
+		List:  list,
+		Text:  ChaptersToText(list),
+		Valid: ValidateChapters(list),
 	}
-
-	return chapters
 }
 
 // function to parse different time stamp
@@ -92,10 +86,10 @@ func parseTimestamp(ts string) int {
 func ExtractChapterText(description string) string {
 	chapters := ExtractChapters(description)
 
-	if len(chapters) == 0 {
+	if len(chapters.Text) == 0 {
 		return ""
 	}
 
-	return ChaptersToText(chapters)
+	return chapters.Text
 }
 

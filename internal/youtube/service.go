@@ -21,7 +21,7 @@ func NewService(
 func (s *Service) GetPlaylist(
 	ctx context.Context,
 	playlistID string,
-) (*Playlist, error) {
+) (Playlist, error) {
 
 	return s.provider.GetPlaylist(
 		ctx,
@@ -32,7 +32,7 @@ func (s *Service) GetPlaylist(
 func (s *Service) GetVideo(
 	ctx context.Context,
 	videoID string,
-) (*Video, error) {
+) (Video, error) {
 
 	return s.provider.GetVideo(
 		ctx,

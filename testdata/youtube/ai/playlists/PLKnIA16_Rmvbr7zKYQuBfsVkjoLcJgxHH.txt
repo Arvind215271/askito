@@ -1,0 +1,1330 @@
+Playlist Title:
+100 Days of Machine Learning | CampusX
+
+Playlist Description:
+Welcome to the 100 Days of Machine Learning series — one of the most watched and most trusted and Evergreen Machine Learning playlists on Indian YouTube, followed by millions of learners who want to build a strong foundation in ML.
+
+This playlist is designed as a step-by-step roadmap to master Machine Learning, starting from the absolute basics and gradually moving toward advanced concepts and real-world implementation.
+
+Instead of jumping directly into code, the series focuses on building clear intuition, strong fundamentals, and practical understanding of how machine learning actually works.
+
+What you will learn in this series:
+	•	AI vs Machine Learning vs Deep Learning
+	•	Types of Machine Learning (Supervised, Unsupervised, Reinforcement Learning)
+	•	Data preprocessing and feature engineering
+	•	Exploratory Data Analysis (EDA)
+	•	Important ML algorithms (Regression, Classification, Clustering, etc.)
+	•	Model evaluation and validation techniques
+	•	Real-world ML workflow and best practices
+
+Each video covers a specific concept in a simple and structured way so you can build knowledge one step at a time, just like a 100-day learning roadmap.
+
+If you want to build a strong Machine Learning foundation for Data Science, AI, or ML Engineering, this playlist will guide you from beginner concepts to industry-level understanding.
+
+Notes: https://learnwith.campusx.in/s/store/courses/YouTube%20Notes
+
+Channel:
+CampusX
+
+----------------------------------------
+Position: 0
+Title: What is Machine Learning? | 100 Days of Machine Learning
+
+----------------------------------------
+Position: 1
+Title: AI Vs ML Vs DL for Beginners in Hindi
+
+----------------------------------------
+Position: 2
+Title: Types of Machine Learning for Beginners | Types of Machine learning in Hindi | Types of ML in Depth
+
+Chapters:
+00:00 Intro
+00:45 Types of ML
+01:50 Supervised Learning
+08:10 Unsupervised Learning
+20:55 Semi Supervised Learning
+27:25 Outro
+
+----------------------------------------
+Position: 3
+Title: Batch Machine Learning | Offline Vs Online Learning | Machine Learning Types
+
+----------------------------------------
+Position: 4
+Title: Online Machine Learning | Online Learning | Online Vs Offline Machine Learning
+
+Chapters:
+00:00 Intro
+00:42 What is Online Machine Learning?
+02:20 How does online ML works?
+05:58 When should you use Online ML?
+09:55 River Library
+10:45 Vowpal Wabbit
+11:20 What is Online Learning Rate?
+12:30 Out of Core Learning
+14:15 Disadvantages of Online ML
+16:50 Differences between Batch vs Online Learning
+19:10 Outro
+
+----------------------------------------
+Position: 5
+Title: Instance-Based Vs Model-Based Learning | Types of Machine Learning
+
+Chapters:
+00:00 Intro
+00:50 Instance vs Model Based Learning
+03:00 Instance based Learning
+07:45 Model based Learning
+11:20 Differences
+16:30 Outro
+
+----------------------------------------
+Position: 6
+Title: Challenges in Machine Learning | Problems in Machine Learning
+
+Chapters:
+00:00 Intro
+00:50 Data Collection
+02:22 Insufficient Data
+06:10 Non Representative Data
+09:19 Poor Quality Data
+10:32 Irrelevant Features
+13:05 Overfitting
+15:39 Underfitting
+16:33 Software Integration
+19:20 Offline Learning/Deployment
+20:45 Cost Involved
+23:20 Outro
+
+----------------------------------------
+Position: 7
+Title: Application of Machine Learning | Real Life Machine Learning Applications
+
+Chapters:
+00:00 Intro
+03:00 Application in Retail Sector
+09:33 Banking and Finance
+11:21 Transportation
+15:08 Manufacturing
+17:53 Consumer Internet
+19:40 IMDB Movie Review Application
+28:40 Outro
+
+----------------------------------------
+Position: 8
+Title: Machine Learning Development Life Cycle | MLDLC in Data Science
+
+Chapters:
+00:00 Intro
+01:02 Background of the Topic
+01:40 What is Software Development Life Cycle
+04:40 Framing the problem
+06:00 Gathering the Data
+08:32 Data Pre-Processing
+10:25 EDA
+13:20 Feature Engineering and Selection
+15:43 Model Training, Evaluation and Selection+
+19:23 Model Deployment
+21:23 Beta Testing
+22:45 Optimizing the Model
+
+----------------------------------------
+Position: 9
+Title: Data Engineer Vs Data Analyst Vs Data Scientist Vs ML Engineer | Data Science Job Roles
+
+Chapters:
+00:00 Intro
+03:10 Various Data based Job Roles
+05:08 Data Engineer
+11:00 Data Analyst
+16:27 Data Scientist
+19:50 ML Engineer
+21:50 Comparison
+
+----------------------------------------
+Position: 10
+Title: What are Tensors | Tensor In-depth Explanation | Tensor in Machine Learning
+
+Chapters:
+00:00 Intro
+03:30 What are Tensors?
+03:40 What are 0D Tensor/Scalar
+06:10 1D Tensor/Vector
+10:30 2D Tensor/Matrices
+12:15 ND Tensors
+15:21 Rank, Axes and Shape
+18:25 Example of 1D Tensor
+23:28 Example of 2D Tensor
+25:45 Example of 3D Tensor
+32:35 Example of 4D Tensor
+35:14 Example of 5D Tensor
+
+----------------------------------------
+Position: 11
+Title: Installing Anaconda For Data Science | Jupyter Notebook for Machine Learning | Google Colab for ML
+
+Chapters:
+00:00 Intro
+01:30 Installing Anaconda
+03:00 Spyder
+03:50 Jupyter Notebook
+11:34 Virtual Environment
+23:40 Using Kaggle
+29:20 Google Collab
+36:28 Outro
+
+----------------------------------------
+Position: 12
+Title: End to End Toy Project | Day 13 | 100 Days of Machine Learning
+
+Chapters:
+00:00 Intro
+03:34 Plan of attack
+08:17 Preprocessing
+09:51 EDA
+11:48 Scatterplot example
+13:45 Feature Selection
+14:00 Extracting Input and Output columns
+16:07 Train Test Split
+22:10 Evaluating the model
+23:23 Accuracy Score
+25:50 Exporting the Model
+28:40 Deploying the Model on Cloud
+
+----------------------------------------
+Position: 13
+Title: How to Frame a Machine Learning Problem | How to plan a Data Science Project Effectively
+
+Chapters:
+00:00 Introduction to framing the problem
+2:24 Case study example of Netflix for churn rate
+6:23 Business problem to ML problem
+7:08 Types of problem
+12:24 Current solution
+13:33 Getting data
+15:09 Metrics to measure
+17:15 Online Vs Batch?
+19:15 Check Assumptions
+
+----------------------------------------
+Position: 14
+Title: Working with CSV files | Day 15 | 100 Days of Machine Learning
+
+Chapters:
+00:00 Intro
+00:54 Process of Gathering Data
+04:45 Different types of file formats
+05:45 Code Demo with Jupyter Notebook
+06:35 Methods to handle CSV files
+
+----------------------------------------
+Position: 15
+Title: Working with JSON/SQL | Day 16 | 100 Days of Machine Learning
+
+----------------------------------------
+Position: 16
+Title: Fetching Data From an API | Day 17 | 100 Days of Machine Learning
+
+Chapters:
+00:00 Intro
+00:30 What is an API?
+05:45 Getting TMDB data with API
+12:10 Code Demo
+20:33 Uploading Dataset on Kaggle
+
+----------------------------------------
+Position: 17
+Title: Fetching data using Web Scraping | Day 18 | 100 Days of Machine Learning
+
+----------------------------------------
+Position: 18
+Title: Understanding Your Data | Day 19 | 100 Days of Machine Learning
+
+Chapters:
+00:00 Intro
+00:27 Understanding your data
+00:53 Asking Basic Questions to your Data
+03:00 How big is the data?
+03:35 How does the data looks like?
+05:02 What is the data type of columns?
+06:50 Are there any missing values?
+08:39 How does the data looks mathematically?
+10:25 Are there any duplicate values?
+11:27 How is the Corelation between the columns?
+
+----------------------------------------
+Position: 19
+Title: EDA using Univariate Analysis | Day 20 | 100 Days of Machine Learning
+
+Chapters:
+00:00 Intro
+00:52 What is univariate Analysis
+02:00 Types of Data
+03:50 Code Demo on Titanic Dataset
+12:05 Countplot
+13:55 Piechart
+15:56 Working with Numerical Data
+19:40 Distplot
+22:05 Boxplot
+
+----------------------------------------
+Position: 20
+Title: EDA using Bivariate and Multivariate Analysis | Day 21 | 100 Days of Machine Learning
+
+Chapters:
+00:00 Intro
+00:46 Agenda
+03:10 ScatterPlot (Numerical to Numerical
+09:05 Bar Plot (Numerical to Categorical
+13:37 Box Plot (Numerical to Categorical
+15:30 DistPlot (Numerical to Categorical
+20:13 HeatMap (Categorical to Categorical
+26:28 ClusterMap (Categorical to Categorical
+28:48 Pairplot
+31:50 LinePlot (Numerical to Numerical
+
+----------------------------------------
+Position: 21
+Title: Pandas Profiling | Day 22 | 100 Days of Machine Learning
+
+----------------------------------------
+Position: 22
+Title: What is Feature Engineering | Day 23 | 100 Days of Machine Learning
+
+Chapters:
+00:00 Intro
+01:05 What is feature Engineering?
+04:05 Classifying feature Engineering
+06:19 Missing Values Imputation
+08:10 Handling Categorical Values
+09:56 Outlier Detection
+11:30 Feature Scaling
+13:57 Feature Construction
+16:40 Feature Selection
+20:12 Feature Extraction
+
+----------------------------------------
+Position: 23
+Title: Feature Scaling - Standardization | Day 24 | 100 Days of Machine Learning
+
+Chapters:
+00:00 Intro
+01:10 What is feature scaling?
+02:16 Why do we need feature scaling?
+04:58 Types of feature scaling
+06:00 Standardization - Intuition
+13:55 Code Example and Impact of Outliers
+23:20 Why scaling is important?
+28:22 When should you use Standardization?
+
+----------------------------------------
+Position: 24
+Title: Feature Scaling - Normalization | MinMaxScaling | MaxAbsScaling | RobustScaling
+
+Chapters:
+00:00 Intro
+00:30 What is Normalization
+03:20 MinMaxScaling Intuition
+08:15 Code Example
+14:43 Mean Normalization
+16:52 MaxAbsScaling
+18:20 Robust Scaling
+20:15 Normalization vs Standardization
+
+----------------------------------------
+Position: 25
+Title: Encoding Categorical Data | Ordinal Encoding | Label Encoding
+
+Chapters:
+00:00 Intro
+00:35 Revision
+03:06 What is Ordinal data
+05:27 Label Encoding
+07:09 How ordinal encoding works?
+09:20 Code Example
+
+----------------------------------------
+Position: 26
+Title: One Hot Encoding | Handling Categorical Data | Day 27 | 100 Days of Machine Learning
+
+Chapters:
+00:00 Intro
+00:28 Revision
+02:39 One Hot Encoding
+05:40 Dummy Variable Trap
+10:10 OHE using most frequent variables
+12:15 Code Example
+18:30 Code Example using SKlearn
+
+----------------------------------------
+Position: 27
+Title: Column Transformer in Machine Learning | How to use ColumnTransformer in Sklearn
+
+----------------------------------------
+Position: 28
+Title: Machine Learning Pipelines A-Z | Day 29 | 100 Days of Machine Learning
+
+Chapters:
+00:00 Intro
+00:32 SKLearn Pipelines
+03:42 Example through Titanic Dataset
+06:12 Train/Test/Split
+07:15 Applying Imputation
+13:30 Pickling the model
+21:35 Strategy for the Pipeline
+30:00 Creating Pipeline
+30:43 Pipeline vs make_pipeline
+33:40 Explore the pipeline
+39:20 Cross Validation using Pipeline
+
+----------------------------------------
+Position: 29
+Title: Function Transformer | Log Transform | Reciprocal Transform | Square Root Transform
+
+Chapters:
+00:00 Intro
+00:23 Revision - Mathematical Transformations
+05:40 Function Transformer
+07:15 How to find if the data is normal?
+08:46 QQ Plots
+11:10 Log Transform
+14:08 Three more transforms
+14:10 Reciprocal Transform
+15:04 Square Transform
+15:57 Example with Titanic Dataset
+
+----------------------------------------
+Position: 30
+Title: Power Transformer | Box - Cox Transform | Yeo - Johnson Transform
+
+Chapters:
+00:00 Intro
+00:22 Revision
+01:35 Box Cox Transform
+04:40 Yeo - Johnson Transform
+05:50 Code Example
+
+----------------------------------------
+Position: 31
+Title: Binning and Binarization | Discretization | Quantile Binning | KMeans Binning
+
+Chapters:
+00:00 Intro
+00:14 Encoding Numerical Features
+03:37 What is Discretization?
+06:14 Types of Discretization
+08:05 Equal Width/Uniform Binning
+11:50 Equal Frequency / Quantile Binning
+14:47 KMeans Binning
+19:57 Encoding the discretized variable
+21:45 Example thorugh Code
+31:00 Custom/Domain based Binning
+32:32 Binarization
+34:04 Example
+
+----------------------------------------
+Position: 32
+Title: Handling Mixed Variables | Feature Engineering
+
+----------------------------------------
+Position: 33
+Title: Handling Date and Time Variables | Day 34 | 100 Days of Machine Learning
+
+----------------------------------------
+Position: 34
+Title: Handling Missing Data | Part 1 | Complete Case Analysis
+
+Chapters:
+00:00 Intro
+00:58 Handling Missing Data
+05:50 Complete Case Analysis [CCA
+07:09 Assumption for CCA
+09:38 Advantages and Disadvantages of CCA
+11:39 When to use CCA?
+13:24 Code Example
+
+----------------------------------------
+Position: 35
+Title: Handling missing data | Numerical Data | Simple Imputer
+
+Chapters:
+00:00 Intro
+00:37 Handling Missing Numerical Data
+03:33 Mean / Median Imputation
+07:55 Code Demo
+17:15 Imputation using SKlearn
+20:15 Arbitarry Value Imputation
+22:40 Code Demo
+25:57 End of Distribution Imputation
+30:09 Outro
+
+----------------------------------------
+Position: 36
+Title: Handling Missing Categorical Data | Simple Imputer | Most Frequent Imputation | Missing Category Imp
+
+----------------------------------------
+Position: 37
+Title: Missing Indicator | Random Sample Imputation | Handling Missing Data Part 4
+
+Chapters:
+00:00 Intro
+00:12 Revision
+02:12 What is Random Imputation?
+08:35 Code Demo using Titanic Dataset
+21:33 Missing Indicator
+30:17 Automatically selecting value for Imputation
+36:36 Outro
+
+----------------------------------------
+Position: 38
+Title: KNN Imputer | Multivariate Imputation | Handling Missing Data Part 5
+
+Chapters:
+00:00 Intro
+00:19 Difference between Univariate and Multivariate Imputation
+02:15 How KNN Imputer works?
+06:46 NAN Euclidean Distance Documentation
+14:17 Advantages and Disadvantages of KNN Imputer
+15:56 Code Demo
+20:00 Concept of Uniform and Distance
+
+----------------------------------------
+Position: 39
+Title: Multivariate Imputation by Chained Equations for Missing Value | MICE Algorithm | Iterative Imputer
+
+Chapters:
+00:00 Intro
+00:53 MICE [Multivariate Imputation by Chained Equations
+04:38 How MICE Works?
+17:45 Code
+
+----------------------------------------
+Position: 40
+Title: What are Outliers | Outliers in Machine Learning
+
+Chapters:
+00:00 Intro
+00:51 What are outliers?
+04:40 When should you remove outliers?
+07:14 The effects of outliers in ML algorithms
+09:14 How to treat outliers?
+12:01 How to detect outliers?
+15:58 Techniques for outlier detection and removal
+
+----------------------------------------
+Position: 41
+Title: Outlier Detection and Removal using Z-score Method | Handling Outliers Part 2
+
+Chapters:
+00:00 Intro
+00:30 Outlier removal using Z score
+03:40 Z Score Formula
+05:07 Outlier Treatment
+08:00 Code Demo
+14:08 Capping
+
+----------------------------------------
+Position: 42
+Title: Outlier Detection and Removal using the IQR Method | Handing Outliers Part 3
+
+----------------------------------------
+Position: 43
+Title: Outlier Detection using the Percentile Method | Winsorization Technique
+
+----------------------------------------
+Position: 44
+Title: Feature Construction | Feature Splitting
+
+----------------------------------------
+Position: 45
+Title: Curse of Dimensionality
+
+----------------------------------------
+Position: 46
+Title: Principle Component Analysis  (PCA) | Part 1 | Geometric Intuition
+
+Chapters:
+00:00 Intro
+00:44 What is PCA
+05:16 Benefits of using PCA
+07:33 Geometric Intuition
+25:01 What is variance and why is it important?
+
+----------------------------------------
+Position: 47
+Title: Principle Component Analysis (PCA) | Part 2 | Problem Formulation and Step by Step Solution
+
+Chapters:
+00:00 Practical Example on MNIST Dataset
+00:33 Problem Formulation
+12:55 Covariance and Covariance Matrix
+23:17 Eigen Vectors and Eigen Values
+25:37 Visualizing Linear Trasnformations
+35:35 Eigendecompostion of a covariance Matrix
+38:04 How to solve PCA
+43:41 How to transform points?
+48:18 Code Demo with Vizualization
+56:00 Outro
+
+----------------------------------------
+Position: 48
+Title: Principle Component Analysis(PCA) | Part 3 | Code Example and Visualization
+
+Chapters:
+00:00 Practical Example on MNIST Dataset
+01:30 PCA Code Demo
+21:50 2D Visualization
+28:50 Explained Variance
+30:48 Finding Optimum number of principle components required
+34:34 PCA Code Demo
+39:35 When does PCA not work?
+43:00 Outro
+
+----------------------------------------
+Position: 49
+Title: Simple Linear Regression | Code + Intuition | Simplest Explanation in Hindi
+
+Chapters:
+00:00 Intro
+00:15 What is Linear Regression
+02:58 Types of Linear Regression
+07:26 Simple Linear Regression
+17:07 Applying with Code
+28:47 Intuition
+
+----------------------------------------
+Position: 50
+Title: Simple Linear Regression | Mathematical Formulation | Coding from Scratch
+
+Chapters:
+00:00 Intro
+01:15 Revision / How to Find 'm' and 'b'
+40:06 Coding from Scratch
+53:10 Outro
+
+----------------------------------------
+Position: 51
+Title: Regression Metrics | MSE, MAE & RMSE | R2 Score & Adjusted R2 Score
+
+Chapters:
+00:00 Intro
+01:32 MAE(Mean Absolute Error
+07:41 MSE(Mean squared Error
+12:29 RSME(Root Mean Squared Error
+15:52 R2 SCORE
+27:06 Adjusted R2 SCORE
+33:41 Code for the above Matrix
+
+----------------------------------------
+Position: 52
+Title: Multiple Linear Regression | Geometric Intuition & Code
+
+----------------------------------------
+Position: 53
+Title: Multiple Linear Regression | Part 2 | Mathematical Formulation From Scratch
+
+Chapters:
+00:00 Intro
+00:30 Types of Linear Regression
+03:31 Mathematical Formulation
+26:45 Detouring for sometime
+43:20 Why Gradient Descent?
+
+----------------------------------------
+Position: 54
+Title: Multiple Linear Regression | Part 3 | Code From Scratch
+
+----------------------------------------
+Position: 55
+Title: What are the main Assumptions of Linear Regression? | Top 5 Assumptions of Linear Regression
+
+Chapters:
+00:00 Intro
+00:32 Main Assumptions of Linear Regression
+01:57 Linear Relationship
+04:25 Multicollinearity
+09:56 Normal Residual
+13:14 Homoscedasticity
+15:36 No Autocorrelation of Error
+17:25 Outro
+
+----------------------------------------
+Position: 56
+Title: Gradient Descent From Scratch | End to End Gradient Descent | Gradient Descent Animation
+
+Chapters:
+00:00 Intro
+01:15 Summary of Gradient Descent
+04:10 What is gradient descent?
+05:22 Plan of attack
+07:25 Intuition for GD
+28:45 Mathematical Formulation of Gradient Descent
+36:11 Code Demo
+47:41 Creating our own class and methods
+57:16 Vizualizing our class
+01:05:05 Effect of Learning Rate
+01:07:33 Universality of GD
+01:10:23 Performing Gradient Descent by adding 'm'
+01:14:15 Vizualisation
+01:23:48 Code Demo and Vizualization
+01:44:35 Effect of Learning rate
+01:49:25 Effects of Loss Function
+01:55:12 Effect of Data
+
+----------------------------------------
+Position: 57
+Title: Batch Gradient Descent with Code Demo | Simple Explanation in Hindi
+
+Chapters:
+00:00 Intro
+00:15 What is Gradient Descent
+00:35 Types of Gradient Descent
+02:03 Revision
+10:02 Mathematical Formulation of BGD
+36:05 Creating our own GDRegressor Class
+
+----------------------------------------
+Position: 58
+Title: Stochastic Gradient Descent
+
+Chapters:
+00:00 Intro
+00:21 The problem with batch gradient descent
+06:14 Stochastic Gradient Descent
+06:33 Code Demo
+12:25 Creating our own SGD Class from Scratch
+27:53 Time Comparison/ Question for you
+30:35 Code Visualization
+35:35 When should you use SGD?
+41:41 Learning Schedules
+44:25 SGD Regressor Class in SKLearn
+
+----------------------------------------
+Position: 59
+Title: Mini-Batch Gradient Descent
+
+Chapters:
+00:00 Intro
+00:27 What is Mini-Batch Gradient Descent
+05:50 Coding Mini-Batch Gradient Descent from Scratch
+16:40 Visualization of the code
+
+----------------------------------------
+Position: 60
+Title: Polynomial Regression | Machine Learning
+
+Chapters:
+00:00 Intro
+00:10 What is Polynomial Regression
+07:25 Code Demo
+
+----------------------------------------
+Position: 61
+Title: Bias Variance Trade-off | Overfitting and Underfitting in Machine Learning
+
+----------------------------------------
+Position: 62
+Title: Ridge Regression Part 1 | Geometric Intuition and Code | Regularized Linear Models
+
+----------------------------------------
+Position: 63
+Title: Ridge Regression Part 2 | Mathematical Formulation & Code from scratch | Regularized Linear Models
+
+Chapters:
+00:00 Intro
+00:32 Revision on Ridge Regression
+12:27 Code Demo
+20:50 Ridge Regression for N-Dimensional Data
+33:46 Coding ridge regression from scratch
+
+----------------------------------------
+Position: 64
+Title: Ridge Regression Part 3 | Gradient Descent | Regularized Linear Models
+
+----------------------------------------
+Position: 65
+Title: 5 Key Points - Ridge Regression | Part 4 | Regularized Linear Models
+
+Chapters:
+00:00 Intro
+00:46 5 Key Understandings about Ridge Regression
+02:11 How the coefficients get affected?
+06:20 Higher Values are impacted more
+10:26 Impact on Bias variance TradeOff
+18:18 Effect on the Loss Function
+25:05 Why Ridge Regression is called so?
+29:23 A Pratical Tip Apply Ridge Regression
+
+----------------------------------------
+Position: 66
+Title: Lasso Regression | Intuition and Code Sample | Regularized Linear Models
+
+Chapters:
+00:00 Lasso Regression
+04:27 Code Implementation in SKLearn
+12:21 How are coefficients affected with Lambda and Alpha
+15:38 Higher Coefficients are affected more
+18:45 Impact of Lambda on Bias and Variance
+23:21 Effect of Regularization on Loss Function
+
+----------------------------------------
+Position: 67
+Title: Why Lasso Regression creates sparsity?
+
+----------------------------------------
+Position: 68
+Title: ElasticNet Regression | Intuition and Code Example | Regularized Linear Models
+
+----------------------------------------
+Position: 69
+Title: Logistic Regression Part 1 | Perceptron Trick
+
+Chapters:
+00:00 Intro
+00:42 What is Logistic Regression
+02:36 Prerequisite for Logistic Regression
+05:07 Perceptron Trick
+14:56 How to label regions?
+18:15 Transformations
+30:44 Algorithm
+41:43 Simplified Algorithm
+
+----------------------------------------
+Position: 70
+Title: Logistic Regression Part 2 | Perceptron Trick Code
+
+----------------------------------------
+Position: 71
+Title: Logistic Regression Part 3 | Sigmoid Function | 100 Days of ML
+
+Chapters:
+00:00 Intro
+00:17 Problem with perceptron
+02:00 The Solution
+08:33 Understanding the equation
+15:55 Sigmoid Function
+27:02 Impact of Sigmoid Function
+38:20 Code Demo
+
+----------------------------------------
+Position: 72
+Title: Logistic Regression Part 4 | Loss Function | Maximum Likelihood | Binary Cross Entropy
+
+Chapters:
+00:00 Intro
+00:30 The Problem
+04:48 Maximum Likelihood
+
+----------------------------------------
+Position: 73
+Title: Derivative of Sigmoid Function
+
+----------------------------------------
+Position: 74
+Title: Logistic Regression Part 5 | Gradient Descent & Code From Scratch
+
+Chapters:
+00:00 Intro
+00:36 Gradient Descent
+12:58 Loss function in Matrix Form
+28:23 Code Demo
+
+----------------------------------------
+Position: 75
+Title: Accuracy and Confusion Matrix | Type 1 and Type 2 Errors | Classification Metrics Part 1
+
+Chapters:
+00:00 Intro
+00:46 Accuracy
+06:25 Code Example using SKL
+08:35 Accuracy of multi-classification problem
+10:18 How much accuracy is good?
+13:16 The problem with Accuracy Score
+15:30 Confusion Matrix
+23:15 Type 1 Error
+25:53 Confusion Matrix for Multi Classification Problem
+30:03 When is accuracy misleading?
+
+----------------------------------------
+Position: 76
+Title: Precision, Recall and F1 Score | Classification Metrics Part 2
+
+Chapters:
+00:00 Intro
+00:42 When is accuracy misleading?
+02:44 Precision
+08:53 Recall
+13:47 F1 Score
+19:40 Calculating Recall,Precision,F1 score using SKLearn
+21:35 Multi-Class precision and recall
+38:50 mnist Code Example
+
+----------------------------------------
+Position: 77
+Title: ROC Curve in Machine Learning | ROC-AUC in Machine Learning Simplified | CampusX
+
+Chapters:
+00:00 Intro
+01:15 Why ROC Curve?
+16:05 Confusion Matrix
+20:57 True Positive Rate (TPR) - Benefit
+28:05 False Positive Rate (FPR) - Cost
+38:12 ROC Curve
+43:12 Different Cases
+01:01:28 Code Example
+01:05:37 AUC/ROC
+
+----------------------------------------
+Position: 78
+Title: Softmax Regression || Multinomial Logistic Regression || Logistic Regression Part 6
+
+Chapters:
+00:00 Intro
+00:55 Softmax Regression
+08:20 Training Intuition
+14:53 Prediction
+19:58 Loss Function
+34:30 Softmax Demo in SKlearn
+
+----------------------------------------
+Position: 79
+Title: Polynomial Features in Logistic Regression | Non Linear Logistic Regression | Logistic Regression 7
+
+----------------------------------------
+Position: 80
+Title: Logistic Regression Hyperparameters || Logistic Regression Part 8
+
+----------------------------------------
+Position: 81
+Title: Naive Bayes Classifier | Part 1 | Conditional Probability
+
+----------------------------------------
+Position: 82
+Title: Naive Bayes Classifier | Part 2 | Independent Events in Probability
+
+----------------------------------------
+Position: 83
+Title: Naive Bayes Classifier | Part 3 | Mutually Exclusive Events
+
+----------------------------------------
+Position: 84
+Title: Naive Bayes Classifier | Part 4 | Bayes Theorem in Probability
+
+----------------------------------------
+Position: 85
+Title: Naive Bayes Classifier | Part 5 | Problem based upon Bayes Theorem
+
+----------------------------------------
+Position: 86
+Title: Naive Bayes Classifier | Part 6 | Intuition
+
+----------------------------------------
+Position: 87
+Title: Naive Bayes Classifier | Part 7 | Mathematics behind Naive Bayes Algorithm
+
+----------------------------------------
+Position: 88
+Title: Naive Bayes Classifier | Part 8 | Simple Example Code
+
+----------------------------------------
+Position: 89
+Title: Naive Bayes Part 9 | Handling Numerical Data
+
+----------------------------------------
+Position: 90
+Title: What is K Nearest Neighbors? | KNN Explained in Hindi | Simple Overview in 1 Video | CampusX
+
+Chapters:
+00:00 Intro
+01:04 KNN Intuition
+08:26 KNN on breast cancer dataset / Code Example
+17:35 How to select K?
+23:28 Decision Surface
+29:58 Overfitting and Underfitting in KNN
+39:08 Limitations of KNN
+51:48 Outro
+
+----------------------------------------
+Position: 91
+Title: Support Vector Machines | Geometric Intuition
+
+----------------------------------------
+Position: 92
+Title: Mathematics of SVM | Support Vector Machines | Hard margin SVM
+
+----------------------------------------
+Position: 93
+Title: Mathematics of Support Vector Machine | Soft Margin SVM
+
+----------------------------------------
+Position: 94
+Title: Kernel Trick in SVM | Geometric Intuition
+
+----------------------------------------
+Position: 95
+Title: Kernel Trick in SVM | Code Example
+
+----------------------------------------
+Position: 96
+Title: Decision Trees Geometric Intuition | Entropy | Gini impurity | Information Gain
+
+Chapters:
+00:00 Intro
+00:14 Example 1
+03:00 Where is the Tree?
+04:00 Example 2
+06:09 What if we have numerical data?
+07:57 Geometric Intuition
+10:50 Pseudo Code
+11:54 Conclusion
+14:00 Terminology
+14:53 Unanswered Questions
+16:16 Advantages and Disadvantages
+18:04 CART
+18:45 Game Example
+21:45 How do decision trees work? / Entropy
+22:15 What is Entropy
+25:40 How to calculate Entropy
+29:40 Observations
+31:35 Entropy vs Probability
+36:20 Information Gain
+41:40 Gini Impurity
+50:30 Handling Numerical Data
+
+----------------------------------------
+Position: 97
+Title: Decision Trees - Hyperparameters | Overfitting and Underfitting in Decision Trees
+
+Chapters:
+00:00 Intro
+01:19 Depth of tree
+04:26 Geometrical Intuition of over fitting
+07:19 Geometric Intuition of under fitting
+11:46 Decision tree Hyper parameter tuning
+27:05 Outro
+
+----------------------------------------
+Position: 98
+Title: Regression Trees | Decision Trees Part 3
+
+Chapters:
+00:00 Intro
+01:58 Best Fit Line
+07:30 Finding the splitting criteria
+16:57 Final Criteria
+20:50 Streamlit Web App
+31:07 Code Example
+33:45 Feature Importance
+
+----------------------------------------
+Position: 99
+Title: Awesome Decision Tree Visualization using dtreeviz library
+
+----------------------------------------
+Position: 100
+Title: Introduction to Ensemble Learning | Ensemble Techniques in Machine Learning
+
+Chapters:
+00:00 Intro
+01:45 Wisdom of the crowd
+06:17 Resource [Book
+07:00 Core Idea behind Ensemble learning
+14:58 Types of Ensemble Learning
+28:38 Why Ensemble Learning Works?
+31:35 Disadvantage of Ensemble Learning
+32:22 Benefits of Ensemble Learning
+35:40 When to use Ensemble Learning?
+
+----------------------------------------
+Position: 101
+Title: Voting Ensemble |  Introduction and Core Idea | Part 1
+
+----------------------------------------
+Position: 102
+Title: Voting Ensemble | Classification | Voting Classifier | Hard Voting Vs Soft Voting | Part 2
+
+Chapters:
+00:00 Intro
+01:03 Core Idea
+12:50 Code Demo
+23:30 Outro
+
+----------------------------------------
+Position: 103
+Title: Voting Ensemble | Regression | Part 3
+
+----------------------------------------
+Position: 104
+Title: Bagging | Introduction | Part 1
+
+Chapters:
+00:00 Intro
+00:25 Plan of attack
+01:50 What is Bagging
+14:32 Code Demo
+30:50 Outro
+
+----------------------------------------
+Position: 105
+Title: Bagging Ensemble | Part 2 | Bagging Classifiers
+
+----------------------------------------
+Position: 106
+Title: Bagging Ensemble | Part 3 | Bagging Regressor
+
+----------------------------------------
+Position: 107
+Title: Introduction to Random Forest | Intuition behind the Algorithm
+
+Chapters:
+00:00 Intro
+00:29 Intuition
+14:35 Code Demo
+
+----------------------------------------
+Position: 108
+Title: How Random Forest Performs So Well? Bias Variance Trade-Off in Random Forest
+
+----------------------------------------
+Position: 109
+Title: Bagging Vs Random Forest | What is the difference between Bagging and Random Forest | Very Important
+
+----------------------------------------
+Position: 110
+Title: Random Forest Hyper-parameters
+
+----------------------------------------
+Position: 111
+Title: Hyperparameter Tuning Random Forest using GridSearchCV and RandomizedSearchCV | Code Example
+
+----------------------------------------
+Position: 112
+Title: OOB Score | Out of Bag Evaluation in Random Forest | Machine Learning
+
+----------------------------------------
+Position: 113
+Title: Feature Importance using Random Forest and Decision Trees | How is Feature Importance calculated
+
+Chapters:
+00:00 Intro
+00:52 What is Feature Importance
+06:10 Feature importance in SKLearn
+08:40 Feature Importance Documentation
+11:10 Calculating Importance using Decision trees
+23:45 Calculating Importance using Random Forest
+
+----------------------------------------
+Position: 114
+Title: How Adaboost Classifier Works? | Geometric Intuition
+
+----------------------------------------
+Position: 115
+Title: AdaBoost - A Step by Step Explanation
+
+----------------------------------------
+Position: 116
+Title: AdaBoost Algorithm | Code from Scratch
+
+----------------------------------------
+Position: 117
+Title: AdaBoost Hyperparameters | GridSearchCV in Adaboost
+
+----------------------------------------
+Position: 118
+Title: Bagging Vs Boosting | What is the difference between Bagging and Boosting
+
+----------------------------------------
+Position: 119
+Title: Gradient Boosting Explained | How Gradient Boosting Works?
+
+----------------------------------------
+Position: 120
+Title: Gradient Boosting Regression Part 2 | Mathematics of Gradient Boosting
+
+Chapters:
+00:00 Intro
+00:35 Algorithm
+01:46 Additive Modelling
+04:40 Runge's Phenomenon
+06:40 Desmos Demo
+09:45 Gradient Boost Demo on Kaggle
+12:44 Explanation
+
+----------------------------------------
+Position: 121
+Title: Gradient Boosting for Classification | Geometric Intuition | CampusX
+
+Chapters:
+00:00 Intro
+01:37 Gradient Boosting
+05:20 Classification vs Regression
+07:21 Example
+13:07 Demo Code
+46:01 Prediction
+50:49 Demo Code
+01:04:16 Outro
+
+----------------------------------------
+Position: 122
+Title: Introduction to XGBOOST | Machine Learning | CampusX
+
+Chapters:
+00:00 Intro
+01:50 XGBoost Introduction
+08:14 History of XGBoost
+17:23 XGBoost Features
+19:05 Flexiblity
+27:53 Speed
+59:15 Performance
+01:01:51 XGBoost Research Paper
+01:17:13 LightGBM
+01:18:30 CatBoost
+
+----------------------------------------
+Position: 123
+Title: XGBoost for Regression | XGBoost Part 2 | CampusX
+
+Chapters:
+00:00 Intro
+00:59 The problem statement
+02:24 Solution Overview
+10:42 Step by Step Calculation
+34:12 Final Decision Tree
+44:32 Original Paper
+
+----------------------------------------
+Position: 124
+Title: XGBoost For Classification | How XGBoost works on Classification Problems | CampusX
+
+Chapters:
+00:00 Intro
+01:00 Prerequisite & Disclaimer
+04:04 Problem Statement
+05:19 Overview
+09:21 Solution
+38:25 Outro
+
+----------------------------------------
+Position: 125
+Title: The Maths Behind XGBoost | Machine Learning | CampusX
+
+Chapters:
+00:00 Intro
+01:44 The Plan
+06:07 Pre-requisite
+07:12 Boosting as an Additive Model
+15:54 XGBoost Loss Function
+26:19 The Derivation
+37:01 Taylor Series Expansion
+50:04 The solution to Taylor series
+58:51 Applying Taylor Series
+01:06:00 Simplification
+01:29:08 Output Value for Regression
+01:36:43 Output Value for Classification
+01:39:52 Derivation of Similarity Score
+01:45:40 Final Calculation of Similarity Score
+01:56:56 Outro
+
+----------------------------------------
+Position: 126
+Title: Stacking and Blending Ensembles
+
+Chapters:
+00:00 Intro
+00:40 What is Stacking?
+09:25 The problem with stacking
+10:35 Solutions
+12:05 Blending - using Hold Out Approach
+17:44 Stacking - K Fold Approach
+25:32 Multi Layer Stacking
+31:28 SKLearn implementation / Code Demo
+
+----------------------------------------
+Position: 127
+Title: K-Means Clustering Algorithm | Geometric Intuition | Clustering | Unsupervised Learning
+
+Chapters:
+00:00 Intro
+01:10 Understanding K-Means Clustering through a problem statement
+04:34 Deciding Number of Clusters
+04:56 Initializing Centroids
+05:41 Assigning a Cluster
+09:20 Should we finish the clustering process
+14:28 K-Means Clustering (Elbow Method
+
+----------------------------------------
+Position: 128
+Title: K-Means Clustering Algorithm in Python | Practical Example | Student Clustering Example | sklearn
+
+----------------------------------------
+Position: 129
+Title: K-Means Clustering Algorithm From Scratch In Python | ML Algorithms From Scratch
+
+Chapters:
+00:00 Intro
+00:34 Code Demo
+01:55 Creating a Class & Constructor
+10:58 Kmeans Intuition
+32:05 Running the Code
+
+----------------------------------------
+Position: 130
+Title: Agglomerative Hierarchical Clustering | Python Code Example
+
+Chapters:
+00:00 Intro
+00:29 The Need for Other Clustering Methods
+03:35 Clustering Methods
+04:50 Types of Hierarchial Clustering
+13:03 Coding the Algorithm
+18:20 Types of Agglomerative Clustering
+19:03 Single Link
+21:44 Complete Link
+24:01 Group Average
+25:31 Ward
+27:22 How to find the ideal number of clusters
+30:57 Hyperparameters
+32:10 Code Example
+34:12 Benefits of Hierarchial Clustering
+36:10 Limitations
+37:05 Outro
+
+----------------------------------------
+Position: 131
+Title: DBSCAN Clustering Algorithms | Density Based Clustering | How DBSCAN Works | CampusX
+
+Chapters:
+00:00 00:31 - Intro
+00:32 03:59 - Why DBSCAN?
+04:00 06:28 - What is density based clustering?
+06:29 08:41 - Epsilon Example
+08:42 14:12 - 3 Types of points in DBSCAN
+14:13 17:58 - Density connected points
+17:59 25:20 - DBSCAN Algorithm
+25:21 28:55 - DBSCAN Demo
+28:56 32:40 - Limitations
+32:41 34:00 - Visualization Tool
+34:01 34:15 - Outro
+
+----------------------------------------
+Position: 132
+Title: Imbalanced Data in Machine Learning | Undersampling | Oversampling | SMOTE
+
+Chapters:
+00:00 Intro
+00:54 What is Imbalanced Data?
+04:10 Problems with Imbalanced Data
+08:00 Imbalanced Data Demo
+11:13 Why studying imbalanced data is important?
+16:58 Undersampling
+25:56 Oversampling
+31:06 SMOTE
+42:43 Ensemble Learning
+47:06 Cost Sensitive Learning
+51:30 Other techniques
+
+----------------------------------------
+Position: 133
+Title: Hyperparameter Tuning using Optuna | Bayesian Optimization using Optuna
+

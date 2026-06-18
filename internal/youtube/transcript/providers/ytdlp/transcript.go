@@ -42,7 +42,7 @@ func (c *Client) GetTranscript(
 		"yt-dlp",
 		"--write-auto-subs",
 		"--write-subs",
-		"--sub-langs", "en,en-orig",
+		"--sub-langs", "en",
 		"--sub-format", "json3", // Target the raw layout tree directly
 		"--skip-download",
 		"--no-playlist",

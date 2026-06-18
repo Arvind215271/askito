@@ -1,0 +1,687 @@
+{
+  "schema_version": "1.0",
+  "format": "json",
+  "data": {
+    "channel_id": "UCCWi3hpnq_Pe03nGxuS7isg",
+    "channel_title": "CampusX",
+    "description": "Welcome to the 100 Days of Machine Learning series — one of the most watched and most trusted and Evergreen Machine Learning playlists on Indian YouTube, followed by millions of learners who want to build a strong foundation in ML.\n\nThis playlist is designed as a step-by-step roadmap to master Machine Learning, starting from the absolute basics and gradually moving toward advanced concepts and real-world implementation.\n\nInstead of jumping directly into code, the series focuses on building clear intuition, strong fundamentals, and practical understanding of how machine learning actually works.\n\nWhat you will learn in this series:\n\t•\tAI vs Machine Learning vs Deep Learning\n\t•\tTypes of Machine Learning (Supervised, Unsupervised, Reinforcement Learning)\n\t•\tData preprocessing and feature engineering\n\t•\tExploratory Data Analysis (EDA)\n\t•\tImportant ML algorithms (Regression, Classification, Clustering, etc.)\n\t•\tModel evaluation and validation techniques\n\t•\tReal-world ML workflow and best practices\n\nEach video covers a specific concept in a simple and structured way so you can build knowledge one step at a time, just like a 100-day learning roadmap.\n\nIf you want to build a strong Machine Learning foundation for Data Science, AI, or ML Engineering, this playlist will guide you from beginner concepts to industry-level understanding.\n\nNotes: https://learnwith.campusx.in/s/store/courses/YouTube%20Notes",
+    "id": "PLKnIA16_Rmvbr7zKYQuBfsVkjoLcJgxHH",
+    "item_count": 134,
+    "privacy_status": "public",
+    "published_at": "2021-03-16T01:11:33.179895Z",
+    "thumbnail_url": "https://i.ytimg.com/vi/ZftI2fEz0Fw/hqdefault.jpg",
+    "title": "100 Days of Machine Learning | CampusX",
+    "videos": [
+      {
+        "added_at": "2021-03-16T01:12:33Z",
+        "position": 0,
+        "title": "What is Machine Learning? | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-03-16T01:12:55Z",
+        "position": 1,
+        "title": "AI Vs ML Vs DL for Beginners in Hindi"
+      },
+      {
+        "added_at": "2021-03-16T13:40:03Z",
+        "position": 2,
+        "title": "Types of Machine Learning for Beginners | Types of Machine learning in Hindi | Types of ML in Depth"
+      },
+      {
+        "added_at": "2021-03-17T14:14:01Z",
+        "position": 3,
+        "title": "Batch Machine Learning | Offline Vs Online Learning | Machine Learning Types"
+      },
+      {
+        "added_at": "2021-03-18T18:22:41Z",
+        "position": 4,
+        "title": "Online Machine Learning | Online Learning | Online Vs Offline Machine Learning"
+      },
+      {
+        "added_at": "2021-03-19T13:28:54Z",
+        "position": 5,
+        "title": "Instance-Based Vs Model-Based Learning | Types of Machine Learning"
+      },
+      {
+        "added_at": "2021-03-20T14:02:54Z",
+        "position": 6,
+        "title": "Challenges in Machine Learning | Problems in Machine Learning"
+      },
+      {
+        "added_at": "2021-03-22T14:07:37Z",
+        "position": 7,
+        "title": "Application of Machine Learning | Real Life Machine Learning Applications"
+      },
+      {
+        "added_at": "2021-03-23T14:38:24Z",
+        "position": 8,
+        "title": "Machine Learning Development Life Cycle | MLDLC in Data Science"
+      },
+      {
+        "added_at": "2021-03-24T12:37:20Z",
+        "position": 9,
+        "title": "Data Engineer Vs Data Analyst Vs Data Scientist Vs ML Engineer | Data Science Job Roles"
+      },
+      {
+        "added_at": "2021-03-25T14:29:43Z",
+        "position": 10,
+        "title": "What are Tensors | Tensor In-depth Explanation | Tensor in Machine Learning"
+      },
+      {
+        "added_at": "2021-03-26T15:36:44Z",
+        "position": 11,
+        "title": "Installing Anaconda For Data Science | Jupyter Notebook for Machine Learning | Google Colab for ML"
+      },
+      {
+        "added_at": "2021-03-27T04:07:08Z",
+        "position": 12,
+        "title": "End to End Toy Project | Day 13 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-03-29T04:05:51Z",
+        "position": 13,
+        "title": "How to Frame a Machine Learning Problem | How to plan a Data Science Project Effectively"
+      },
+      {
+        "added_at": "2021-03-30T14:29:28Z",
+        "position": 14,
+        "title": "Working with CSV files | Day 15 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-01T19:45:22Z",
+        "position": 15,
+        "title": "Working with JSON/SQL | Day 16 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-01T07:42:13Z",
+        "position": 16,
+        "title": "Fetching Data From an API | Day 17 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-02T14:04:12Z",
+        "position": 17,
+        "title": "Fetching data using Web Scraping | Day 18 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-03T06:08:25Z",
+        "position": 18,
+        "title": "Understanding Your Data | Day 19 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-05T08:29:05Z",
+        "position": 19,
+        "title": "EDA using Univariate Analysis | Day 20 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-06T12:51:35Z",
+        "position": 20,
+        "title": "EDA using Bivariate and Multivariate Analysis | Day 21 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-07T08:37:07Z",
+        "position": 21,
+        "title": "Pandas Profiling | Day 22 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-08T14:40:43Z",
+        "position": 22,
+        "title": "What is Feature Engineering | Day 23 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-09T14:26:00Z",
+        "position": 23,
+        "title": "Feature Scaling - Standardization | Day 24 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-10T14:06:41Z",
+        "position": 24,
+        "title": "Feature Scaling - Normalization | MinMaxScaling | MaxAbsScaling | RobustScaling"
+      },
+      {
+        "added_at": "2021-04-12T16:54:33Z",
+        "position": 25,
+        "title": "Encoding Categorical Data | Ordinal Encoding | Label Encoding"
+      },
+      {
+        "added_at": "2021-04-13T11:13:25Z",
+        "position": 26,
+        "title": "One Hot Encoding | Handling Categorical Data | Day 27 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-14T12:20:58Z",
+        "position": 27,
+        "title": "Column Transformer in Machine Learning | How to use ColumnTransformer in Sklearn"
+      },
+      {
+        "added_at": "2021-04-15T14:55:24Z",
+        "position": 28,
+        "title": "Machine Learning Pipelines A-Z | Day 29 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-16T14:35:09Z",
+        "position": 29,
+        "title": "Function Transformer | Log Transform | Reciprocal Transform | Square Root Transform"
+      },
+      {
+        "added_at": "2021-04-17T12:53:49Z",
+        "position": 30,
+        "title": "Power Transformer | Box - Cox Transform | Yeo - Johnson Transform"
+      },
+      {
+        "added_at": "2021-04-19T14:23:39Z",
+        "position": 31,
+        "title": "Binning and Binarization | Discretization | Quantile Binning | KMeans Binning"
+      },
+      {
+        "added_at": "2021-04-20T11:30:43Z",
+        "position": 32,
+        "title": "Handling Mixed Variables | Feature Engineering"
+      },
+      {
+        "added_at": "2021-04-21T11:28:18Z",
+        "position": 33,
+        "title": "Handling Date and Time Variables | Day 34 | 100 Days of Machine Learning"
+      },
+      {
+        "added_at": "2021-04-22T10:34:27Z",
+        "position": 34,
+        "title": "Handling Missing Data | Part 1 | Complete Case Analysis"
+      },
+      {
+        "added_at": "2021-04-23T11:33:09Z",
+        "position": 35,
+        "title": "Handling missing data | Numerical Data | Simple Imputer"
+      },
+      {
+        "added_at": "2021-04-24T12:15:16Z",
+        "position": 36,
+        "title": "Handling Missing Categorical Data | Simple Imputer | Most Frequent Imputation | Missing Category Imp"
+      },
+      {
+        "added_at": "2021-04-26T11:57:22Z",
+        "position": 37,
+        "title": "Missing Indicator | Random Sample Imputation | Handling Missing Data Part 4"
+      },
+      {
+        "added_at": "2021-04-27T07:39:30Z",
+        "position": 38,
+        "title": "KNN Imputer | Multivariate Imputation | Handling Missing Data Part 5"
+      },
+      {
+        "added_at": "2021-04-28T08:16:34Z",
+        "position": 39,
+        "title": "Multivariate Imputation by Chained Equations for Missing Value | MICE Algorithm | Iterative Imputer"
+      },
+      {
+        "added_at": "2021-04-29T12:15:49Z",
+        "position": 40,
+        "title": "What are Outliers | Outliers in Machine Learning"
+      },
+      {
+        "added_at": "2021-04-30T11:03:36Z",
+        "position": 41,
+        "title": "Outlier Detection and Removal using Z-score Method | Handling Outliers Part 2"
+      },
+      {
+        "added_at": "2021-04-30T11:06:00Z",
+        "position": 42,
+        "title": "Outlier Detection and Removal using the IQR Method | Handing Outliers Part 3"
+      },
+      {
+        "added_at": "2021-05-03T07:12:00Z",
+        "position": 43,
+        "title": "Outlier Detection using the Percentile Method | Winsorization Technique"
+      },
+      {
+        "added_at": "2021-05-04T07:40:10Z",
+        "position": 44,
+        "title": "Feature Construction | Feature Splitting"
+      },
+      {
+        "added_at": "2021-05-05T08:18:19Z",
+        "position": 45,
+        "title": "Curse of Dimensionality"
+      },
+      {
+        "added_at": "2021-05-06T10:07:27Z",
+        "position": 46,
+        "title": "Principle Component Analysis  (PCA) | Part 1 | Geometric Intuition"
+      },
+      {
+        "added_at": "2021-05-07T09:50:46Z",
+        "position": 47,
+        "title": "Principle Component Analysis (PCA) | Part 2 | Problem Formulation and Step by Step Solution"
+      },
+      {
+        "added_at": "2021-05-07T10:22:32Z",
+        "position": 48,
+        "title": "Principle Component Analysis(PCA) | Part 3 | Code Example and Visualization"
+      },
+      {
+        "added_at": "2021-05-10T12:16:30Z",
+        "position": 49,
+        "title": "Simple Linear Regression | Code + Intuition | Simplest Explanation in Hindi"
+      },
+      {
+        "added_at": "2021-05-11T12:18:05Z",
+        "position": 50,
+        "title": "Simple Linear Regression | Mathematical Formulation | Coding from Scratch"
+      },
+      {
+        "added_at": "2021-05-13T10:48:41Z",
+        "position": 51,
+        "title": "Regression Metrics | MSE, MAE \u0026 RMSE | R2 Score \u0026 Adjusted R2 Score"
+      },
+      {
+        "added_at": "2021-05-14T11:48:15Z",
+        "position": 52,
+        "title": "Multiple Linear Regression | Geometric Intuition \u0026 Code"
+      },
+      {
+        "added_at": "2021-05-15T13:55:25Z",
+        "position": 53,
+        "title": "Multiple Linear Regression | Part 2 | Mathematical Formulation From Scratch"
+      },
+      {
+        "added_at": "2021-05-17T07:30:40Z",
+        "position": 54,
+        "title": "Multiple Linear Regression | Part 3 | Code From Scratch"
+      },
+      {
+        "added_at": "2023-07-20T10:35:09Z",
+        "position": 55,
+        "title": "What are the main Assumptions of Linear Regression? | Top 5 Assumptions of Linear Regression"
+      },
+      {
+        "added_at": "2021-05-21T13:58:25Z",
+        "position": 56,
+        "title": "Gradient Descent From Scratch | End to End Gradient Descent | Gradient Descent Animation"
+      },
+      {
+        "added_at": "2021-05-22T14:26:15Z",
+        "position": 57,
+        "title": "Batch Gradient Descent with Code Demo | Simple Explanation in Hindi"
+      },
+      {
+        "added_at": "2021-05-25T11:56:01Z",
+        "position": 58,
+        "title": "Stochastic Gradient Descent"
+      },
+      {
+        "added_at": "2021-05-26T13:26:48Z",
+        "position": 59,
+        "title": "Mini-Batch Gradient Descent"
+      },
+      {
+        "added_at": "2021-05-29T01:45:19Z",
+        "position": 60,
+        "title": "Polynomial Regression | Machine Learning"
+      },
+      {
+        "added_at": "2021-05-29T15:12:41Z",
+        "position": 61,
+        "title": "Bias Variance Trade-off | Overfitting and Underfitting in Machine Learning"
+      },
+      {
+        "added_at": "2021-06-02T07:45:51Z",
+        "position": 62,
+        "title": "Ridge Regression Part 1 | Geometric Intuition and Code | Regularized Linear Models"
+      },
+      {
+        "added_at": "2021-06-03T12:09:38Z",
+        "position": 63,
+        "title": "Ridge Regression Part 2 | Mathematical Formulation \u0026 Code from scratch | Regularized Linear Models"
+      },
+      {
+        "added_at": "2021-06-04T09:31:11Z",
+        "position": 64,
+        "title": "Ridge Regression Part 3 | Gradient Descent | Regularized Linear Models"
+      },
+      {
+        "added_at": "2021-06-08T08:36:58Z",
+        "position": 65,
+        "title": "5 Key Points - Ridge Regression | Part 4 | Regularized Linear Models"
+      },
+      {
+        "added_at": "2021-06-10T09:40:29Z",
+        "position": 66,
+        "title": "Lasso Regression | Intuition and Code Sample | Regularized Linear Models"
+      },
+      {
+        "added_at": "2021-06-11T08:16:07Z",
+        "position": 67,
+        "title": "Why Lasso Regression creates sparsity?"
+      },
+      {
+        "added_at": "2021-06-12T08:12:46Z",
+        "position": 68,
+        "title": "ElasticNet Regression | Intuition and Code Example | Regularized Linear Models"
+      },
+      {
+        "added_at": "2021-06-15T11:57:00Z",
+        "position": 69,
+        "title": "Logistic Regression Part 1 | Perceptron Trick"
+      },
+      {
+        "added_at": "2021-06-16T06:28:54Z",
+        "position": 70,
+        "title": "Logistic Regression Part 2 | Perceptron Trick Code"
+      },
+      {
+        "added_at": "2021-06-17T12:09:50Z",
+        "position": 71,
+        "title": "Logistic Regression Part 3 | Sigmoid Function | 100 Days of ML"
+      },
+      {
+        "added_at": "2021-06-18T11:28:19Z",
+        "position": 72,
+        "title": "Logistic Regression Part 4 | Loss Function | Maximum Likelihood | Binary Cross Entropy"
+      },
+      {
+        "added_at": "2021-06-19T09:48:29Z",
+        "position": 73,
+        "title": "Derivative of Sigmoid Function"
+      },
+      {
+        "added_at": "2021-06-21T10:19:33Z",
+        "position": 74,
+        "title": "Logistic Regression Part 5 | Gradient Descent \u0026 Code From Scratch"
+      },
+      {
+        "added_at": "2021-06-23T08:20:30Z",
+        "position": 75,
+        "title": "Accuracy and Confusion Matrix | Type 1 and Type 2 Errors | Classification Metrics Part 1"
+      },
+      {
+        "added_at": "2021-06-24T09:35:55Z",
+        "position": 76,
+        "title": "Precision, Recall and F1 Score | Classification Metrics Part 2"
+      },
+      {
+        "added_at": "2025-03-05T06:58:40Z",
+        "position": 77,
+        "title": "ROC Curve in Machine Learning | ROC-AUC in Machine Learning Simplified | CampusX"
+      },
+      {
+        "added_at": "2021-06-28T12:44:03Z",
+        "position": 78,
+        "title": "Softmax Regression || Multinomial Logistic Regression || Logistic Regression Part 6"
+      },
+      {
+        "added_at": "2021-06-28T13:33:51Z",
+        "position": 79,
+        "title": "Polynomial Features in Logistic Regression | Non Linear Logistic Regression | Logistic Regression 7"
+      },
+      {
+        "added_at": "2021-06-29T06:26:24Z",
+        "position": 80,
+        "title": "Logistic Regression Hyperparameters || Logistic Regression Part 8"
+      },
+      {
+        "added_at": "2023-07-20T10:39:55Z",
+        "position": 81,
+        "title": "Naive Bayes Classifier | Part 1 | Conditional Probability"
+      },
+      {
+        "added_at": "2023-07-20T10:40:11Z",
+        "position": 82,
+        "title": "Naive Bayes Classifier | Part 2 | Independent Events in Probability"
+      },
+      {
+        "added_at": "2023-07-20T10:40:29Z",
+        "position": 83,
+        "title": "Naive Bayes Classifier | Part 3 | Mutually Exclusive Events"
+      },
+      {
+        "added_at": "2023-07-20T10:40:45Z",
+        "position": 84,
+        "title": "Naive Bayes Classifier | Part 4 | Bayes Theorem in Probability"
+      },
+      {
+        "added_at": "2023-07-20T10:41:12Z",
+        "position": 85,
+        "title": "Naive Bayes Classifier | Part 5 | Problem based upon Bayes Theorem"
+      },
+      {
+        "added_at": "2023-07-20T10:41:31Z",
+        "position": 86,
+        "title": "Naive Bayes Classifier | Part 6 | Intuition"
+      },
+      {
+        "added_at": "2023-07-20T10:41:53Z",
+        "position": 87,
+        "title": "Naive Bayes Classifier | Part 7 | Mathematics behind Naive Bayes Algorithm"
+      },
+      {
+        "added_at": "2023-07-20T10:42:11Z",
+        "position": 88,
+        "title": "Naive Bayes Classifier | Part 8 | Simple Example Code"
+      },
+      {
+        "added_at": "2023-07-20T10:42:35Z",
+        "position": 89,
+        "title": "Naive Bayes Part 9 | Handling Numerical Data"
+      },
+      {
+        "added_at": "2023-07-20T10:34:49Z",
+        "position": 90,
+        "title": "What is K Nearest Neighbors? | KNN Explained in Hindi | Simple Overview in 1 Video | CampusX"
+      },
+      {
+        "added_at": "2023-07-20T10:36:15Z",
+        "position": 91,
+        "title": "Support Vector Machines | Geometric Intuition"
+      },
+      {
+        "added_at": "2023-07-20T10:37:49Z",
+        "position": 92,
+        "title": "Mathematics of SVM | Support Vector Machines | Hard margin SVM"
+      },
+      {
+        "added_at": "2023-07-20T10:38:16Z",
+        "position": 93,
+        "title": "Mathematics of Support Vector Machine | Soft Margin SVM"
+      },
+      {
+        "added_at": "2023-07-20T10:39:04Z",
+        "position": 94,
+        "title": "Kernel Trick in SVM | Geometric Intuition"
+      },
+      {
+        "added_at": "2023-07-20T10:38:44Z",
+        "position": 95,
+        "title": "Kernel Trick in SVM | Code Example"
+      },
+      {
+        "added_at": "2021-07-02T13:41:31Z",
+        "position": 96,
+        "title": "Decision Trees Geometric Intuition | Entropy | Gini impurity | Information Gain"
+      },
+      {
+        "added_at": "2021-07-03T13:14:04Z",
+        "position": 97,
+        "title": "Decision Trees - Hyperparameters | Overfitting and Underfitting in Decision Trees"
+      },
+      {
+        "added_at": "2021-07-05T07:13:36Z",
+        "position": 98,
+        "title": "Regression Trees | Decision Trees Part 3"
+      },
+      {
+        "added_at": "2021-07-06T11:07:16Z",
+        "position": 99,
+        "title": "Awesome Decision Tree Visualization using dtreeviz library"
+      },
+      {
+        "added_at": "2021-07-12T06:48:27Z",
+        "position": 100,
+        "title": "Introduction to Ensemble Learning | Ensemble Techniques in Machine Learning"
+      },
+      {
+        "added_at": "2021-07-12T07:53:27Z",
+        "position": 101,
+        "title": "Voting Ensemble |  Introduction and Core Idea | Part 1"
+      },
+      {
+        "added_at": "2021-07-12T07:53:41Z",
+        "position": 102,
+        "title": "Voting Ensemble | Classification | Voting Classifier | Hard Voting Vs Soft Voting | Part 2"
+      },
+      {
+        "added_at": "2021-07-12T07:53:53Z",
+        "position": 103,
+        "title": "Voting Ensemble | Regression | Part 3"
+      },
+      {
+        "added_at": "2021-07-12T07:54:16Z",
+        "position": 104,
+        "title": "Bagging | Introduction | Part 1"
+      },
+      {
+        "added_at": "2021-07-12T07:54:47Z",
+        "position": 105,
+        "title": "Bagging Ensemble | Part 2 | Bagging Classifiers"
+      },
+      {
+        "added_at": "2021-07-12T07:55:01Z",
+        "position": 106,
+        "title": "Bagging Ensemble | Part 3 | Bagging Regressor"
+      },
+      {
+        "added_at": "2021-07-19T14:52:19Z",
+        "position": 107,
+        "title": "Introduction to Random Forest | Intuition behind the Algorithm"
+      },
+      {
+        "added_at": "2021-07-20T06:12:44Z",
+        "position": 108,
+        "title": "How Random Forest Performs So Well? Bias Variance Trade-Off in Random Forest"
+      },
+      {
+        "added_at": "2021-07-22T10:06:18Z",
+        "position": 109,
+        "title": "Bagging Vs Random Forest | What is the difference between Bagging and Random Forest | Very Important"
+      },
+      {
+        "added_at": "2021-07-22T10:08:55Z",
+        "position": 110,
+        "title": "Random Forest Hyper-parameters"
+      },
+      {
+        "added_at": "2021-07-26T07:28:06Z",
+        "position": 111,
+        "title": "Hyperparameter Tuning Random Forest using GridSearchCV and RandomizedSearchCV | Code Example"
+      },
+      {
+        "added_at": "2021-07-28T12:41:09Z",
+        "position": 112,
+        "title": "OOB Score | Out of Bag Evaluation in Random Forest | Machine Learning"
+      },
+      {
+        "added_at": "2021-07-30T11:54:49Z",
+        "position": 113,
+        "title": "Feature Importance using Random Forest and Decision Trees | How is Feature Importance calculated"
+      },
+      {
+        "added_at": "2021-08-09T13:03:07Z",
+        "position": 114,
+        "title": "How Adaboost Classifier Works? | Geometric Intuition"
+      },
+      {
+        "added_at": "2021-08-14T03:00:36Z",
+        "position": 115,
+        "title": "AdaBoost - A Step by Step Explanation"
+      },
+      {
+        "added_at": "2021-08-16T13:32:09Z",
+        "position": 116,
+        "title": "AdaBoost Algorithm | Code from Scratch"
+      },
+      {
+        "added_at": "2021-08-17T13:18:51Z",
+        "position": 117,
+        "title": "AdaBoost Hyperparameters | GridSearchCV in Adaboost"
+      },
+      {
+        "added_at": "2021-08-17T15:56:32Z",
+        "position": 118,
+        "title": "Bagging Vs Boosting | What is the difference between Bagging and Boosting"
+      },
+      {
+        "added_at": "2021-09-09T11:57:07Z",
+        "position": 119,
+        "title": "Gradient Boosting Explained | How Gradient Boosting Works?"
+      },
+      {
+        "added_at": "2021-09-20T10:01:08Z",
+        "position": 120,
+        "title": "Gradient Boosting Regression Part 2 | Mathematics of Gradient Boosting"
+      },
+      {
+        "added_at": "2023-08-08T08:09:45Z",
+        "position": 121,
+        "title": "Gradient Boosting for Classification | Geometric Intuition | CampusX"
+      },
+      {
+        "added_at": "2023-10-14T10:41:43Z",
+        "position": 122,
+        "title": "Introduction to XGBOOST | Machine Learning | CampusX"
+      },
+      {
+        "added_at": "2023-10-24T12:56:07Z",
+        "position": 123,
+        "title": "XGBoost for Regression | XGBoost Part 2 | CampusX"
+      },
+      {
+        "added_at": "2023-11-12T03:12:13Z",
+        "position": 124,
+        "title": "XGBoost For Classification | How XGBoost works on Classification Problems | CampusX"
+      },
+      {
+        "added_at": "2023-12-02T07:46:36Z",
+        "position": 125,
+        "title": "The Maths Behind XGBoost | Machine Learning | CampusX"
+      },
+      {
+        "added_at": "2021-09-30T12:41:23Z",
+        "position": 126,
+        "title": "Stacking and Blending Ensembles"
+      },
+      {
+        "added_at": "2021-08-24T12:27:01Z",
+        "position": 127,
+        "title": "K-Means Clustering Algorithm | Geometric Intuition | Clustering | Unsupervised Learning"
+      },
+      {
+        "added_at": "2021-08-25T10:06:12Z",
+        "position": 128,
+        "title": "K-Means Clustering Algorithm in Python | Practical Example | Student Clustering Example | sklearn"
+      },
+      {
+        "added_at": "2021-08-25T10:31:07Z",
+        "position": 129,
+        "title": "K-Means Clustering Algorithm From Scratch In Python | ML Algorithms From Scratch"
+      },
+      {
+        "added_at": "2021-11-07T03:34:02Z",
+        "position": 130,
+        "title": "Agglomerative Hierarchical Clustering | Python Code Example"
+      },
+      {
+        "added_at": "2023-12-17T00:28:14Z",
+        "position": 131,
+        "title": "DBSCAN Clustering Algorithms | Density Based Clustering | How DBSCAN Works | CampusX"
+      },
+      {
+        "added_at": "2024-05-04T09:07:59Z",
+        "position": 132,
+        "title": "Imbalanced Data in Machine Learning | Undersampling | Oversampling | SMOTE"
+      },
+      {
+        "added_at": "2024-09-24T15:32:07Z",
+        "position": 133,
+        "title": "Hyperparameter Tuning using Optuna | Bayesian Optimization using Optuna"
+      }
+    ]
+  }
+}
