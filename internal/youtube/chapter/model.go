@@ -8,11 +8,8 @@ type Chapter struct {
 
 
 type Chapters struct {
+	// list of chapters to be used as primary structural data
 	List []Chapter `json:"list"`
-
-	// AI / export friendly representation
-	Text string `json:"text"`
-
 	// optional metadata (NOT enforcement)
 	Valid bool `json:"valid"`
 }

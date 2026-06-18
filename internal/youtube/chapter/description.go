@@ -26,11 +26,13 @@ func ExtractChapters(description string) Chapters {
 
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
+
 		if line == "" {
 			continue
 		}
 
 		match := chapterRegex.FindStringSubmatch(line)
+
 		if len(match) == 0 {
 			continue
 		}
@@ -53,11 +55,13 @@ func ExtractChapters(description string) Chapters {
 		})
 	}
 
-	return Chapters{
-		List:  list,
-		Text:  ChaptersToText(list),
-		Valid: ValidateChapters(list),
+	chapters := Chapters{
+		List: list,
 	}
+
+	chapters.Valid = chapters.IsValid()
+
+	return chapters
 }
 
 // function to parse different time stamp
@@ -84,12 +88,6 @@ func parseTimestamp(ts string) int {
 
 
 func ExtractChapterText(description string) string {
-	chapters := ExtractChapters(description)
-
-	if len(chapters.Text) == 0 {
-		return ""
-	}
-
-	return chapters.Text
+	return ExtractChapters(description).Text()
 }
 
