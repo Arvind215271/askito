@@ -426,16 +426,16 @@ func debugVideo(
 			transcriptData.Source,
 		)
 
-		if len(transcriptData.Text) > 1000 {
+		if len(transcriptData.ToTimelineText()) > 1000 {
 
 			fmt.Println(
-				transcriptData.Text[:1000],
+				transcriptData.ToTimelineText()[:1000],
 			)
 
 		} else {
 
 			fmt.Println(
-				transcriptData.Text,
+				transcriptData.ToTimelineText(),
 			)
 		}
 
@@ -446,9 +446,12 @@ func debugVideo(
 			videoID+".txt",
 		)
 
+		tmp := transcriptData.GroupByDuration(30)
+		transcriptData.Segments = tmp
+
 		if err := saveFile(
 			transcriptPath,
-			[]byte(transcriptData.Text),
+			[]byte(transcriptData.ToTimelineText()),
 		); err != nil {
 
 			log.Error(
@@ -534,7 +537,7 @@ func debugVideo(
 	var transcriptText string
 
 	if video.Transcript != nil {
-		transcriptText = video.Transcript.Text
+		transcriptText = video.Transcript.ToTimelineText()
 	}
 
 	aiText := buildVideoAIText(

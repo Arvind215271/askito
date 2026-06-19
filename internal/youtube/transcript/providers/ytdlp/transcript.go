@@ -80,16 +80,15 @@ func (c *Client) GetTranscript(
 	}
 
 	// Parse and flatten the raw json3 tree down into a linear transcript string
-	text, err := parser.ExtractTextFromJSON3(raw)
+	segments, err := parser.ParseJSON3ToSegments(raw)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse json3 transcript: %w", err)
 	}
 
 	return &transcript.Transcript{
 		Language: "en",
-		Source:   transcript.TranscriptSourceYTDLP,
-		Raw:      string(raw),
-		Text:     text,
+		Source:   transcript.TranscriptSourceJSON3,
+		Segments: segments,
 	}, nil
 }
 
