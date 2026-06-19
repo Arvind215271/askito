@@ -377,14 +377,14 @@ func debugVideo(
 		video.ChannelTitle,
 	)
 
-	if video.Chapters.Text != "" {
+	if video.Chapters.Text() != "" {
 
 		fmt.Printf(
 			"\n-------------- CHAPTERS --------------\n",
 		)
 
 		fmt.Println(
-			video.Chapters.Text,
+			video.Chapters.Text(),
 		)
 	}
 
@@ -680,14 +680,14 @@ func buildPlaylistAIText(
         //     )
         // }
 
-        if v.Chapters.Text != "" {
+        if v.Chapters.Text() != "" {
 
             b.WriteString(
                 "Chapters:\n",
             )
 
             b.WriteString(
-                v.Chapters.Text,
+                v.Chapters.Text(),
             )
 
             b.WriteString(
@@ -728,14 +728,14 @@ func buildVideoAIText(
         )
     }
 
-    if video.Chapters.Text != "" {
+    if video.Chapters.Text() != "" {
 
         b.WriteString(
             "Chapters:\n",
         )
 
         b.WriteString(
-            video.Chapters.Text,
+            video.Chapters.Text(),
         )
 
         b.WriteString(

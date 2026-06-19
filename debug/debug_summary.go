@@ -42,7 +42,7 @@ func DebugLLMContext(
 		playlist.Videos[i].Video.Chapters = chapter.ExtractChapters(playlist.Videos[i].Video.Description)
 
 		// Fallback to Transcripts if Chapters do not exist
-		if len(playlist.Videos[i].Video.Chapters.Text) == 0 && playlist.Videos[i].Video.CaptionAvailable {
+		if len(playlist.Videos[i].Video.Chapters.Text()) == 0 && playlist.Videos[i].Video.CaptionAvailable {
 			transcriptData, err := transcriptSvc.Get(ctx, playlist.Videos[i].Video.ID)
 			if err == nil {
 				playlist.Videos[i].Video.Transcript = transcriptData

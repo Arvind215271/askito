@@ -55,7 +55,7 @@ func GenerateLLMContext(pl youtube.Playlist) PlaylistSummary {
 		}
 
 		// 2. Strategy A: If human-defined chapters exist, use them!
-		if len(pv.Video.Chapters.Text) > 0 {
+		if len(pv.Video.Chapters.Text()) > 0 {
 			seenChapters := make(map[string]bool)
 			for _, ch := range pv.Video.Chapters.List {
 				cleanCh := sanitizeTopicName(ch.Title)
