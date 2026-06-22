@@ -16,6 +16,8 @@ import (
 	"github.com/Arvind215271/askito/internal/youtube/transcript"
 	"github.com/Arvind215271/askito/internal/youtube/input"
 	"github.com/Arvind215271/askito/internal/youtube/chapter"
+
+	debugvideo "github.com/Arvind215271/askito/debug/testing/video"
 )
 
 func DebugInput(
@@ -33,7 +35,7 @@ https://www.youtube.com/watch?v=NWONeJKn6kc
 
 random garbage text
 
-https://www.youtube.com/watch?v=jNQXAC9IVRw
+https://youtu.be/yK1uBHPdp30
 `
 
 	results := youtubeurl.ParseMany(
@@ -101,13 +103,13 @@ https://www.youtube.com/watch?v=jNQXAC9IVRw
 			)
 
 			// Triggers your summary context optimization parser engine
-            DebugLLMContext(
-                ctx,
-                log,
-                youtubeSvc,
-                transcriptSvc,
-                item.ID,
-            )
+            // DebugLLMContext(
+            //     ctx,
+            //     log,
+            //     youtubeSvc,
+            //     transcriptSvc,
+            //     item.ID,
+            // )
 
 		case youtubeurl.InputTypeVideo:
 
@@ -573,6 +575,10 @@ func debugVideo(
 			aiPath,
 		)
 	}
+
+	// call for testing trasncript here ig..
+	debugvideo.DebugVideoTranscript(video)
+	
 }
 
 
