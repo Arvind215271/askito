@@ -31,11 +31,23 @@ func DebugInput(
 	input := `
 https://youtube.com/playlist?list=PLKnIA16_Rmvbr7zKYQuBfsVkjoLcJgxHH
 
+https://www.youtube.com/watch?v=7HKot-brXFE	
+https://www.youtube.com/watch?v=8jLOx1hD3_o 
 https://www.youtube.com/watch?v=NWONeJKn6kc
+ https://www.youtube.com/watch?v=hDKCxebp88A
+https://www.youtube.com/watch?v=Oe421EPjeBE
+https://www.youtube.com/watch?v=V_xro1bcAuA
+https://www.youtube.com/watch?v=un6ZyFkqFKo
+https://www.youtube.com/watch?v=qwAFL1597eM	
+https://www.youtube.com/watch?v=LzMnsfqjzkA	
+https://www.youtube.com/watch?v=mHxLXzYjQRE	
+https://www.youtube.com/watch?v=n1sfrc-RjyM
+https://www.youtube.com/watch?v=xwI5OBEnsZU
+https://www.youtube.com/watch?v=gmuTjeQUbTM
+https://youtu.be/yK1uBHPdp30
 
 random garbage text
 
-https://youtu.be/yK1uBHPdp30
 `
 
 	results := youtubeurl.ParseMany(
@@ -121,6 +133,7 @@ https://youtu.be/yK1uBHPdp30
 				exportSvc,
 				item.ID,
 			)
+
 		}
 	}
 }
@@ -327,120 +340,32 @@ func debugVideo(
 	exportSvc *export.Service,
 	videoID string,
 ) {
+	fmt.Printf("\n================ VIDEO =================\n")
 
-	fmt.Printf(
-		"\n================ VIDEO =================\n",
-	)
-
-	video, err := youtubeSvc.GetVideo(
-		ctx,
-		videoID,
-	)
+	video, err := youtubeSvc.GetVideo(ctx, videoID)
 	if err != nil {
-
-		log.Error(
-			"failed to fetch video",
-			"video_id",
-			videoID,
-			"error",
-			err,
-		)
-
+		log.Error("failed to fetch video", "video_id", videoID, "error", err)
 		return
 	}
 
 	// Extract chapters from description
-	video.Chapters = chapter.ExtractChapters(
-		video.Description,
-	)
+	video.Chapters = chapter.ExtractChapters(video.Description)
 
-	printSize(
-		"video",
-		video,
-	)
+	printSize("video", video)
 
-	fmt.Println(
-		"Title      :",
-		video.Title,
-	)
+	fmt.Println("Title      :", video.Title)
+	fmt.Println("Duration   :", video.Duration)
+	fmt.Println("Views      :", video.ViewCount)
+	fmt.Println("Channel    :", video.ChannelTitle)
 
-	fmt.Println(
-		"Duration   :",
-		video.Duration,
-	)
-
-	fmt.Println(
-		"Views      :",
-		video.ViewCount,
-	)
-
-	fmt.Println(
-		"Channel    :",
-		video.ChannelTitle,
-	)
-
-	if video.Chapters.Text() != "" {
-
-		fmt.Printf(
-			"\n-------------- CHAPTERS --------------\n",
-		)
-
-		fmt.Println(
-			video.Chapters.Text(),
-		)
-	}
-
-	transcriptData, err := transcriptSvc.Get(
-		ctx,
-		videoID,
-	)
-
+	// Transcript fetch (kept, but no heavy printing)
+	transcriptData, err := transcriptSvc.Get(ctx, videoID)
 	if err != nil {
-
-		log.Warn(
-			"transcript unavailable",
-			"video_id",
-			videoID,
-			"error",
-			err,
-		)
-
+		log.Warn("transcript unavailable", "video_id", videoID, "error", err)
 	} else {
-
 		video.Transcript = transcriptData
 
-		fmt.Printf(
-			"\n-------------- TRANSCRIPT --------------\n",
-		)
-
-		printSize(
-			"transcript",
-			transcriptData,
-		)
-
-		fmt.Println(
-			"Language :",
-			transcriptData.Language,
-		)
-
-		fmt.Println(
-			"Source   :",
-			transcriptData.Source,
-		)
-
-		if len(transcriptData.ToTimelineText()) > 1000 {
-
-			fmt.Println(
-				transcriptData.ToTimelineText()[:1000],
-			)
-
-		} else {
-
-			fmt.Println(
-				transcriptData.ToTimelineText(),
-			)
-		}
-
+		// still normalize for saving
 		transcriptPath := filepath.Join(
 			"testdata",
 			"youtube",
@@ -455,21 +380,9 @@ func debugVideo(
 			transcriptPath,
 			[]byte(transcriptData.ToTimelineText()),
 		); err != nil {
-
-			log.Error(
-				"failed to save transcript",
-				"path",
-				transcriptPath,
-				"error",
-				err,
-			)
-
+			log.Error("failed to save transcript", "path", transcriptPath, "error", err)
 		} else {
-
-			fmt.Println(
-				"saved:",
-				transcriptPath,
-			)
+			fmt.Println("saved:", transcriptPath)
 		}
 	}
 
@@ -477,7 +390,6 @@ func debugVideo(
 		video,
 		export.VideoExportRequest{
 			Format: export.FormatJSON,
-
 			Fields: []string{
 				"title",
 				"description",
@@ -487,26 +399,12 @@ func debugVideo(
 		},
 	)
 	if err != nil {
-
-		log.Error(
-			"failed video export",
-			"video_id",
-			videoID,
-			"error",
-			err,
-		)
-
+		log.Error("failed video export", "video_id", videoID, "error", err)
 		return
 	}
 
-	fmt.Printf(
-		"\n-------------- EXPORT --------------\n",
-	)
-
-	fmt.Printf(
-		"Export Size : %.2f KB\n",
-		float64(len(exportJSON))/1024,
-	)
+	fmt.Printf("\n-------------- EXPORT --------------\n")
+	fmt.Printf("Export Size : %.2f KB\n", float64(len(exportJSON))/1024)
 
 	filePath := filepath.Join(
 		"testdata",
@@ -515,37 +413,18 @@ func debugVideo(
 		videoID+".json",
 	)
 
-	if err := saveFile(
-		filePath,
-		exportJSON,
-	); err != nil {
-
-		log.Error(
-			"failed to save video export",
-			"path",
-			filePath,
-			"error",
-			err,
-		)
-
+	if err := saveFile(filePath, exportJSON); err != nil {
+		log.Error("failed to save video export", "path", filePath, "error", err)
 	} else {
-
-		fmt.Println(
-			"saved:",
-			filePath,
-		)
+		fmt.Println("saved:", filePath)
 	}
 
 	var transcriptText string
-
 	if video.Transcript != nil {
 		transcriptText = video.Transcript.ToTimelineText()
 	}
 
-	aiText := buildVideoAIText(
-		video,
-		transcriptText,
-	)
+	aiText := buildVideoAIText(video, transcriptText)
 
 	aiPath := filepath.Join(
 		"testdata",
@@ -555,30 +434,17 @@ func debugVideo(
 		videoID+".txt",
 	)
 
-	if err := saveFile(
-		aiPath,
-		[]byte(aiText),
-	); err != nil {
-
-		log.Error(
-			"failed to save ai video",
-			"path",
-			aiPath,
-			"error",
-			err,
-		)
-
+	if err := saveFile(aiPath, []byte(aiText)); err != nil {
+		log.Error("failed to save ai video", "path", aiPath, "error", err)
 	} else {
-
-		fmt.Println(
-			"saved:",
-			aiPath,
-		)
+		fmt.Println("saved:", aiPath)
 	}
 
-	// call for testing trasncript here ig..
-	debugvideo.DebugVideoTranscript(video)
-	
+	// transcript debug hook (kept)
+	err = debugvideo.DebugVideoTranscript(video)
+	if err != nil {
+		log.Error("Signal Failed", err)
+	}
 }
 
 
