@@ -1,9 +1,11 @@
 package wordstats
 
-const BucketCount = 32
+type BucketConfig struct {
+	Count int
+}
 
 // CreateBuckets assigns words into importance buckets
-func CreateBuckets(words []*WordStats) []Bucket {
+func CreateBuckets(words []*WordStats, cfg BucketConfig) []Bucket {
 	if len(words) == 0 {
 		return nil
 	}
@@ -15,12 +17,12 @@ func CreateBuckets(words []*WordStats) []Bucket {
 		}
 	}
 
-	buckets := make([]Bucket, BucketCount)
+	buckets := make([]Bucket, cfg.Count)
 
 	for _, w := range words {
 		bid := 0
 		if maxScore > 0 {
-			bid = int((w.Score / maxScore) * float64(BucketCount-1))
+			bid = int((w.Score / maxScore) * float64(cfg.Count-1))
 		}
 
 		b := &buckets[bid]
@@ -44,8 +46,8 @@ func CreateBuckets(words []*WordStats) []Bucket {
 	}
 
 	// compact output (remove empty buckets)
-	out := make([]Bucket, 0, BucketCount)
-	for i := BucketCount - 1; i >= 0; i-- {
+	out := make([]Bucket, 0, cfg.Count)
+	for i := cfg.Count - 1; i >= 0; i-- {
 		if len(buckets[i].Words) > 0 {
 			out = append(out, buckets[i])
 		}

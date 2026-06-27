@@ -441,9 +441,14 @@ func debugVideo(
 	}
 
 	// transcript debug hook (kept)
-	err = debugvideo.DebugVideoTranscript(video)
+	// err = debugvideo.DebugVideoTranscript(video)
+	// if err != nil {
+	// 	log.Error("Word Stats Signal Failed", err)
+	// }
+
+	err = debugvideo.DebugWindowTranscript(video)
 	if err != nil {
-		log.Error("Signal Failed", err)
+		log.Error("Window Word Stats Signal failed", err)
 	}
 }
 

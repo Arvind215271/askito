@@ -60,3 +60,64 @@ func ScoreWords(stats map[string]*WordStats) []*WordStats {
 }
 
 
+
+type Window struct {
+	Words map[string]*WordStats
+
+	OriginalWords int
+	OriginalChars int
+}
+
+
+func BuildWindowStats(t *transcript.Transcript, windowSize float64) map[int]*Window {
+
+	windowMap := make(map[int]*Window)
+
+	if t == nil {
+		return windowMap
+	}
+
+	for _, seg := range t.Segments {
+
+		wid := int(seg.Start / windowSize)
+
+		if windowMap[wid] == nil {
+			windowMap[wid] = &Window{
+				Words: make(map[string]*WordStats),
+			}
+		}
+
+		w := windowMap[wid]
+
+		// ORIGINAL SOURCE STATS (correct now)
+		w.OriginalWords += len(strings.Fields(seg.Text))
+		w.OriginalChars += len([]rune(seg.Text))
+
+		clean := cleanRegex.ReplaceAllString(strings.ToLower(seg.Text), "")
+		words := strings.Fields(clean)
+
+		if len(words) == 0 {
+			continue
+		}
+
+		duration := seg.End - seg.Start
+		perWord := duration / float64(len(words))
+
+		for _, token := range words {
+
+			if token == "" {
+				continue
+			}
+
+			if w.Words[token] == nil {
+				w.Words[token] = &WordStats{Word: token}
+			}
+
+			ws := w.Words[token]
+			ws.Count++
+			ws.Duration += perWord
+		}
+	}
+
+	return windowMap
+}

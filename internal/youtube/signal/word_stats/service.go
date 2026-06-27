@@ -10,6 +10,9 @@ type AnalysisConfig struct {
 	Depth float64 // 0.0 - 1.0
 
 	MaxChars int
+
+	WindowSize float64   // how many seconds each window is using
+	BucketCount int      // how many bucekts to create per window
 }
 
 type Service struct{}
@@ -18,33 +21,76 @@ func NewService() *Service {
 	return &Service{}
 }
 
-func (s *Service) AnalyzeVideo(
+func (s *Service) AnalyzeVideoWordStats(
 	t *transcript.Transcript,
 	cfg AnalysisConfig,
 ) Result {
 
-	// 1. raw extraction
 	raw := BuildWordStats(t)
 
-	// 2. scoring
+	return RunPipeline(raw, cfg)
+}
+
+
+
+func RunPipeline(
+	raw map[string]*WordStats,
+	cfg AnalysisConfig,
+) Result {
+
 	scored := ScoreWords(raw)
 
-	// 3. optional heavy stopword filtering
 	if cfg.UseHeavyStopWords {
 		scored = FilterHeavyStopWords(scored)
 	}
 
-	// 4. main filtering rules
 	scored = FilterWords(scored, FilterConfig{
 		MinFreq:  cfg.MinFreq,
 		Depth:    cfg.Depth,
 		MaxChars: cfg.MaxChars,
 	})
 
-	// 5. bucketization
-	buckets := CreateBuckets(scored)
+	buckets := CreateBuckets(scored, BucketConfig{
+		Count: cfg.BucketCount,
+	})
 
-	// 6. result
-	return BuildResult(t, scored, buckets)
+	outputChars := 0
+	for _, w := range scored {
+		outputChars += len(w.Word)
+	}
+
+	return Result{
+		Buckets: buckets,
+
+		OriginalWords: len(raw),
+		KeptWords:     len(scored),
+
+		OriginalChars: 0, // window/global decides this externally
+		OutputChars:   outputChars,
+	}
 }
 
+
+
+func (s *Service) AnalyzeVideoWindowed(
+	t *transcript.Transcript,
+	cfg AnalysisConfig,
+) []Result {
+
+	windows := BuildWindowStats(t, cfg.WindowSize)
+
+	out := make([]Result, 0, len(windows))
+
+	for _, w := range windows {
+
+		res := RunPipeline(w.Words, cfg)
+
+		// attach correct source stats
+		res.OriginalWords = w.OriginalWords
+		res.OriginalChars = w.OriginalChars
+
+		out = append(out, res)
+	}
+
+	return out
+}

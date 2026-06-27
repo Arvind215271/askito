@@ -103,7 +103,7 @@ func runVideoTests(
 	results := make([]VideoTestResult, 0, len(tests))
 
 	for _, t := range tests {
-		res := svc.AnalyzeVideo(video.Transcript, t.Config)
+		res := svc.AnalyzeVideoWordStats(video.Transcript, t.Config)
 		results = append(results, mapResult(t.Name, res))
 	}
 
@@ -117,7 +117,7 @@ func DebugVideoTranscript(video youtube.Video) error {
 
 	
 
-	fmt.Println("Transcript Signal Testing")
+	// fmt.Println("Transcript Signal Testing")
 
 	svc := wordstats.NewService()
 
@@ -266,4 +266,207 @@ func PrintVideoTestResult(r VideoTestResult) {
 
 	fmt.Println("-----------------------------------")
 	fmt.Println("===================================")
+}
+
+
+type WindowTestCase struct {
+	Name string
+
+	Config wordstats.AnalysisConfig
+	WindowSize float64
+}
+
+
+func runWindowTests(
+	svc *wordstats.Service,
+	video *youtube.Video,
+	tests []WindowTestCase,
+) []VideoTestResult {
+
+	results := make([]VideoTestResult, 0, len(tests))
+
+	for _, t := range tests {
+
+		res := svc.AnalyzeVideoWindowed(
+			video.Transcript,
+			t.Config,
+			
+		)
+
+		// export window result (NEW exporter you built earlier)
+		output := wordstats.ExportWindowVerbose(res, t.Config)
+
+		originalSize := len(video.Transcript.ToPlainText())
+		resultSize := len(output)
+
+		results = append(results, VideoTestResult{
+			Name:             t.Name,
+			OriginalSize:     originalSize,
+			ResultSize:       resultSize,
+			ReductionPercent: float64(originalSize-resultSize) / float64(originalSize) * 100,
+			Output:           output,
+		})
+	}
+
+	return results
+}
+
+
+
+func getWindowTestCases() []WindowTestCase {
+
+	return []WindowTestCase{
+
+		// -------------------------
+		// DEFAULT BASELINE
+		// -------------------------
+		{
+			Name: "ws_300_default",
+			Config: wordstats.AnalysisConfig{
+				WindowSize: 300,
+				BucketCount: 3,
+				UseHeavyStopWords: true,
+				MinFreq: 2,
+				Depth: 0.8,
+			},
+		},
+
+		// -------------------------
+		// SMALLER WINDOWS (more detail)
+		// -------------------------
+		{
+			Name: "ws_200_dense_3b",
+			Config: wordstats.AnalysisConfig{
+				WindowSize: 200,
+				BucketCount: 3,
+				UseHeavyStopWords: true,
+				MinFreq: 1,
+				Depth: 1.0,
+			},
+		},
+		{
+			Name: "ws_200_dense_2b",
+			Config: wordstats.AnalysisConfig{
+				WindowSize: 200,
+				BucketCount: 2,
+				UseHeavyStopWords: true,
+				MinFreq: 1,
+				Depth: 1.0,
+			},
+		},
+
+		// -------------------------
+		// MID RANGE WINDOWS (stable)
+		// -------------------------
+		{
+			Name: "ws_300_balanced_3b",
+			Config: wordstats.AnalysisConfig{
+				WindowSize: 300,
+				BucketCount: 3,
+				UseHeavyStopWords: true,
+				MinFreq: 2,
+				Depth: 0.8,
+			},
+		},
+		{
+			Name: "ws_300_balanced_2b",
+			Config: wordstats.AnalysisConfig{
+				WindowSize: 300,
+				BucketCount: 2,
+				UseHeavyStopWords: true,
+				MinFreq: 2,
+				Depth: 0.8,
+			},
+		},
+
+		// -------------------------
+		// LARGER WINDOWS (compression heavy)
+		// -------------------------
+		{
+			Name: "ws_450_compact_3b",
+			Config: wordstats.AnalysisConfig{
+				WindowSize: 450,
+				BucketCount: 3,
+				UseHeavyStopWords: true,
+				MinFreq: 3,
+				Depth: 0.6,
+			},
+		},
+		{
+			Name: "ws_450_compact_2b",
+			Config: wordstats.AnalysisConfig{
+				WindowSize: 450,
+				BucketCount: 2,
+				UseHeavyStopWords: true,
+				MinFreq: 3,
+				Depth: 0.6,
+			},
+		},
+
+		// -------------------------
+		// MAX WINDOW RANGE (heavy compression)
+		// -------------------------
+		{
+			Name: "ws_600_ultra_3b",
+			Config: wordstats.AnalysisConfig{
+				WindowSize: 600,
+				BucketCount: 3,
+				UseHeavyStopWords: true,
+				MinFreq: 4,
+				Depth: 0.5,
+			},
+		},
+		{
+			Name: "ws_600_ultra_2b",
+			Config: wordstats.AnalysisConfig{
+				WindowSize: 600,
+				BucketCount: 2,
+				UseHeavyStopWords: true,
+				MinFreq: 5,
+				Depth: 0.4,
+			},
+		},
+
+		// -------------------------
+		// EDGE COMPRESSION STRESS TEST
+		// -------------------------
+		{
+			Name: "ws_300_extreme_compress_2b",
+			Config: wordstats.AnalysisConfig{
+				WindowSize: 300,
+				BucketCount: 2,
+				UseHeavyStopWords: true,
+				MinFreq: 8,
+				Depth: 0.3,
+			},
+		},
+	}
+}
+
+
+func DebugWindowTranscript(video youtube.Video) error {
+
+	if video.Transcript == nil {
+		return fmt.Errorf("video transcript not available")
+	}
+
+	fmt.Println("Window Signal Testing")
+
+	svc := wordstats.NewService()
+
+	tests := getWindowTestCases()
+
+	results := runWindowTests(svc, &video, tests)
+
+	for _, r := range results {
+		PrintVideoTestResult(r)
+	}
+
+	suite := VideoTestSuite{
+		VideoID: video.ID,
+		Title:   video.Title,
+		Results: results,
+	}
+
+	return ExportVideoTestResults(suite)
 }
