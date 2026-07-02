@@ -87,7 +87,7 @@
 
 ---
 
-## Phase 4: Transcript Normalization
+## Phase 4: Transcript Normalization (NOT NEEDED, everything is currently english)
 
 - [ ] Detect transcript language
   Identify the original language of the extracted transcript.
@@ -109,7 +109,7 @@
 
 ---
 
-## Phase 5: Chapter Generation
+## Phase 5: Chapter Generation (NOT doing... too much work as transcript can be quite large)
 
 - [ ] Research chapter generation approaches
   Evaluate methods for generating chapters from transcript content.

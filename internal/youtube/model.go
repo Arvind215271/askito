@@ -59,8 +59,10 @@ type Video struct {
 
 	PublishedAt time.Time `json:"published_at"`
 
-	Duration string `json:"duration"`
-	DurationSeconds int64  `json:"duration_seconds"`
+	Duration          string  `json:"duration"`
+	DurationSeconds   int64   `json:"duration_seconds"`
+	DurationMinutes   float64 `json:"duration_minutes"`
+	DurationTimestamp string  `json:"duration_timestamp"`
 
 	ViewCount    uint64 `json:"view_count"`
 	LikeCount    uint64 `json:"like_count"`

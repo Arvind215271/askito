@@ -15,14 +15,16 @@ import (
 
 	// api
 	"github.com/Arvind215271/askito/internal/api"
+	"github.com/Arvind215271/askito/internal/api/video"
 
 	// youtube
 	"github.com/Arvind215271/askito/internal/youtube"
-	youtubeapi "github.com/Arvind215271/askito/internal/youtube/youtube_api"
+	youtubeapi "github.com/Arvind215271/askito/internal/youtube/metadata/youtube_api"
+	ytdlpmetadata "github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp"
 
 	// transcript
 	"github.com/Arvind215271/askito/internal/youtube/transcript"
-	ytdlp "github.com/Arvind215271/askito/internal/youtube/transcript/providers/ytdlp"
+	ytdlptranscript "github.com/Arvind215271/askito/internal/youtube/transcript/providers/ytdlp"
 
 	// export
 	"github.com/Arvind215271/askito/internal/youtube/export"
@@ -30,6 +32,7 @@ import (
 	// debug
 	"github.com/Arvind215271/askito/debug"
 )
+
 func main() {
 
 	// get the config
@@ -68,28 +71,34 @@ func main() {
 		config.YouTubeAPIKey,
 	)
 	if err != nil {
-
 		logger.Fatal(
 			"failed to create youtube client",
 			"error",
 			err,
 		)
 	}
-	
 
 	youtubeProvider := youtubeapi.NewProvider(
 		youtubeClient,
 	)
 
+	ytdlpMetadataClient := ytdlpmetadata.NewClient()
+	ytdlpMetadataProvider := ytdlpmetadata.NewProvider(ytdlpMetadataClient)
+
 	youtubeService := youtube.NewService(
 		youtubeProvider,
+		ytdlpMetadataProvider,
 	)
+
+	// video handler
+	videoHandler := video.NewHandler(youtubeService)
+	e.GET("/videos/:id", videoHandler.GetVideoByID)
 
 	// transcript
 
-	ytdlpClient := &ytdlp.Client{}
+	ytdlpTranscriptClient := &ytdlptranscript.Client{}
 
-	if err := ytdlpClient.ValidateYTDLP(); err != nil {
+	if err := ytdlpTranscriptClient.ValidateYTDLP(); err != nil {
 
 		logger.Warn(
 			"yt-dlp unavailable",
@@ -98,8 +107,8 @@ func main() {
 		)
 	}
 
-	transcriptProvider := ytdlp.NewProvider(
-		ytdlpClient,
+	transcriptProvider := ytdlptranscript.NewProvider(
+		ytdlpTranscriptClient,
 	)
 
 	transcriptService := transcript.NewService(
@@ -116,8 +125,7 @@ func main() {
 	)
 
 	// only run debug in development
-
-	if config.Env == "development" {
+	if config.Env == "dev" {
 
 		debug.DebugInput(
 			ctx,
@@ -127,6 +135,7 @@ func main() {
 			exportService,
 		)
 	}
+
 
 	e.HTTPErrorHandler = errorHandler.Handle
 
@@ -142,8 +151,6 @@ func main() {
 	}
 }
 
-
-
 func ping(
 	c *echo.Context,
 ) error {
@@ -152,4 +159,4 @@ func ping(
 		http.StatusOK,
 		"pong",
 	)
-} 
+}

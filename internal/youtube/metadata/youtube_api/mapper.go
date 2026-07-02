@@ -8,7 +8,8 @@ import (
 func MapVideo(
 	video *yt.Video,
 ) youtube.Video {
-
+	seconds := youtube.ParseYouTubeDuration(video.ContentDetails.Duration)
+	
 	return youtube.Video{
 		ID:          video.Id,
 		Title:       video.Snippet.Title,
@@ -21,7 +22,10 @@ func MapVideo(
 
 		PublishedAt: parseTime(video.Snippet.PublishedAt),
 
-		Duration: video.ContentDetails.Duration,
+		Duration:          video.ContentDetails.Duration,
+		DurationSeconds:   int64(seconds),
+		DurationMinutes:   youtube.GetDurationMinutes(seconds),
+		DurationTimestamp: youtube.GetDurationTimestamp(seconds),
 
 		ViewCount:    video.Statistics.ViewCount,
 		LikeCount:    video.Statistics.LikeCount,

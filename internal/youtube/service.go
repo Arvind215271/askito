@@ -7,35 +7,38 @@ import(
 )
 
 type Service struct {
-	provider Provider
+	apiProvider    Provider
+	ytdlpProvider  Provider
 }
 
 func NewService(
-	provider Provider,
+	apiProvider Provider,
+	ytdlpProvider Provider,
 ) *Service {
 	return &Service{
-		provider: provider,
+		apiProvider:   apiProvider,
+		ytdlpProvider: ytdlpProvider,
 	}
 }
 
 func (s *Service) GetPlaylist(
 	ctx context.Context,
 	playlistID string,
+	providerType ProviderType,
 ) (Playlist, error) {
-
-	return s.provider.GetPlaylist(
-		ctx,
-		playlistID,
-	)
+	if providerType == ProviderAPI {
+		return s.apiProvider.GetPlaylist(ctx, playlistID)
+	}
+	return s.ytdlpProvider.GetPlaylist(ctx, playlistID)
 }
 
 func (s *Service) GetVideo(
 	ctx context.Context,
 	videoID string,
+	providerType ProviderType,
 ) (Video, error) {
-
-	return s.provider.GetVideo(
-		ctx,
-		videoID,
-	)
+	if providerType == ProviderAPI {
+		return s.apiProvider.GetVideo(ctx, videoID)
+	}
+	return s.ytdlpProvider.GetVideo(ctx, videoID)
 }

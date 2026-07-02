@@ -30,3 +30,6 @@ testdata/
 # Editor/IDE
 # .idea/
 # .vscode/
+
+.roo/
+AGENTS.md

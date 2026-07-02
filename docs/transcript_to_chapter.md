@@ -1,4 +1,4 @@
-# Transcript to Chapter Generation TODO
+# Transcript to Chapter Generation TODO (NOT DOING)
 
 ## Phase 1: Research & Validation
 

@@ -1,6 +1,7 @@
 package youtube
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	
@@ -59,4 +60,19 @@ func mustAtoi(s string) int {
 
 func (v *Video) Seconds() float64 {
 	return ParseYouTubeDuration(v.Duration)
+}
+
+func GetDurationMinutes(seconds float64) float64 {
+	return seconds / 60.0
+}
+
+func GetDurationTimestamp(seconds float64) string {
+	h := int(seconds) / 3600
+	m := (int(seconds) % 3600) / 60
+	s := int(seconds) % 60
+	
+	if h > 0 {
+		return fmt.Sprintf("%d:%02d:%02d", h, m, s)
+	}
+	return fmt.Sprintf("%d:%02d", m, s)
 }

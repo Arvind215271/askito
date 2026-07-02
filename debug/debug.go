@@ -153,6 +153,7 @@ func debugPlaylist(
 	playlist, err := youtubeSvc.GetPlaylist(
 		ctx,
 		playlistID,
+		youtube.ProviderAPI,
 	)
 	if err != nil {
 
@@ -342,7 +343,7 @@ func debugVideo(
 ) {
 	fmt.Printf("\n================ VIDEO =================\n")
 
-	video, err := youtubeSvc.GetVideo(ctx, videoID)
+	video, err := youtubeSvc.GetVideo(ctx, videoID, youtube.ProviderAPI)
 	if err != nil {
 		log.Error("failed to fetch video", "video_id", videoID, "error", err)
 		return
