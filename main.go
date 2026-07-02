@@ -92,7 +92,7 @@ func main() {
 
 	// video handler
 	videoHandler := video.NewHandler(youtubeService)
-	e.GET("/videos/:id", videoHandler.GetVideoByID)
+	video.RegisterRoutes(e, videoHandler)
 
 	// transcript
 

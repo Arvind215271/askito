@@ -2,13 +2,13 @@
 
 ## Phase 1: Video Metadata
 
-- [ ] Video endpoint
+- [x] Video endpoint
   Accept a YouTube video URL and return the normalized video model.
 
-- [ ] Video ID endpoint
+- [x] Video ID endpoint
   Accept a YouTube video ID and return the normalized video model.
 
-- [ ] Normalize YouTube metadata
+- [x] Normalize YouTube metadata
   Convert the YouTube API response into the project's internal schema.
 
 ---

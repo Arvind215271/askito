@@ -3,10 +3,17 @@ package ytdlp
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"os/exec"
+	"time"
 )
 
 type Client struct{}
+
+const (
+	maxRetries = 3
+	timeout    = 10 * time.Second
+)
 
 func NewClient() *Client {
 	return &Client{}
@@ -18,8 +25,19 @@ func (c *Client) ValidateYTDLP() error {
 }
 
 func (c *Client) Fetch(ctx context.Context, args ...string) ([]byte, error) {
-	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
-	return cmd.Output()
+	var lastErr error
+	for i := 0; i < maxRetries; i++ {
+		ctxWithTimeout, cancel := context.WithTimeout(ctx, timeout)
+		defer cancel()
+
+		cmd := exec.CommandContext(ctxWithTimeout, "yt-dlp", args...)
+		output, err := cmd.Output()
+		if err == nil {
+			return output, nil
+		}
+		lastErr = err
+	}
+	return nil, errors.New("failed after max retries: " + lastErr.Error())
 }
 
 func (c *Client) GetVideo(ctx context.Context, videoID string) (YTOutput, error) {
