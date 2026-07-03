@@ -1,6 +1,6 @@
 // reference: https://stackoverflow.com/questions/63821605/how-do-i-get-info-about-a-youtube-videos-chapters-from-the-api
 
-package chapter
+package description
 
 import (
 	"regexp"

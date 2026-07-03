@@ -1,9 +1,11 @@
 package video
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/Arvind215271/askito/internal/youtube"
+	"github.com/Arvind215271/askito/internal/youtube/description"
 	youtubeurl "github.com/Arvind215271/askito/internal/youtube/input"
 	"github.com/labstack/echo/v5"
 )
@@ -25,15 +27,8 @@ func (h *Handler) GetVideoByID(c *echo.Context) error {
 	}
 
 	providerType := youtube.ProviderType((*c).QueryParam("provider"))
-	if providerType == "" {
-		providerType = youtube.ProviderYTDLP
-	}
-
-	if providerType != youtube.ProviderAPI && providerType != youtube.ProviderYTDLP {
-		return Err.InvalidProvider()
-	}
-
-	video, err := h.youtubeService.GetVideo((*c).Request().Context(), id, providerType)
+	
+	video, err := h.getVideo( (*c).Request().Context(), id, providerType)
 	if err != nil {
 		return Err.FetchFailed(err)
 	}
@@ -57,18 +52,29 @@ func (h *Handler) GetVideoByURL(c *echo.Context) error {
 	}
 
 	providerType := youtube.ProviderType((*c).QueryParam("provider"))
-	if providerType == "" {
-		providerType = youtube.ProviderYTDLP
-	}
-
-	if providerType != youtube.ProviderAPI && providerType != youtube.ProviderYTDLP {
-		return Err.InvalidProvider()
-	}
-
-	video, err := h.youtubeService.GetVideo((*c).Request().Context(), parsed.ID, providerType)
+	
+	video, err := h.getVideo((*c).Request().Context(), parsed.ID, providerType)
 	if err != nil {
 		return Err.FetchFailed(err)
 	}
 
 	return (*c).JSON(http.StatusOK, video)
+}
+
+func (h *Handler) getVideo(ctx context.Context, id string, providerType youtube.ProviderType) (youtube.Video, error) {
+	if providerType == "" {
+		providerType = youtube.ProviderYTDLP
+	}
+
+	if providerType != youtube.ProviderAPI && providerType != youtube.ProviderYTDLP {
+		return youtube.Video{}, Err.InvalidProvider()
+	}
+
+	video, err := h.youtubeService.GetVideo(ctx, id, providerType)
+	if err != nil {
+		return youtube.Video{}, err
+	}
+
+	video.DescriptionMetadata = description.ProcessDescription(video.Description)
+	return video, nil
 }

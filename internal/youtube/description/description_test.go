@@ -1,6 +1,6 @@
 // ./internal/youtube/description_chapter_test.go
 
-package chapter
+package description
 
 import (
 	"testing"

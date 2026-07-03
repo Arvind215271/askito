@@ -1,4 +1,4 @@
-package chapter
+package description
 
 func (c Chapters) IsValid() bool {
 	// YouTube requires at least 3 chapters

@@ -2,13 +2,13 @@
 
 package youtube
 
-import(
+import (
 	"context"
 )
 
 type Service struct {
-	apiProvider    Provider
-	ytdlpProvider  Provider
+	apiProvider   Provider
+	ytdlpProvider Provider
 }
 
 func NewService(

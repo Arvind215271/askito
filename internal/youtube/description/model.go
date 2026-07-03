@@ -1,4 +1,4 @@
-package chapter	
+package description	
 
 type Chapter struct {
 	Title     string

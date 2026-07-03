@@ -15,7 +15,7 @@ import (
 	"github.com/Arvind215271/askito/internal/youtube"
 	"github.com/Arvind215271/askito/internal/youtube/transcript"
 	"github.com/Arvind215271/askito/internal/youtube/input"
-	"github.com/Arvind215271/askito/internal/youtube/chapter"
+	"github.com/Arvind215271/askito/internal/youtube/description"
 
 	debugvideo "github.com/Arvind215271/askito/debug/testing/video"
 )
@@ -170,12 +170,7 @@ func debugPlaylist(
 
 	// enrich playlist videos with chapter data
 	for i := range playlist.Videos {
-
-		chapters := chapter.ExtractChapters(
-			playlist.Videos[i].Video.Description,
-		)
-
-		playlist.Videos[i].Video.Chapters = chapters
+		playlist.Videos[i].Video.DescriptionMetadata = description.ProcessDescription(playlist.Videos[i].Video.Description)
 	}
 
 	printSize(
@@ -213,7 +208,7 @@ func debugPlaylist(
 
 		fmt.Println(
 			"Chapters   :",
-			len(first.Video.Chapters.List),
+			len(first.Video.DescriptionMetadata.Chapters.List),
 		)
 
 		fmt.Println(
@@ -350,7 +345,7 @@ func debugVideo(
 	}
 
 	// Extract chapters from description
-	video.Chapters = chapter.ExtractChapters(video.Description)
+	video.DescriptionMetadata = description.ProcessDescription(video.Description)
 
 	printSize("video", video)
 
@@ -561,14 +556,14 @@ func buildPlaylistAIText(
         //     )
         // }
 
-        if v.Chapters.Text() != "" {
+        if v.DescriptionMetadata.Chapters.Text() != "" {
 
             b.WriteString(
                 "Chapters:\n",
             )
 
             b.WriteString(
-                v.Chapters.Text(),
+                v.DescriptionMetadata.Chapters.Text(),
             )
 
             b.WriteString(
@@ -609,14 +604,14 @@ func buildVideoAIText(
         )
     }
 
-    if video.Chapters.Text() != "" {
+    if video.DescriptionMetadata.Chapters.Text() != "" {
 
         b.WriteString(
             "Chapters:\n",
         )
 
         b.WriteString(
-            video.Chapters.Text(),
+            video.DescriptionMetadata.Chapters.Text(),
         )
 
         b.WriteString(

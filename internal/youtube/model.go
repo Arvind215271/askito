@@ -4,8 +4,8 @@ package youtube
 
 import (
 	"time"
-	transcript "github.com/Arvind215271/askito/internal/youtube/transcript"
-	chapter "github.com/Arvind215271/askito/internal/youtube/chapter"
+	"github.com/Arvind215271/askito/internal/youtube/transcript"
+	"github.com/Arvind215271/askito/internal/youtube/description"
 )
 
 type Playlist struct {
@@ -47,7 +47,7 @@ type Video struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 
-	Chapters chapter.Chapters `json:"chapters,omitempty"`
+	DescriptionMetadata description.Metadata `json:"description_metadata,omitempty"`
 
 	Transcript *transcript.Transcript `json:"transcript,omitempty"`
 	
