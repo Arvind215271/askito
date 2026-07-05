@@ -12,7 +12,7 @@ type Client struct{}
 
 const (
 	maxRetries = 3
-	timeout    = 10 * time.Second
+	timeout    = 30 * time.Second
 )
 
 func NewClient() *Client {

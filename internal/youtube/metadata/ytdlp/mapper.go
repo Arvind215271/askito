@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Arvind215271/askito/internal/youtube"
+	"github.com/Arvind215271/askito/internal/youtube/subtitle"
 )
 
 func MapVideo(meta YTOutput) youtube.Video {
@@ -37,7 +38,35 @@ func MapVideo(meta YTOutput) youtube.Video {
 		Tags:              meta.Tags,
 		CategoryID:        "", // Need to map categories if available
 		PrivacyStatus:     meta.Availability,
+		SubtitleMetadata:  mapSubtitleMetadata(meta),
 	}
+}
+
+func mapSubtitleMetadata(meta YTOutput) subtitle.SubtitleMetadata {
+	return subtitle.SubtitleMetadata{
+		Manual:    mapTracks(meta.Subtitles),
+		Automatic: mapTracks(meta.AutomaticCaptions),
+	}
+}
+
+func mapTracks(raw map[string][]SubtitleFormat) []subtitle.SubtitleTrack {
+	var tracks []subtitle.SubtitleTrack
+	for lang, formats := range raw {
+		track := subtitle.SubtitleTrack{
+			LanguageCode: lang,
+			LanguageName: lang, // Could be enhanced with a lookup
+			Formats:      []string{},
+		}
+		seen := make(map[string]bool)
+		for _, f := range formats {
+			if !seen[f.Ext] {
+				track.Formats = append(track.Formats, f.Ext)
+				seen[f.Ext] = true
+			}
+		}
+		tracks = append(tracks, track)
+	}
+	return tracks
 }
 
 func MapPlaylist(meta YTPlaylistOutput) youtube.Playlist {

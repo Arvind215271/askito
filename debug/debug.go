@@ -9,13 +9,13 @@ import (
 
 	"strings"
 
-
 	"github.com/Arvind215271/askito/internal/youtube/export"
 	"github.com/Arvind215271/askito/internal/logger"
 	"github.com/Arvind215271/askito/internal/youtube"
 	"github.com/Arvind215271/askito/internal/youtube/transcript"
-	"github.com/Arvind215271/askito/internal/youtube/input"
+	youtubeurl "github.com/Arvind215271/askito/internal/youtube/input"
 	"github.com/Arvind215271/askito/internal/youtube/description"
+	"github.com/Arvind215271/askito/internal/youtube/subtitle"
 
 	debugvideo "github.com/Arvind215271/askito/debug/testing/video"
 )
@@ -28,7 +28,7 @@ func DebugInput(
 	exportSvc *export.Service,
 ) {
 
-	input := `
+	inputStr := `
 https://youtube.com/playlist?list=PLKnIA16_Rmvbr7zKYQuBfsVkjoLcJgxHH
 
 https://www.youtube.com/watch?v=7HKot-brXFE	
@@ -51,7 +51,7 @@ random garbage text
 `
 
 	results := youtubeurl.ParseMany(
-		input,
+		inputStr,
 	)
 
 	if len(results) == 0 {
@@ -113,15 +113,6 @@ random garbage text
 				exportSvc,
 				item.ID,
 			)
-
-			// Triggers your summary context optimization parser engine
-            // DebugLLMContext(
-            //     ctx,
-            //     log,
-            //     youtubeSvc,
-            //     transcriptSvc,
-            //     item.ID,
-            // )
 
 		case youtubeurl.InputTypeVideo:
 
@@ -353,33 +344,43 @@ func debugVideo(
 	fmt.Println("Duration   :", video.Duration)
 	fmt.Println("Views      :", video.ViewCount)
 	fmt.Println("Channel    :", video.ChannelTitle)
-
-	// Transcript fetch (kept, but no heavy printing)
-	transcriptData, err := transcriptSvc.Get(ctx, videoID)
+	
+	// Transcript fetch
+    subService := subtitle.NewSubtitleService()
+    result, err := subService.DownloadSubtitle(ctx, subtitle.DownloadRequest{
+        VideoID: videoID,
+        Type: "automatic",
+        Language: "en",
+        Format: "json3",
+    }, video.SubtitleMetadata)
 	if err != nil {
 		log.Warn("transcript unavailable", "video_id", videoID, "error", err)
 	} else {
-		video.Transcript = transcriptData
+        transcriptData, err := transcriptSvc.Parse(result)
+        if err != nil {
+             log.Error("failed to parse transcript", "video_id", videoID, "error", err)
+        } else {
+            video.Transcript = transcriptData
+            // still normalize for saving
+            transcriptPath := filepath.Join(
+                "testdata",
+                "youtube",
+                "transcripts",
+                videoID+".txt",
+            )
 
-		// still normalize for saving
-		transcriptPath := filepath.Join(
-			"testdata",
-			"youtube",
-			"transcripts",
-			videoID+".txt",
-		)
+            tmp := transcriptData.GroupByDuration(30)
+            transcriptData.Segments = tmp
 
-		tmp := transcriptData.GroupByDuration(30)
-		transcriptData.Segments = tmp
-
-		if err := saveFile(
-			transcriptPath,
-			[]byte(transcriptData.ToTimelineText()),
-		); err != nil {
-			log.Error("failed to save transcript", "path", transcriptPath, "error", err)
-		} else {
-			fmt.Println("saved:", transcriptPath)
-		}
+            if err := saveFile(
+                transcriptPath,
+                []byte(transcriptData.ToTimelineText()),
+            ); err != nil {
+                log.Error("failed to save transcript", "path", transcriptPath, "error", err)
+            } else {
+                fmt.Println("saved:", transcriptPath)
+            }
+        }
 	}
 
 	exportJSON, err := exportSvc.ExportVideo(
@@ -435,12 +436,6 @@ func debugVideo(
 	} else {
 		fmt.Println("saved:", aiPath)
 	}
-
-	// transcript debug hook (kept)
-	// err = debugvideo.DebugVideoTranscript(video)
-	// if err != nil {
-	// 	log.Error("Word Stats Signal Failed", err)
-	// }
 
 	err = debugvideo.DebugWindowTranscript(video)
 	if err != nil {
@@ -540,21 +535,6 @@ func buildPlaylistAIText(
                 v.Title,
             ),
         )
-
-        // if v.Description != "" {
-
-        //     b.WriteString(
-        //         "Description:\n",
-        //     )
-
-        //     b.WriteString(
-        //         v.Description,
-        //     )
-
-        //     b.WriteString(
-        //         "\n\n",
-        //     )
-        // }
 
         if v.DescriptionMetadata.Chapters.Text() != "" {
 

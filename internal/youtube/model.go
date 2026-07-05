@@ -4,8 +4,10 @@ package youtube
 
 import (
 	"time"
-	"github.com/Arvind215271/askito/internal/youtube/transcript"
+
 	"github.com/Arvind215271/askito/internal/youtube/description"
+	"github.com/Arvind215271/askito/internal/youtube/subtitle"
+	"github.com/Arvind215271/askito/internal/youtube/transcript"
 )
 
 type Playlist struct {
@@ -28,18 +30,12 @@ type Playlist struct {
 	Videos []PlaylistVideo `json:"videos,omitempty"`
 }
 
-
-
 type PlaylistVideo struct {
 	Video
 
 	Position int       `json:"position"`
 	AddedAt  time.Time `json:"added_at"`
-
-
 }
-
-
 
 type Video struct {
 	ID string `json:"id"`
@@ -50,7 +46,8 @@ type Video struct {
 	DescriptionMetadata description.Metadata `json:"description_metadata,omitempty"`
 
 	Transcript *transcript.Transcript `json:"transcript,omitempty"`
-	
+
+	SubtitleMetadata subtitle.SubtitleMetadata `json:"subtitle_metadata"`
 
 	ChannelID    string `json:"channel_id"`
 	ChannelTitle string `json:"channel_title"`

@@ -4,8 +4,13 @@ import (
 	"github.com/labstack/echo/v5"
 )
 
-func RegisterRoutes(e *echo.Echo, h *Handler) {
-	g := e.Group("/videos")
-	g.GET("/:id", h.GetVideoByID)
+func RegisterVideoRoutes(g *echo.Group, h *Handler) {
+	g.GET("/id", h.GetVideoByID)
 	g.GET("/url", h.GetVideoByURL)
+	g.POST("/transcripts", h.GetTranscript)
+}
+
+func RegisterSubtitleRoutes(g *echo.Group, h *Handler) {
+	g.POST("/options", h.GetSubtitleOptions)
+	g.POST("/download", h.DownloadSubtitle)
 }

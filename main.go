@@ -21,10 +21,10 @@ import (
 	"github.com/Arvind215271/askito/internal/youtube"
 	youtubeapi "github.com/Arvind215271/askito/internal/youtube/metadata/youtube_api"
 	ytdlpmetadata "github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp"
+	"github.com/Arvind215271/askito/internal/youtube/subtitle"
 
 	// transcript
 	"github.com/Arvind215271/askito/internal/youtube/transcript"
-	ytdlptranscript "github.com/Arvind215271/askito/internal/youtube/transcript/providers/ytdlp"
 
 	// export
 	"github.com/Arvind215271/askito/internal/youtube/export"
@@ -90,30 +90,16 @@ func main() {
 		ytdlpMetadataProvider,
 	)
 
+	subtitleService := subtitle.NewSubtitleService()
+    transcriptService := transcript.NewService()
+
 	// video handler
-	videoHandler := video.NewHandler(youtubeService)
-	video.RegisterRoutes(e, videoHandler)
+	videoHandler := video.NewHandler(youtubeService, subtitleService, transcriptService)
+	
+	video.RegisterVideoRoutes(e.Group("/videos"), videoHandler)
+	video.RegisterSubtitleRoutes(e.Group("/subtitles"), videoHandler)
 
-	// transcript
-
-	ytdlpTranscriptClient := &ytdlptranscript.Client{}
-
-	if err := ytdlpTranscriptClient.ValidateYTDLP(); err != nil {
-
-		logger.Warn(
-			"yt-dlp unavailable",
-			"error",
-			err,
-		)
-	}
-
-	transcriptProvider := ytdlptranscript.NewProvider(
-		ytdlpTranscriptClient,
-	)
-
-	transcriptService := transcript.NewService(
-		transcriptProvider,
-	)
+    e.POST("/transcripts", videoHandler.GetTranscript)
 
 	// export
 

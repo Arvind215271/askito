@@ -58,10 +58,18 @@ func (VideoErrors) FetchFailed(err error) *api.AppError {
 	).Wrap(err)
 }
 
-func (VideoErrors) Timeout() *api.AppError {
+func (VideoErrors) BadRequest(msg string) *api.AppError {
 	return api.NewError(
-		"FETCH_TIMEOUT",
-		"Request timed out",
-		http.StatusGatewayTimeout,
+		"BAD_REQUEST",
+		msg,
+		http.StatusBadRequest,
 	)
+}
+
+func (VideoErrors) InternalError(err error) *api.AppError {
+	return api.NewError(
+		"INTERNAL_ERROR",
+		"Something went wrong",
+		http.StatusInternalServerError,
+	).Wrap(err)
 }

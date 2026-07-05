@@ -1,32 +1,36 @@
 package transcript
 
 import (
-	"context"
-)
+	"fmt"
 
-type Service struct {
-    provider Provider
+	"github.com/Arvind215271/askito/internal/youtube/subtitle"
+	)
+
+type Service struct{}
+
+func NewService() *Service {
+	return &Service{}
 }
 
+func (s *Service) Parse(result *subtitle.SubtitleResult) (*Transcript, error) {
+	if result == nil {
+		return nil, fmt.Errorf("subtitle result is nil")
+	}
 
+	switch result.Format {
 
-func NewService(
-    provider Provider,
-) *Service {
-    return &Service{
-        provider: provider,
-    }
-}
+	case "json3":
+		segments, err := ParseJSON3ToSegments(result.Content)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse json3 transcript: %w", err)
+		}
 
+		return &Transcript{
+			Language: result.Language,
+			Segments: segments,
+		}, nil
 
-
-func (s *Service) Get(
-    ctx context.Context,
-    videoID string,
-) (*Transcript, error) {
-
-    return s.provider.GetTranscript(
-        ctx,
-        videoID,
-    )
+	default:
+		return nil, fmt.Errorf("unsupported subtitle format: %s", result.Format)
+	}
 }
