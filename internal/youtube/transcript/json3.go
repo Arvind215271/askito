@@ -25,10 +25,20 @@ type JSON3Segment struct {
 
 // ExtractTextFromJSON3 converts JSON3 into a readable timestamped transcript.
 func ExtractTextFromJSON3(jsonData []byte) (string, error) {
+	if len(jsonData) == 0 {
+		return "", fmt.Errorf("empty transcript data")
+	}
+
 	var yt YouTubeJSON3
 
 	if err := json.Unmarshal(jsonData, &yt); err != nil {
-		return "", err
+		snippet := ""
+		if len(jsonData) > 50 {
+			snippet = string(jsonData[:50])
+		} else {
+			snippet = string(jsonData)
+		}
+		return "", fmt.Errorf("failed to unmarshal JSON3: %w, data snippet: %s", err, snippet)
 	}
 
 	var transcriptLines []string
@@ -69,10 +79,20 @@ func ExtractTextFromJSON3(jsonData []byte) (string, error) {
 
 // ParseJSON3ToSegments converts JSON3 into transcript segments.
 func ParseJSON3ToSegments(jsonData []byte) ([]TranscriptSegment, error) {
+	if len(jsonData) == 0 {
+		return nil, fmt.Errorf("empty transcript data")
+	}
+
 	var yt YouTubeJSON3
 
 	if err := json.Unmarshal(jsonData, &yt); err != nil {
-		return nil, err
+		snippet := ""
+		if len(jsonData) > 50 {
+			snippet = string(jsonData[:50])
+		} else {
+			snippet = string(jsonData)
+		}
+		return nil, fmt.Errorf("failed to unmarshal JSON3: %w, data snippet: %s", err, snippet)
 	}
 
 	segments := make([]TranscriptSegment, 0, len(yt.Events))

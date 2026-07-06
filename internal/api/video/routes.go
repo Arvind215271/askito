@@ -8,6 +8,7 @@ func RegisterVideoRoutes(g *echo.Group, h *Handler) {
 	g.GET("/id", h.GetVideoByID)
 	g.GET("/url", h.GetVideoByURL)
 	g.POST("/transcripts", h.GetTranscript)
+	g.POST("/signals", h.GetVideoSignals)
 }
 
 func RegisterSubtitleRoutes(g *echo.Group, h *Handler) {

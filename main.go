@@ -26,6 +26,9 @@ import (
 	// transcript
 	"github.com/Arvind215271/askito/internal/youtube/transcript"
 
+	// signal
+	"github.com/Arvind215271/askito/internal/youtube/signal"
+
 	// export
 	"github.com/Arvind215271/askito/internal/youtube/export"
 
@@ -91,10 +94,11 @@ func main() {
 	)
 
 	subtitleService := subtitle.NewSubtitleService()
-    transcriptService := transcript.NewService()
+	transcriptService := transcript.NewService()
+	signalService := signal.NewSignalService()
 
 	// video handler
-	videoHandler := video.NewHandler(youtubeService, subtitleService, transcriptService)
+	videoHandler := video.NewHandler(youtubeService, subtitleService, transcriptService, signalService)
 	
 	video.RegisterVideoRoutes(e.Group("/videos"), videoHandler)
 	video.RegisterSubtitleRoutes(e.Group("/subtitles"), videoHandler)

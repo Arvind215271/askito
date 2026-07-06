@@ -98,7 +98,7 @@
 
 ## Phase 7: Transcript Signals
 
-- [ ] Transcript signal endpoint
+- [x] Transcript signal endpoint
   Analyze transcript content and return extracted signals.
 
 - [ ] Keyword extraction (NOT DOING) 
@@ -107,10 +107,10 @@
 - [ ] Topic extraction (NOT DOING)
   Return detected topics discussed throughout the video.
 
-- [ ] Word statistics
+- [x] Word statistics
   Return word frequency and occurrence statistics.
 
-- [ ] Window statistics
+- [x] Window statistics
   Return window-based signal analysis.
 
 - [ ] Concept extraction (NOT DOING)
