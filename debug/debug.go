@@ -12,6 +12,7 @@ import (
 	"github.com/Arvind215271/askito/internal/youtube/export"
 	"github.com/Arvind215271/askito/internal/logger"
 	"github.com/Arvind215271/askito/internal/youtube"
+	"github.com/Arvind215271/askito/internal/youtube/metadata"
 	"github.com/Arvind215271/askito/internal/youtube/transcript"
 	youtubeurl "github.com/Arvind215271/askito/internal/youtube/input"
 	"github.com/Arvind215271/askito/internal/youtube/description"
@@ -23,7 +24,7 @@ import (
 func DebugInput(
 	ctx context.Context,
 	log *logger.Logger,
-	youtubeSvc *youtube.Service,
+	youtubeSvc *metadata.Service,
 	transcriptSvc *transcript.Service,
 	exportSvc *export.Service,
 ) {
@@ -132,7 +133,7 @@ random garbage text
 func debugPlaylist(
 	ctx context.Context,
 	log *logger.Logger,
-	youtubeSvc *youtube.Service,
+	youtubeSvc *metadata.Service,
 	exportSvc *export.Service,
 	playlistID string,
 ) {
@@ -144,7 +145,7 @@ func debugPlaylist(
 	playlist, err := youtubeSvc.GetPlaylist(
 		ctx,
 		playlistID,
-		youtube.ProviderAPI,
+		metadata.ProviderAPI,
 	)
 	if err != nil {
 
@@ -322,14 +323,14 @@ func debugPlaylist(
 func debugVideo(
 	ctx context.Context,
 	log *logger.Logger,
-	youtubeSvc *youtube.Service,
+	youtubeSvc *metadata.Service,
 	transcriptSvc *transcript.Service,
 	exportSvc *export.Service,
 	videoID string,
 ) {
 	fmt.Printf("\n================ VIDEO =================\n")
 
-	video, err := youtubeSvc.GetVideo(ctx, videoID, youtube.ProviderAPI)
+	video, err := youtubeSvc.GetVideo(ctx, videoID, metadata.ProviderAPI)
 	if err != nil {
 		log.Error("failed to fetch video", "video_id", videoID, "error", err)
 		return

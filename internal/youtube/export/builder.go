@@ -2,6 +2,7 @@ package export
 
 import (
 	youtube "github.com/Arvind215271/askito/internal/youtube"
+	"github.com/Arvind215271/askito/internal/youtube/fields"
 )
 
 // this is common function that we will be using to export playlist and convert it to a simple format that can be used by an export TYPE like JSON, CSV, etc.
@@ -10,20 +11,15 @@ import (
 // The only thing left is to filter what is needed from Video ONLY.
 func BuildPlaylistExport(
 	playlist youtube.Playlist,
-	videoFields []string,
+	planner *fields.Planner,
 ) (ExportData, error) {
-
-	fieldSet := make(map[string]bool, len(videoFields))
-	for _, f := range videoFields {
-		fieldSet[f] = true
-	}
 
 	videos := make([]any, 0, len(playlist.Videos))
 
 	for _, v := range playlist.Videos {
 
 		// ONLY Video struct is filtered
-		videoData, err := structToExportData(v.Video, fieldSet)
+		videoData, err := exportStruct(v.Video, planner)
 		if err != nil {
 			return nil, youtube.Err.Export.MarshalFailed().Wrap(err)
 		}
@@ -31,6 +27,7 @@ func BuildPlaylistExport(
 		// PlaylistVideo metadata is ALWAYS preserved
 		videoData["position"] = v.Position
 		videoData["added_at"] = v.AddedAt
+		videoData["id"] = v.Video.ID
 
 		videos = append(videos, videoData)
 	}
@@ -57,16 +54,11 @@ func BuildPlaylistExport(
 // The only thing left is to filter what is needed from Video ONLY.
 func BuildVideoExport(
 	video youtube.Video,
-	fields []string,
+	planner *fields.Planner,
 ) (ExportData, error) {
 
-	fieldSet := make(map[string]bool, len(fields))
-	for _, f := range fields {
-		fieldSet[f] = true
-	}
-
 	// ONLY Video is filterable
-	data, err := structToExportData(video, fieldSet)
+	data, err := exportStruct(video, planner)
 	if err != nil {
 		return nil, youtube.Err.Export.MarshalFailed().Wrap(err)
 	}

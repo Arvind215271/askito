@@ -7,6 +7,7 @@ import (
 	"github.com/Arvind215271/askito/internal/api"
 	"github.com/Arvind215271/askito/internal/youtube"
 	"github.com/Arvind215271/askito/internal/youtube/description"
+	"github.com/Arvind215271/askito/internal/youtube/metadata"
 	youtubeurl "github.com/Arvind215271/askito/internal/youtube/input"
 	"github.com/Arvind215271/askito/internal/youtube/signal"
 	wordstats "github.com/Arvind215271/askito/internal/youtube/signal/word_stats"
@@ -16,13 +17,13 @@ import (
 )
 
 type Handler struct {
-	youtubeService    *youtube.Service
+	youtubeService    *metadata.Service
 	subtitleService   *subtitle.SubtitleService
 	transcriptService *transcript.Service
 	signalService     *signal.SignalService
 }
 
-func NewHandler(youtubeService *youtube.Service, subtitleService *subtitle.SubtitleService, transcriptService *transcript.Service, signalService *signal.SignalService) *Handler {
+func NewHandler(youtubeService *metadata.Service, subtitleService *subtitle.SubtitleService, transcriptService *transcript.Service, signalService *signal.SignalService) *Handler {
 	return &Handler{
 		youtubeService:    youtubeService,
 		subtitleService:   subtitleService,
@@ -46,7 +47,7 @@ func (h *Handler) GetSubtitleOptions(c *echo.Context) error {
 		return Err.InvalidURL().Wrap(err)
 	}
 
-	video, err := h.getVideo((*c).Request().Context(), parsed.ID, youtube.ProviderYTDLP)
+	video, err := h.getVideo((*c).Request().Context(), parsed.ID, metadata.ProviderYTDLP)
 	if err != nil {
 		return Err.FetchFailed(err)
 	}
@@ -69,7 +70,7 @@ func (h *Handler) DownloadSubtitle(c *echo.Context) error {
 		req.URL = parsed.ID
 	}
 
-	video, err := h.getVideo((*c).Request().Context(), req.URL, youtube.ProviderYTDLP)
+	video, err := h.getVideo((*c).Request().Context(), req.URL, metadata.ProviderYTDLP)
 	if err != nil {
 		return Err.FetchFailed(err)
 	}
@@ -104,7 +105,7 @@ func (h *Handler) GetTranscript(c *echo.Context) error {
 		return Err.InvalidURL().Wrap(err)
 	}
 
-	video, err := h.getVideo((*c).Request().Context(), parsed.ID, youtube.ProviderYTDLP)
+	video, err := h.getVideo((*c).Request().Context(), parsed.ID, metadata.ProviderYTDLP)
 	if err != nil {
 		return Err.FetchFailed(err)
 	}
@@ -137,7 +138,7 @@ func (h *Handler) GetVideoByID(c *echo.Context) error {
 		return err
 	}
 
-	providerType := youtube.ProviderType(req.Provider)
+	providerType := metadata.ProviderType(req.Provider)
 
 	video, err := h.getVideo((*c).Request().Context(), req.ID, providerType)
 	if err != nil {
@@ -162,7 +163,7 @@ func (h *Handler) GetVideoSignals(c *echo.Context) error {
 		return Err.InvalidURL().Wrap(err)
 	}
 
-	video, err := h.getVideo((*c).Request().Context(), parsed.ID, youtube.ProviderYTDLP)
+	video, err := h.getVideo((*c).Request().Context(), parsed.ID, metadata.ProviderYTDLP)
 	if err != nil {
 		return Err.FetchFailed(err)
 	}
@@ -238,7 +239,7 @@ func (h *Handler) GetVideoByURL(c *echo.Context) error {
 		return Err.NotAVideo()
 	}
 
-	providerType := youtube.ProviderType(req.Provider)
+	providerType := metadata.ProviderType(req.Provider)
 
 	video, err := h.getVideo((*c).Request().Context(), parsed.ID, providerType)
 	if err != nil {
@@ -248,16 +249,17 @@ func (h *Handler) GetVideoByURL(c *echo.Context) error {
 	return (*c).JSON(http.StatusOK, VideoResponse{Video: video})
 }
 
-func (h *Handler) getVideo(ctx context.Context, id string, providerType youtube.ProviderType) (youtube.Video, error) {
+func (h *Handler) getVideo(ctx context.Context, id string, providerType metadata.ProviderType) (youtube.Video, error) {
 	if providerType == "" {
-		providerType = youtube.ProviderYTDLP
+		providerType = metadata.ProviderYTDLP
 	}
 
-	if providerType != youtube.ProviderAPI && providerType != youtube.ProviderYTDLP {
+	if providerType != metadata.ProviderAPI && providerType != metadata.ProviderYTDLP {
 		return youtube.Video{}, Err.InvalidProvider()
 	}
 
-	video, err := h.youtubeService.GetVideo(ctx, id, providerType)
+	providerTypeMetadata := metadata.ProviderType(providerType)
+	video, err := h.youtubeService.GetVideo(ctx, id, providerTypeMetadata)
 	if err != nil {
 		return youtube.Video{}, err
 	}

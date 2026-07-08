@@ -137,3 +137,14 @@
 
 - [ ] Batch export
   Export multiple video analyses in a single request.
+
+---
+
+## Phase 9: Cache
+
+- [ ] Add cache at metadata and subtitle
+  These endpoints are going to be reasked unless we maintain session ID but works well tho.
+
+- [ ] Add file downloading at each of the endpoint and reuse them.
+  Then flush those file to be automatically deleted after a period of days like a 28 days or 180 days. To reduce file size being stored.
+

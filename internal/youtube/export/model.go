@@ -1,6 +1,8 @@
 package export
 
-
+import (
+	"github.com/Arvind215271/askito/internal/youtube/fields"
+)
 
 type Format string
 
@@ -11,15 +13,15 @@ const (
 type ExportData map[string]any
 
 type PlaylistExportRequest struct {
-    PlaylistID string   `json:"playlist_id"`
-    VideoFields []string `json:"video_fields,omitempty"`
-    Format Format `json:"format"`
+	PlaylistID  string            `json:"playlist_id"`
+	VideoFields *fields.Planner   `json:"-"`
+	Format      Format            `json:"format"`
 }
 
 type VideoExportRequest struct {
-	VideoID string   `json:"video_id"`
-	Fields  []string `json:"fields,omitempty"`
-	Format  Format   `json:"format"`
+	VideoID string          `json:"video_id"`
+	Fields  *fields.Planner `json:"-"`
+	Format  Format          `json:"format"`
 }
 
 type ExportResponse struct {
@@ -27,4 +29,3 @@ type ExportResponse struct {
 	Format        Format     `json:"format"`
 	Data          ExportData `json:"data"`
 }
-

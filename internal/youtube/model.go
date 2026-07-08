@@ -45,7 +45,16 @@ type Video struct {
 
 	DescriptionMetadata description.Metadata `json:"description_metadata,omitempty"`
 
+	// Export fields
+	DescriptionChapters string   `json:"description_chapters"`
+	DescriptionLinks    []string `json:"description_links"`
+	DescriptionEmails   []string `json:"description_emails"`
+	DescriptionCleaned  string   `json:"description_cleaned"`
+
 	Transcript *transcript.Transcript `json:"transcript,omitempty"`
+	// TranscriptText stores the final transcript representation.
+	TranscriptText   string `json:"transcript_text"`
+	TranscriptSignal string `json:"transcript_signal"`
 
 	SubtitleMetadata subtitle.SubtitleMetadata `json:"subtitle_metadata"`
 

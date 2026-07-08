@@ -18,7 +18,7 @@ import (
 	"github.com/Arvind215271/askito/internal/api/video"
 
 	// youtube
-	"github.com/Arvind215271/askito/internal/youtube"
+	"github.com/Arvind215271/askito/internal/youtube/metadata"
 	youtubeapi "github.com/Arvind215271/askito/internal/youtube/metadata/youtube_api"
 	ytdlpmetadata "github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp"
 	"github.com/Arvind215271/askito/internal/youtube/subtitle"
@@ -88,7 +88,7 @@ func main() {
 	ytdlpMetadataClient := ytdlpmetadata.NewClient()
 	ytdlpMetadataProvider := ytdlpmetadata.NewProvider(ytdlpMetadataClient)
 
-	youtubeService := youtube.NewService(
+	youtubeService := metadata.NewService(
 		youtubeProvider,
 		ytdlpMetadataProvider,
 	)
@@ -131,14 +131,13 @@ func main() {
 
 	// start the server
 
-	if err := e.Start(":8080"); err != nil {
-
+	if err := e.Start(":" + config.Port); err != nil {
 		fmt.Println(
 			"FAILED TO START THE SERVER",
 			"ERROR:",
 			err,
 		)
-	}
+}
 }
 
 func ping(
