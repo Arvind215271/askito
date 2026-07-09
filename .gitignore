@@ -27,6 +27,9 @@ testdata/
 # env file
 .env
 
+# this is for storing cache for YTDLP  
+.cache/
+
 # Editor/IDE
 # .idea/
 # .vscode/

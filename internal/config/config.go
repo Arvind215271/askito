@@ -28,7 +28,7 @@ func Load() Config {
 		YouTubeAPIKey: getEnv("YOUTUBE_API_KEY", ""),
 
 		YtdlpCache: ytdlp.CacheConfig{
-			CacheDir:    getEnv("YTDLP_CACHE_DIR", "./cache/ytdlp"),
+			CacheDir:    getEnv("YTDLP_CACHE_DIR", "./.cache/ytdlp"),
 			TTLDays:     getEnvAsInt("YTDLP_CACHE_TTL_DAYS", 28),
 			MaxFiles:    getEnvAsInt("YTDLP_CACHE_MAX_FILES", 5000),
 		},
