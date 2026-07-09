@@ -1,14 +1,20 @@
 package fields
 
-import "github.com/Arvind215271/askito/internal/api"
+
 
 // NewPlanner creates a new Planner instance, validating the fields.
-func NewPlanner(fields []string) (*Planner, *api.AppError) {
-	if len(fields) > 0 {
-		if err := ValidateFields(fields); err != nil {
-			return nil, err
-		}
+func NewPlanner(fields []string) (*Planner, error) {
+
+	if len(fields) == 0 {
+        fields = DefaultFields()
+    }
+
+	
+	
+	if err := ValidateFields(fields); err != nil {
+		return nil, err
 	}
+
 
 	fieldSet := make(map[string]bool, len(fields))
 	for _, f := range fields {

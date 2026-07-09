@@ -229,10 +229,7 @@ func debugPlaylist(
 		export.PlaylistExportRequest{
 			Format: export.FormatJSON,
 
-			VideoFields: []string{
-				"title",
-				"chapters",
-			},
+			VideoFields: nil, // Update for fix
 		},
 	)
 	if err != nil {
@@ -388,12 +385,7 @@ func debugVideo(
 		video,
 		export.VideoExportRequest{
 			Format: export.FormatJSON,
-			Fields: []string{
-				"title",
-				"description",
-				"chapters",
-				"transcript",
-			},
+			Fields: nil, // Update for fix
 		},
 	)
 	if err != nil {

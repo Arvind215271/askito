@@ -15,6 +15,7 @@ import (
 
 	// api
 	"github.com/Arvind215271/askito/internal/api"
+	"github.com/Arvind215271/askito/internal/api/export"
 	"github.com/Arvind215271/askito/internal/api/video"
 
 	// youtube
@@ -30,10 +31,16 @@ import (
 	"github.com/Arvind215271/askito/internal/youtube/signal"
 
 	// export
-	"github.com/Arvind215271/askito/internal/youtube/export"
+	exportservice "github.com/Arvind215271/askito/internal/youtube/export"
+
+	// description
+	"github.com/Arvind215271/askito/internal/youtube/description"
 
 	// debug
 	"github.com/Arvind215271/askito/debug"
+
+	//pipeline
+	"github.com/Arvind215271/askito/internal/youtube/pipeline"
 )
 
 func main() {
@@ -105,14 +112,24 @@ func main() {
 
     e.POST("/transcripts", videoHandler.GetTranscript)
 
+	// description
+	descriptionService := description.NewService()
+
+	// pipeline
+	pipelineService := pipeline.NewService(youtubeService, descriptionService, subtitleService, transcriptService, signalService)
+
 	// export
 
-	exportService := export.NewService()
+	exportService := exportservice.NewService()
 
 	exportService.RegisterExporter(
-		export.FormatJSON,
-		export.NewJSONExporter(),
+		exportservice.FormatJSON,
+		exportservice.NewJSONExporter(),
 	)
+
+    // Export handler
+    exportHandler := export.NewHandler(pipelineService, exportService)
+    export.RegisterRoutes(e.Group("/export"), exportHandler)
 
 	// only run debug in development
 	if config.Env == "dev" {

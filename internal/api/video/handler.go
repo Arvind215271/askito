@@ -193,7 +193,7 @@ func (h *Handler) GetVideoSignals(c *echo.Context) error {
 		if req.Analysis == "word-stats" {
 			bucketCount = 32
 		} else {
-			bucketCount = 3
+			bucketCount = 2
 		}
 	}
 

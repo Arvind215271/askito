@@ -31,7 +31,7 @@ var (
 
 	TranscriptFields = []string{
 		FieldTranscriptText,
-		FieldTranscriptSignal,
+		
 	}
 
 	SignalFields = []string{

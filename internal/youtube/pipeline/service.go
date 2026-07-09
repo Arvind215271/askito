@@ -14,7 +14,6 @@ import (
 )
 
 type Service struct {
-	planner            *Planner
 	metadataService    *metadata.Service
 	descriptionService *description.Service
 	subtitleService    *subtitle.SubtitleService
@@ -23,7 +22,6 @@ type Service struct {
 }
 
 func NewService(
-	planner *Planner,
 	metadataService *metadata.Service,
 	descriptionService *description.Service,
 	subtitleService *subtitle.SubtitleService,
@@ -31,7 +29,6 @@ func NewService(
 	signalService *signal.SignalService,
 ) *Service {
 	return &Service{
-		planner:            planner,
 		metadataService:    metadataService,
 		descriptionService: descriptionService,
 		subtitleService:    subtitleService,
@@ -40,7 +37,7 @@ func NewService(
 	}
 }
 
-func (s *Service) Process(ctx context.Context, videoID string) (*youtube.Video, error) {
+func (s *Service) Process(ctx context.Context, videoID string, planner *Planner) (*youtube.Video, error) {
 	// var err error
 	// 1. Metadata (Base) - Always required as per instructions that everything depends on it
 	meta, err := s.metadataService.GetVideo(ctx, videoID, metadata.ProviderYTDLP)
@@ -50,7 +47,7 @@ func (s *Service) Process(ctx context.Context, videoID string) (*youtube.Video, 
 	video := &meta
 
 	// 2. Description
-	if s.planner.NeedsDescription() {
+	if planner.NeedsDescription() {
 		descMeta, err := s.descriptionService.GetDescription(ctx, video.Description)
 		if err != nil {
 			return nil, fmt.Errorf("failed to fetch description: %w", err)
@@ -60,7 +57,7 @@ func (s *Service) Process(ctx context.Context, videoID string) (*youtube.Video, 
 
 	// 3. Transcript & Subtitle
 	var trans *transcript.Transcript
-	if s.planner.NeedsTranscript() || s.planner.NeedsSignal() {
+	if planner.NeedsTranscript() || planner.NeedsSignal() {
 		sub, err := s.subtitleService.DownloadSubtitle(ctx, subtitle.DownloadRequest{VideoID: video.ID, Language: "en", Type: "automatic", }, video.SubtitleMetadata)
 		if err != nil {
 			return nil, fmt.Errorf("subtitle error: %w", err)
@@ -74,11 +71,8 @@ func (s *Service) Process(ctx context.Context, videoID string) (*youtube.Video, 
 	}
 
 	// 4. Signal
-	if s.planner.NeedsSignal() && trans != nil {
-		sig := s.signalService.AnalyzeWordStats(trans, wordstats.AnalysisConfig{
-			UseHeavyStopWords: true,
-			MinFreq: 5,
-		})
+	if planner.NeedsSignal() && trans != nil {
+		sig := s.signalService.AnalyzeWordStats(trans, wordstats.DefaultWordStatsConfig())
 		MapSignal(video, &sig)
 	}
 

@@ -1,12 +1,12 @@
 package fields
 
 import (
-	"github.com/Arvind215271/askito/internal/api"
+	// "github.com/Arvind215271/askito/internal/api"
 	"github.com/Arvind215271/askito/internal/youtube"
 )
 
 // ValidateFields ensures all requested fields are valid
-func ValidateFields(fields []string) *api.AppError {
+func ValidateFields(fields []string) error {
 	err := youtube.Err.Export.InvalidField()
 	var foundInvalid bool
 	for _, f := range fields {

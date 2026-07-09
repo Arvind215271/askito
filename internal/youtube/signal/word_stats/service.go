@@ -2,18 +2,7 @@ package wordstats
 
 import transcript "github.com/Arvind215271/askito/internal/youtube/transcript"
 
-type AnalysisConfig struct {
-	UseHeavyStopWords bool
 
-	MinFreq int
-
-	Depth float64 // 0.0 - 1.0
-
-	MaxChars int
-
-	WindowSize float64   // how many seconds each window is using
-	BucketCount int      // how many bucekts to create per window
-}
 
 type Service struct{}
 

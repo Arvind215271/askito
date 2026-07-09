@@ -33,6 +33,12 @@ func (h *ErrorHandler) Handle(c *echo.Context, err error) {
 	var appErr *AppError
 
 	if errors.As(err, &appErr) {
+		req := c.Request()
+		var path, method string
+		if req != nil {
+			path = req.URL.Path
+			method = req.Method
+		}
 
 		h.Log.Error(
 			"application error",
@@ -40,10 +46,10 @@ func (h *ErrorHandler) Handle(c *echo.Context, err error) {
 			"code", appErr.Code,
 			"status", appErr.Status,
 
-			"path", c.Request().URL.Path,
-			"method", c.Request().Method,
+			"path", path,
+			"method", method,
 
-			"error", appErr.Err,			
+			"error", appErr.Err,
 		)
 
 		_ = c.JSON(appErr.Status, ErrorResponse(appErr))
@@ -73,10 +79,17 @@ func (h *ErrorHandler) Handle(c *echo.Context, err error) {
 	// fallback error
 	appErr = Err.Common.Internal()
 
+	req := c.Request()
+	var path, method string
+	if req != nil {
+		path = req.URL.Path
+		method = req.Method
+	}
+
 	h.Log.Error(
 		"unexpected error",
-		"path", c.Request().URL.Path,
-		"method", c.Request().Method,
+		"path", path,
+		"method", method,
 		"error", err,
 	)
 
