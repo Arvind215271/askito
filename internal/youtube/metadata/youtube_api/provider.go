@@ -20,11 +20,13 @@ func NewProvider(
 	}
 }
 
+
 func (p *Provider) GetPlaylist(
 	ctx context.Context,
 	playlistID string,
 ) (youtube.Playlist, error) {
 
+	// contain playlist metadata only not any videoID in it.
 	playlist, err := p.client.GetPlaylist(
 		ctx,
 		playlistID,
@@ -33,6 +35,7 @@ func (p *Provider) GetPlaylist(
 		return youtube.Playlist{}, err
 	}
 
+	// this is for videos items from the playlist. Usually we get the video metadata through it.
 	items, err := p.client.GetPlaylistItems(
 		ctx,
 		playlistID,
@@ -53,7 +56,7 @@ func (p *Provider) GetPlaylist(
 			item.ContentDetails.VideoId,
 		)
 	}
-
+	// these are youtubeAPI videos and not our domain logic video.model	
 	videos, err := p.client.GetVideos(
 		ctx,
 		videoIDs,
@@ -89,7 +92,7 @@ func (p *Provider) GetPlaylist(
 	}, nil
 }
 
-
+// for a single video metadata fetching
 func (p *Provider) GetVideo(
 	ctx context.Context,
 	videoID string,

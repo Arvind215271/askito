@@ -5,6 +5,7 @@ import (
 	youtube "github.com/Arvind215271/askito/internal/youtube"
 )
 
+// take youtube API video data and map that to internal video model that we use throughout our backend server.
 func MapVideo(
 	video *yt.Video,
 ) youtube.Video {

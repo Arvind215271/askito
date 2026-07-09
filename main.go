@@ -92,8 +92,15 @@ func main() {
 		youtubeClient,
 	)
 
-	ytdlpMetadataClient := ytdlpmetadata.NewClient()
+	ytdlpMetadataClient := ytdlpmetadata.NewClient(config.YtdlpCache, logger)
 	ytdlpMetadataProvider := ytdlpmetadata.NewProvider(ytdlpMetadataClient)
+
+	// run cleanup on startup
+	if err := ytdlpMetadataClient.Cleanup(); err != nil {
+		logger.Error("failed to perform ytdlp cache cleanup", "error", err)
+	} else {
+		logger.Info("ytdlp cache cleanup completed successfully")
+	}
 
 	youtubeService := metadata.NewService(
 		youtubeProvider,

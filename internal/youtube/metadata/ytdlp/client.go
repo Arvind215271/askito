@@ -6,24 +6,37 @@ import (
 	"fmt"
 	"os/exec"
 	"time"
+
+	"github.com/Arvind215271/askito/internal/logger"
 )
 
-type Client struct{}
+type Client struct {
+	cache *Cache
+}
 
 const (
 	maxRetries = 3
 	timeout    = 30 * time.Second
 )
 
-func NewClient() *Client {
-	return &Client{}
+func NewClient(cfg CacheConfig, logger *logger.Logger) *Client {
+	return &Client{
+		cache: NewCache(cfg, logger),
+	}
 }
 
+// Cleanup runs the cache cleanup routine.
+func (c *Client) Cleanup() error {
+	return c.cache.Cleanup()
+}
+
+// ValidateYTDLP checks if ytdlp is present.
 func (c *Client) ValidateYTDLP() error {
 	_, err := exec.LookPath("yt-dlp")
 	return err
 }
 
+// Fetch fetches the request user asked from ytdlp...
 func (c *Client) Fetch(ctx context.Context, args ...string) ([]byte, error) {
 	var lastErr error
 
@@ -46,17 +59,30 @@ func (c *Client) Fetch(ctx context.Context, args ...string) ([]byte, error) {
 }
 
 func (c *Client) GetVideo(ctx context.Context, videoID string) (YTOutput, error) {
+	// Try cache
+	if cachedData, err := c.cache.Get(videoID); err == nil {
+		var meta YTOutput
+		if err := json.Unmarshal(cachedData, &meta); err == nil {
+			return meta, nil
+		}
+	}
+
 	url := "https://www.youtube.com/watch?v=" + videoID
 
+	// Fetch if cache miss
 	output, err := c.Fetch(
 		ctx,
 		"--skip-download",
 		"--dump-single-json",
 		url,
 	)
+
 	if err != nil {
 		return YTOutput{}, err
 	}
+
+	// Save to cache
+	_ = c.cache.Save(videoID, output)
 
 	var meta YTOutput
 	err = json.Unmarshal(output, &meta)
