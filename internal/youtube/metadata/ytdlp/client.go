@@ -7,11 +7,12 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/Arvind215271/askito/internal/cache"
 	"github.com/Arvind215271/askito/internal/logger"
 )
 
 type Client struct {
-	cache  *Cache
+	cache  *cache.Manager
 	logger *logger.Logger
 }
 
@@ -20,16 +21,16 @@ const (
 	timeout    = 30 * time.Second
 )
 
-func NewClient(cfg CacheConfig, logger *logger.Logger) *Client {
+func NewClient(cfg cache.Config, logger *logger.Logger) *Client {
 	return &Client{
-		cache:  NewCache(cfg, logger),
+		cache:  cache.NewManager(cfg, logger),
 		logger: logger,
 	}
 }
 
 // Cleanup runs the cache cleanup routine.
 func (c *Client) Cleanup() error {
-	return c.cache.Cleanup()
+	return c.cache.Cleanup("metadata.json")
 }
 
 // ValidateYTDLP checks if ytdlp is present.
@@ -67,7 +68,7 @@ func (c *Client) Fetch(ctx context.Context, args ...string) ([]byte, error) {
 
 func (c *Client) GetVideo(ctx context.Context, videoID string) (YTOutput, error) {
 	// Try cache
-	if cachedData, err := c.cache.Get(videoID); err == nil {
+	if cachedData, err := c.cache.Get(videoID, "metadata.json"); err == nil {
 		var meta YTOutput
 		if err := json.Unmarshal(cachedData, &meta); err == nil {
 			return meta, nil
@@ -93,7 +94,7 @@ func (c *Client) GetVideo(ctx context.Context, videoID string) (YTOutput, error)
 	c.logger.Info("fetched video metadata from ytdlp", "videoID", videoID)
 
 	// Save to cache
-	_ = c.cache.Save(videoID, output)
+	_ = c.cache.Save(videoID, "metadata.json", output)
 
 	var meta YTOutput
 	err = json.Unmarshal(output, &meta)

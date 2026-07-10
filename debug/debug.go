@@ -9,6 +9,7 @@ import (
 
 	"strings"
 
+	"github.com/Arvind215271/askito/internal/cache"
 	"github.com/Arvind215271/askito/internal/youtube/export"
 	"github.com/Arvind215271/askito/internal/logger"
 	"github.com/Arvind215271/askito/internal/youtube"
@@ -28,6 +29,13 @@ func DebugInput(
 	transcriptSvc *transcript.Service,
 	exportSvc *export.Service,
 ) {
+
+	// In debug mode, create a dummy cache manager
+	cacheManager := cache.NewManager(cache.Config{
+		CacheDir: "./.cache/debug",
+		TTLDays:  1,
+		MaxFiles: 10,
+	}, log)
 
 	inputStr := `
 https://youtube.com/playlist?list=PLKnIA16_Rmvbr7zKYQuBfsVkjoLcJgxHH
@@ -124,6 +132,7 @@ random garbage text
 				transcriptSvc,
 				exportSvc,
 				item.ID,
+				cacheManager,
 			)
 
 		}
@@ -324,6 +333,7 @@ func debugVideo(
 	transcriptSvc *transcript.Service,
 	exportSvc *export.Service,
 	videoID string,
+	cacheManager *cache.Manager,
 ) {
 	fmt.Printf("\n================ VIDEO =================\n")
 
@@ -344,41 +354,41 @@ func debugVideo(
 	fmt.Println("Channel    :", video.ChannelTitle)
 	
 	// Transcript fetch
-    subService := subtitle.NewSubtitleService()
-    result, err := subService.DownloadSubtitle(ctx, subtitle.DownloadRequest{
-        VideoID: videoID,
-        Type: "automatic",
-        Language: "en",
-        Format: "json3",
-    }, video.SubtitleMetadata)
+	subService := subtitle.NewSubtitleService(cacheManager, log)
+	result, err := subService.DownloadSubtitle(ctx, subtitle.DownloadRequest{
+		VideoID:  videoID,
+		Type:     "automatic",
+		Language: "en",
+		Format:   "json3",
+	}, video.SubtitleMetadata)
 	if err != nil {
 		log.Warn("transcript unavailable", "video_id", videoID, "error", err)
 	} else {
-        transcriptData, err := transcriptSvc.Parse(result)
-        if err != nil {
-             log.Error("failed to parse transcript", "video_id", videoID, "error", err)
-        } else {
-            video.Transcript = transcriptData
-            // still normalize for saving
-            transcriptPath := filepath.Join(
-                "testdata",
-                "youtube",
-                "transcripts",
-                videoID+".txt",
-            )
+		transcriptData, err := transcriptSvc.Parse(result)
+		if err != nil {
+			log.Error("failed to parse transcript", "video_id", videoID, "error", err)
+		} else {
+			video.Transcript = transcriptData
+			// still normalize for saving
+			transcriptPath := filepath.Join(
+				"testdata",
+				"youtube",
+				"transcripts",
+				videoID+".txt",
+			)
 
-            tmp := transcriptData.GroupByDuration(30)
-            transcriptData.Segments = tmp
+			tmp := transcriptData.GroupByDuration(30)
+			transcriptData.Segments = tmp
 
-            if err := saveFile(
-                transcriptPath,
-                []byte(transcriptData.ToTimelineText()),
-            ); err != nil {
-                log.Error("failed to save transcript", "path", transcriptPath, "error", err)
-            } else {
-                fmt.Println("saved:", transcriptPath)
-            }
-        }
+			if err := saveFile(
+				transcriptPath,
+				[]byte(transcriptData.ToTimelineText()),
+			); err != nil {
+				log.Error("failed to save transcript", "path", transcriptPath, "error", err)
+			} else {
+				fmt.Println("saved:", transcriptPath)
+			}
+		}
 	}
 
 	exportJSON, err := exportSvc.ExportVideo(
@@ -473,135 +483,135 @@ func saveFile(
 
 
 func buildPlaylistAIText(
-    playlist youtube.Playlist,
+	playlist youtube.Playlist,
 ) string {
 
-    var b strings.Builder
+	var b strings.Builder
 
-    b.WriteString(
-        fmt.Sprintf(
-            "Playlist Title:\n%s\n\n",
-            playlist.Title,
-        ),
-    )
+	b.WriteString(
+		fmt.Sprintf(
+			"Playlist Title:\n%s\n\n",
+			playlist.Title,
+		),
+	)
 
-    if playlist.Description != "" {
+	if playlist.Description != "" {
 
-        b.WriteString(
-            "Playlist Description:\n",
-        )
+		b.WriteString(
+			"Playlist Description:\n",
+		)
 
-        b.WriteString(
-            playlist.Description,
-        )
+		b.WriteString(
+			playlist.Description,
+		)
 
-        b.WriteString(
-            "\n\n",
-        )
-    }
+		b.WriteString(
+			"\n\n",
+		)
+	}
 
-    b.WriteString(
-        fmt.Sprintf(
-            "Channel:\n%s\n\n",
-            playlist.ChannelTitle,
-        ),
-    )
+	b.WriteString(
+		fmt.Sprintf(
+			"Channel:\n%s\n\n",
+			playlist.ChannelTitle,
+		),
+	)
 
-    for _, pv := range playlist.Videos {
+	for _, pv := range playlist.Videos {
 
-        v := pv.Video
+		v := pv.Video
 
-        b.WriteString(
-            "----------------------------------------\n",
-        )
+		b.WriteString(
+			"----------------------------------------\n",
+		)
 
-        b.WriteString(
-            fmt.Sprintf(
-                "Position: %d\n",
-                pv.Position,
-            ),
-        )
+		b.WriteString(
+			fmt.Sprintf(
+				"Position: %d\n",
+				pv.Position,
+			),
+		)
 
-        b.WriteString(
-            fmt.Sprintf(
-                "Title: %s\n\n",
-                v.Title,
-            ),
-        )
+		b.WriteString(
+			fmt.Sprintf(
+				"Title: %s\n\n",
+				v.Title,
+			),
+		)
 
-        if v.DescriptionMetadata.Chapters.Text() != "" {
+		if v.DescriptionMetadata.Chapters.Text() != "" {
 
-            b.WriteString(
-                "Chapters:\n",
-            )
+			b.WriteString(
+				"Chapters:\n",
+			)
 
-            b.WriteString(
-                v.DescriptionMetadata.Chapters.Text(),
-            )
+			b.WriteString(
+				v.DescriptionMetadata.Chapters.Text(),
+			)
 
-            b.WriteString(
-                "\n\n",
-            )
-        }
-    }
+			b.WriteString(
+				"\n\n",
+			)
+		}
+	}
 
-    return b.String()
+	return b.String()
 }
 
 func buildVideoAIText(
-    video youtube.Video,
-    transcript string,
+	video youtube.Video,
+	transcript string,
 ) string {
 
-    var b strings.Builder
+	var b strings.Builder
 
-    b.WriteString(
-        fmt.Sprintf(
-            "Title:\n%s\n\n",
-            video.Title,
-        ),
-    )
+	b.WriteString(
+		fmt.Sprintf(
+			"Title:\n%s\n\n",
+			video.Title,
+		),
+	)
 
-    if video.Description != "" {
+	if video.Description != "" {
 
-        b.WriteString(
-            "Description:\n",
-        )
+		b.WriteString(
+			"Description:\n",
+		)
 
-        b.WriteString(
-            video.Description,
-        )
+		b.WriteString(
+			video.Description,
+		)
 
-        b.WriteString(
-            "\n\n",
-        )
-    }
+		b.WriteString(
+			"\n\n",
+		)
+	}
 
-    if video.DescriptionMetadata.Chapters.Text() != "" {
+	if video.DescriptionMetadata.Chapters.Text() != "" {
 
-        b.WriteString(
-            "Chapters:\n",
-        )
+		b.WriteString(
+			"Chapters:\n",
+		)
 
-        b.WriteString(
-            video.DescriptionMetadata.Chapters.Text(),
-        )
+		b.WriteString(
+			video.DescriptionMetadata.Chapters.Text(),
+		)
 
-        b.WriteString(
-            "\n\n",
-        )
-    }
+		b.WriteString(
+			"\n\n",
+		)
+	}
 
-    if transcript != "" {
+	if transcript != "" {
 
-        b.WriteString(
-            "Transcript:\n",
-        )
+		b.WriteString(
+			"Transcript:\n",
+		)
 
-        b.WriteString(
-            transcript,
-        )
-    }
+		b.WriteString(
+			transcript,
+		)
+	}
 
-    return b.String()
+	return b.String()
 }

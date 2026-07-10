@@ -6,12 +6,21 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/Arvind215271/askito/internal/cache"
+	"github.com/Arvind215271/askito/internal/logger"
 )
 
-type SubtitleService struct{}
+type SubtitleService struct {
+	cache  *cache.Manager
+	logger *logger.Logger
+}
 
-func NewSubtitleService() *SubtitleService {
-	return &SubtitleService{}
+func NewSubtitleService(cache *cache.Manager, logger *logger.Logger) *SubtitleService {
+	return &SubtitleService{
+		cache:  cache,
+		logger: logger,
+	}
 }
 
 func (s *SubtitleService) DownloadSubtitle(
@@ -22,6 +31,18 @@ func (s *SubtitleService) DownloadSubtitle(
 
 	if req.Format == "" {
 		req.Format = "json3"
+	}
+
+	subtitleFilename := fmt.Sprintf("subtitle.%s.%s", req.Language, req.Format)
+
+	// Try cache
+	if cachedData, err := s.cache.Get(req.VideoID, subtitleFilename); err == nil {
+		s.logger.Debug("subtitle cache hit", "videoID", req.VideoID, "lang", req.Language)
+		return &SubtitleResult{
+			Content:  cachedData,
+			Format:   req.Format,
+			Language: req.Language,
+		}, nil
 	}
 
 	// Validate subtitle type and language.
@@ -116,10 +137,12 @@ func (s *SubtitleService) DownloadSubtitle(
 		return nil, fmt.Errorf("failed to read subtitle file: %w", err)
 	}
 
+	// Save to cache
+	_ = s.cache.Save(req.VideoID, subtitleFilename, data)
+
 	return &SubtitleResult{
 		Content:  data,
 		Format:   req.Format,
 		Language: req.Language,
 	}, nil
 }
-

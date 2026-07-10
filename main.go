@@ -18,6 +18,9 @@ import (
 	"github.com/Arvind215271/askito/internal/api/export"
 	"github.com/Arvind215271/askito/internal/api/video"
 
+	// cache
+	"github.com/Arvind215271/askito/internal/cache"
+
 	// youtube
 	"github.com/Arvind215271/askito/internal/youtube/metadata"
 	youtubeapi "github.com/Arvind215271/askito/internal/youtube/metadata/youtube_api"
@@ -94,6 +97,9 @@ func main() {
 		logger,
 	)
 
+	// cache manager
+	cacheManager := cache.NewManager(config.YtdlpCache, logger)
+
 	ytdlpMetadataClient := ytdlpmetadata.NewClient(config.YtdlpCache, logger)
 	ytdlpMetadataProvider := ytdlpmetadata.NewProvider(ytdlpMetadataClient, logger)
 
@@ -109,17 +115,17 @@ func main() {
 		ytdlpMetadataProvider,
 	)
 
-	subtitleService := subtitle.NewSubtitleService()
+	subtitleService := subtitle.NewSubtitleService(cacheManager, logger)
 	transcriptService := transcript.NewService()
 	signalService := signal.NewSignalService()
 
 	// video handler
 	videoHandler := video.NewHandler(youtubeService, subtitleService, transcriptService, signalService)
-	
+
 	video.RegisterVideoRoutes(e.Group("/videos"), videoHandler)
 	video.RegisterSubtitleRoutes(e.Group("/subtitles"), videoHandler)
 
-    e.POST("/transcripts", videoHandler.GetTranscript)
+	e.POST("/transcripts", videoHandler.GetTranscript)
 
 	// description
 	descriptionService := description.NewService()
@@ -136,9 +142,9 @@ func main() {
 		exportservice.NewJSONExporter(),
 	)
 
-    // Export handler
-    exportHandler := export.NewHandler(pipelineService, exportService)
-    export.RegisterRoutes(e.Group("/export"), exportHandler)
+	// Export handler
+	exportHandler := export.NewHandler(pipelineService, exportService)
+	export.RegisterRoutes(e.Group("/export"), exportHandler)
 
 	// only run debug in development
 	if config.Env == "dev" {
@@ -152,7 +158,6 @@ func main() {
 		)
 	}
 
-
 	e.HTTPErrorHandler = errorHandler.Handle
 
 	// start the server
@@ -163,7 +168,7 @@ func main() {
 			"ERROR:",
 			err,
 		)
-}
+	}
 }
 
 func ping(

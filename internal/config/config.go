@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/joho/godotenv"
-	"github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp"
+	"github.com/Arvind215271/askito/internal/cache"
 )
 
 type Config struct {
@@ -13,7 +13,7 @@ type Config struct {
 	Port string
 
 	YouTubeAPIKey string
-	YtdlpCache    ytdlp.CacheConfig
+	YtdlpCache    cache.Config
 }
 
 // Load reads environment variables once and builds the config
@@ -27,10 +27,10 @@ func Load() Config {
 
 		YouTubeAPIKey: getEnv("YOUTUBE_API_KEY", ""),
 
-		YtdlpCache: ytdlp.CacheConfig{
-			CacheDir:    getEnv("YTDLP_CACHE_DIR", "./.cache/ytdlp"),
-			TTLDays:     getEnvAsInt("YTDLP_CACHE_TTL_DAYS", 28),
-			MaxFiles:    getEnvAsInt("YTDLP_CACHE_MAX_FILES", 5000),
+		YtdlpCache: cache.Config{
+			CacheDir: getEnv("YTDLP_CACHE_DIR", "./.cache/ytdlp"),
+			TTLDays:  getEnvAsInt("YTDLP_CACHE_TTL_DAYS", 28),
+			MaxFiles: getEnvAsInt("YTDLP_CACHE_MAX_FILES", 2000), // Updated to 2000
 		},
 	}
 }
