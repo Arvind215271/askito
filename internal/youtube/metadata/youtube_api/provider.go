@@ -5,21 +5,24 @@ package youtubeapi
 import (
 	"context"
 
+	"github.com/Arvind215271/askito/internal/logger"
 	youtube "github.com/Arvind215271/askito/internal/youtube"
 )
 
 type Provider struct {
 	client *Client
+	logger *logger.Logger
 }
 
 func NewProvider(
 	client *Client,
+	logger *logger.Logger,
 ) *Provider {
 	return &Provider{
 		client: client,
+		logger: logger,
 	}
 }
-
 
 func (p *Provider) GetPlaylist(
 	ctx context.Context,
@@ -56,7 +59,7 @@ func (p *Provider) GetPlaylist(
 			item.ContentDetails.VideoId,
 		)
 	}
-	// these are youtubeAPI videos and not our domain logic video.model	
+	// these are youtubeAPI videos and not our domain logic video.model
 	videos, err := p.client.GetVideos(
 		ctx,
 		videoIDs,
@@ -72,20 +75,19 @@ func (p *Provider) GetPlaylist(
 		ChannelID:    playlist.Snippet.ChannelId,
 		ChannelTitle: playlist.Snippet.ChannelTitle,
 
-		ThumbnailURL: getPlaylistThumbnail(
+		ThumbnailURL: p.getPlaylistThumbnail(
 			playlist,
 		),
 
 		ItemCount: int(playlist.ContentDetails.ItemCount),
 
-
 		PrivacyStatus: playlist.Status.PrivacyStatus,
 
-		PublishedAt: parseTime(
+		PublishedAt: p.parseTime(
 			playlist.Snippet.PublishedAt,
 		),
 
-		Videos: MapPlaylistVideos(
+		Videos: p.mapPlaylistVideos(
 			items,
 			videos,
 		),
@@ -111,6 +113,6 @@ func (p *Provider) GetVideo(
 	}
 
 	video := videoList[0]
-	
-	return MapVideo(video), nil
+
+	return p.mapVideo(video), nil
 }

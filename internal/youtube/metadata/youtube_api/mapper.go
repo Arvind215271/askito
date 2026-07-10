@@ -1,16 +1,15 @@
 package youtubeapi
 
+
 import (
 	yt "google.golang.org/api/youtube/v3"
-	youtube "github.com/Arvind215271/askito/internal/youtube"
+	youtube 	"github.com/Arvind215271/askito/internal/youtube"
+
 )
 
-// take youtube API video data and map that to internal video model that we use throughout our backend server.
-func MapVideo(
-	video *yt.Video,
-) youtube.Video {
+func (p *Provider) mapVideo(video *yt.Video) youtube.Video {
 	seconds := youtube.ParseYouTubeDuration(video.ContentDetails.Duration)
-	
+
 	return youtube.Video{
 		ID:          video.Id,
 		Title:       video.Snippet.Title,
@@ -19,9 +18,9 @@ func MapVideo(
 		ChannelID:    video.Snippet.ChannelId,
 		ChannelTitle: video.Snippet.ChannelTitle,
 
-		ThumbnailURL: getVideoThumbnail(video),
+		ThumbnailURL: p.getVideoThumbnail(video),
 
-		PublishedAt: parseTime(video.Snippet.PublishedAt),
+		PublishedAt: p.parseTime(video.Snippet.PublishedAt),
 
 		Duration:          video.ContentDetails.Duration,
 		DurationSeconds:   int64(seconds),
@@ -43,17 +42,14 @@ func MapVideo(
 	}
 }
 
-// maps the fetched Youtube API video type to domain logic video type
-func MapPlaylistVideos(
+
+
+func (p *Provider) mapPlaylistVideos(
 	items []*yt.PlaylistItem,
 	videos []*yt.Video,
 ) []youtube.PlaylistVideo {
 
-	// create a map of yt.video and total video we have/
 	videoMap := make(map[string]*yt.Video, len(videos))
-
-	// for each video. map that in map with its video ID.
-	// why? Because each video in Playlist Video have a position associated to it. Thus, we would need to map the video to it. Thus, it would be far easier to do so.  
 	for _, video := range videos {
 		videoMap[video.Id] = video
 	}
@@ -75,14 +71,14 @@ func MapPlaylistVideos(
 			video.ContentDetails == nil ||
 			video.Statistics == nil ||
 			video.Status == nil {
+			p.logger.Warn("video missing metadata in playlist", "videoID", item.ContentDetails.VideoId)
 			continue
 		}
 
 		result = append(result, youtube.PlaylistVideo{
-			Video: MapVideo(video),
-
+			Video:    p.mapVideo(video),
 			Position: int(item.Snippet.Position),
-			AddedAt:  parseTime(item.Snippet.PublishedAt),
+			AddedAt:  p.parseTime(item.Snippet.PublishedAt),
 		})
 	}
 

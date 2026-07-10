@@ -11,7 +11,8 @@ import (
 )
 
 type Client struct {
-	cache *Cache
+	cache  *Cache
+	logger *logger.Logger
 }
 
 const (
@@ -21,7 +22,8 @@ const (
 
 func NewClient(cfg CacheConfig, logger *logger.Logger) *Client {
 	return &Client{
-		cache: NewCache(cfg, logger),
+		cache:  NewCache(cfg, logger),
+		logger: logger,
 	}
 }
 
@@ -40,6 +42,8 @@ func (c *Client) ValidateYTDLP() error {
 func (c *Client) Fetch(ctx context.Context, args ...string) ([]byte, error) {
 	var lastErr error
 
+	c.logger.Debug("running yt-dlp", "args", args)
+
 	for i := 0; i < maxRetries; i++ {
 		ctxWithTimeout, cancel := context.WithTimeout(ctx, timeout)
 
@@ -49,12 +53,15 @@ func (c *Client) Fetch(ctx context.Context, args ...string) ([]byte, error) {
 		cancel()
 
 		if err == nil {
+			c.logger.Debug("yt-dlp command succeeded")
 			return output, nil
 		}
 
+		c.logger.Warn("yt-dlp attempt failed", "attempt", i+1, "error", err)
 		lastErr = fmt.Errorf("%w\n%s", err, output)
 	}
 
+	c.logger.Error("yt-dlp command failed after retries", "error", lastErr)
 	return nil, fmt.Errorf("failed after %d retries: %w", maxRetries, lastErr)
 }
 
@@ -69,6 +76,8 @@ func (c *Client) GetVideo(ctx context.Context, videoID string) (YTOutput, error)
 
 	url := "https://www.youtube.com/watch?v=" + videoID
 
+	c.logger.Debug("fetching video metadata from ytdlp", "videoID", videoID)
+
 	// Fetch if cache miss
 	output, err := c.Fetch(
 		ctx,
@@ -81,6 +90,8 @@ func (c *Client) GetVideo(ctx context.Context, videoID string) (YTOutput, error)
 		return YTOutput{}, err
 	}
 
+	c.logger.Info("fetched video metadata from ytdlp", "videoID", videoID)
+
 	// Save to cache
 	_ = c.cache.Save(videoID, output)
 
@@ -92,6 +103,8 @@ func (c *Client) GetVideo(ctx context.Context, videoID string) (YTOutput, error)
 func (c *Client) GetPlaylist(ctx context.Context, playlistID string) (YTPlaylistOutput, error) {
 	url := "https://www.youtube.com/playlist?list=" + playlistID
 
+	c.logger.Debug("fetching playlist from ytdlp", "playlistID", playlistID)
+
 	output, err := c.Fetch(
 		ctx,
 		"-j",
@@ -101,6 +114,8 @@ func (c *Client) GetPlaylist(ctx context.Context, playlistID string) (YTPlaylist
 	if err != nil {
 		return YTPlaylistOutput{}, err
 	}
+
+	c.logger.Info("fetched playlist from ytdlp", "playlistID", playlistID)
 
 	var meta YTPlaylistOutput
 	err = json.Unmarshal(output, &meta)

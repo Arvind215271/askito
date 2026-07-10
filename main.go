@@ -79,6 +79,7 @@ func main() {
 	youtubeClient, err := youtubeapi.NewClient(
 		ctx,
 		config.YouTubeAPIKey,
+		logger,
 	)
 	if err != nil {
 		logger.Fatal(
@@ -90,10 +91,11 @@ func main() {
 
 	youtubeProvider := youtubeapi.NewProvider(
 		youtubeClient,
+		logger,
 	)
 
 	ytdlpMetadataClient := ytdlpmetadata.NewClient(config.YtdlpCache, logger)
-	ytdlpMetadataProvider := ytdlpmetadata.NewProvider(ytdlpMetadataClient)
+	ytdlpMetadataProvider := ytdlpmetadata.NewProvider(ytdlpMetadataClient, logger)
 
 	// run cleanup on startup
 	if err := ytdlpMetadataClient.Cleanup(); err != nil {

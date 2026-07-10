@@ -3,21 +3,21 @@ package youtubeapi
 import (
 	"context"
 
-	
-	yt "google.golang.org/api/youtube/v3"
-	"google.golang.org/api/option"
+	"github.com/Arvind215271/askito/internal/logger"
 	youtube "github.com/Arvind215271/askito/internal/youtube"
+	"google.golang.org/api/option"
+	yt "google.golang.org/api/youtube/v3"
 )
 
 type Client struct {
 	service *yt.Service
+	logger  *logger.Logger
 }
-
- 
 
 func NewClient(
 	ctx context.Context,
 	apiKey string,
+	logger *logger.Logger,
 ) (*Client, error) {
 
 	service, err := yt.NewService(
@@ -30,15 +30,17 @@ func NewClient(
 
 	return &Client{
 		service: service,
+		logger:  logger,
 	}, nil
 }
 
-
-// returns metadata about the playlist, but does not contain any videoID in it 
+// returns metadata about the playlist, but does not contain any videoID in it
 func (c *Client) GetPlaylist(
 	ctx context.Context,
 	playlistID string,
 ) (*yt.Playlist, error) {
+
+	c.logger.Debug("starting GetPlaylist", "playlistID", playlistID)
 
 	resp, err := c.service.Playlists.
 		List([]string{
@@ -61,20 +63,18 @@ func (c *Client) GetPlaylist(
 
 	item := resp.Items[0]
 
-	
+	c.logger.Debug("finished GetPlaylist", "playlistID", playlistID, "title", item.Snippet.Title)
+	c.logger.Info("playlist metadata fetched", "playlistID", playlistID)
 
 	return item, nil
 }
-
-
-
-
-
 // this returns the videoID in the playlist with some data
 func (c *Client) GetPlaylistItems(
 	ctx context.Context,
 	playlistID string,
 ) ([]*yt.PlaylistItem, error) {
+
+	c.logger.Debug("starting GetPlaylistItems", "playlistID", playlistID)
 
 	var items []*yt.PlaylistItem
 	// items represent an array of playlist items.
@@ -84,6 +84,7 @@ func (c *Client) GetPlaylistItems(
 	var pageToken string
 
 	for {
+		c.logger.Debug("fetching page of playlist items", "playlistID", playlistID, "pageToken", pageToken)
 		resp, err := c.service.PlaylistItems.
 			List([]string{
 				"snippet",
@@ -98,8 +99,9 @@ func (c *Client) GetPlaylistItems(
 		if err != nil {
 			return nil, youtube.Err.Playlist.FetchFailed().Wrap(err)
 		}
-		// add the recieved items to an array. 	
+		// add the recieved items to an array.
 		items = append(items, resp.Items...)
+		c.logger.Debug("received items page", "playlistID", playlistID, "count", len(resp.Items))
 
 		if resp.NextPageToken == "" {
 			break
@@ -108,10 +110,11 @@ func (c *Client) GetPlaylistItems(
 		pageToken = resp.NextPageToken
 	}
 
+	c.logger.Debug("finished GetPlaylistItems", "playlistID", playlistID, "total", len(items))
+	c.logger.Info("playlist items fetched", "playlistID", playlistID, "total", len(items))
+
 	return items, nil
 }
-
-
 
 // fetches actual video resources from YouTube
 func (c *Client) GetVideos(
@@ -123,17 +126,20 @@ func (c *Client) GetVideos(
 		return nil, nil
 	}
 
+	c.logger.Debug("starting GetVideos", "videoIDsCount", len(videoIDs))
+
 	var videos []*yt.Video
 
 	// youtube allows max 50 ids per request
 	for start := 0; start < len(videoIDs); start += 50 {
-		
+
 		end := start + 50
 		if end > len(videoIDs) {
 			end = len(videoIDs)
 		}
 
 		chunk := videoIDs[start:end]
+		c.logger.Debug("fetching chunk of videos", "chunkSize", len(chunk))
 
 		resp, err := c.service.Videos.
 			List([]string{
@@ -152,6 +158,9 @@ func (c *Client) GetVideos(
 
 		videos = append(videos, resp.Items...)
 	}
+
+	c.logger.Debug("finished GetVideos", "totalFetched", len(videos))
+	c.logger.Info("videos metadata fetched", "total", len(videos))
 
 	return videos, nil
 }
