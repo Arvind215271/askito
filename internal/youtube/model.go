@@ -30,6 +30,12 @@ type Playlist struct {
 	Videos []PlaylistVideo `json:"videos,omitempty"`
 }
 
+type PlaylistItem struct {
+	VideoID  string    `json:"video_id"`
+	Position int       `json:"position"`
+	AddedAt  time.Time `json:"added_at"`
+}
+
 type PlaylistVideo struct {
 	Video
 

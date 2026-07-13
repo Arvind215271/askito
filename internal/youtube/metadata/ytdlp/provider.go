@@ -2,6 +2,7 @@ package ytdlp
 
 import (
 	"context"
+	"time"
 
 	"github.com/Arvind215271/askito/internal/logger"
 	"github.com/Arvind215271/askito/internal/youtube"
@@ -29,7 +30,7 @@ func (p *Provider) GetVideo(ctx context.Context, videoID string) (youtube.Video,
 	return MapVideo(meta), nil
 }
 
-func (p *Provider) GetPlaylist(ctx context.Context, playlistID string) (youtube.Playlist, error) {
+func (p *Provider) GetPlaylistMetadata(ctx context.Context, playlistID string) (youtube.Playlist, error) {
 	p.logger.Debug("getting playlist from ytdlp provider", "playlistID", playlistID)
 	meta, err := p.client.GetPlaylist(ctx, playlistID)
 	if err != nil {
@@ -37,4 +38,21 @@ func (p *Provider) GetPlaylist(ctx context.Context, playlistID string) (youtube.
 		return youtube.Playlist{}, err
 	}
 	return MapPlaylist(meta), nil
+}
+
+func (p *Provider) GetPlaylistItems(ctx context.Context, playlistID string) ([]youtube.PlaylistItem, error) {
+	meta, err := p.client.GetPlaylist(ctx, playlistID)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]youtube.PlaylistItem, 0, len(meta.Entries))
+	for i, entry := range meta.Entries {
+		result = append(result, youtube.PlaylistItem{
+			VideoID:  entry.ID,
+			Position: i,
+			AddedAt:  time.Time{},
+		})
+	}
+	return result, nil
 }

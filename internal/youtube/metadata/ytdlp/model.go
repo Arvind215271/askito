@@ -56,7 +56,10 @@ type YTPlaylistOutput struct {
 	ChannelID    string   `json:"channel_id"`
 	Thumbnail    string   `json:"thumbnail"`
 	Uploader     string   `json:"uploader"`
-	Entries      []struct {
-		ID string `json:"id"`
-	} `json:"entries"`
+	Entries      []YTPlaylistEntry `json:"entries"`
+}
+
+type YTPlaylistEntry struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
 }

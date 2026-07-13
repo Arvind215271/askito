@@ -21,15 +21,26 @@ func NewService(
 	}
 }
 
-func (s *Service) GetPlaylist(
+func (s *Service) GetPlaylistMetadata(
 	ctx context.Context,
 	playlistID string,
 	providerType ProviderType,
 ) (youtube.Playlist, error) {
 	if providerType == ProviderAPI {
-		return s.apiProvider.GetPlaylist(ctx, playlistID)
+		return s.apiProvider.GetPlaylistMetadata(ctx, playlistID)
 	}
-	return s.ytdlpProvider.GetPlaylist(ctx, playlistID)
+	return s.ytdlpProvider.GetPlaylistMetadata(ctx, playlistID)
+}
+
+func (s *Service) GetPlaylistItems(
+	ctx context.Context,
+	playlistID string,
+	providerType ProviderType,
+) ([]youtube.PlaylistItem, error) {
+	if providerType == ProviderAPI {
+		return s.apiProvider.GetPlaylistItems(ctx, playlistID)
+	}
+	return s.ytdlpProvider.GetPlaylistItems(ctx, playlistID)
 }
 
 func (s *Service) GetVideo(

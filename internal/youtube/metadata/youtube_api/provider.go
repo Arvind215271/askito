@@ -24,7 +24,7 @@ func NewProvider(
 	}
 }
 
-func (p *Provider) GetPlaylist(
+func (p *Provider) GetPlaylistMetadata(
 	ctx context.Context,
 	playlistID string,
 ) (youtube.Playlist, error) {
@@ -33,36 +33,6 @@ func (p *Provider) GetPlaylist(
 	playlist, err := p.client.GetPlaylist(
 		ctx,
 		playlistID,
-	)
-	if err != nil {
-		return youtube.Playlist{}, err
-	}
-
-	// this is for videos items from the playlist. Usually we get the video metadata through it.
-	items, err := p.client.GetPlaylistItems(
-		ctx,
-		playlistID,
-	)
-	if err != nil {
-		return youtube.Playlist{}, err
-	}
-
-	videoIDs := make([]string, 0, len(items))
-
-	for _, item := range items {
-		if item == nil || item.ContentDetails == nil {
-			continue
-		}
-
-		videoIDs = append(
-			videoIDs,
-			item.ContentDetails.VideoId,
-		)
-	}
-	// these are youtubeAPI videos and not our domain logic video.model
-	videos, err := p.client.GetVideos(
-		ctx,
-		videoIDs,
 	)
 	if err != nil {
 		return youtube.Playlist{}, err
@@ -85,11 +55,6 @@ func (p *Provider) GetPlaylist(
 
 		PublishedAt: p.parseTime(
 			playlist.Snippet.PublishedAt,
-		),
-
-		Videos: p.mapPlaylistVideos(
-			items,
-			videos,
 		),
 	}, nil
 }
@@ -115,4 +80,27 @@ func (p *Provider) GetVideo(
 	video := videoList[0]
 
 	return p.mapVideo(video), nil
+}
+
+func (p *Provider) GetPlaylistItems(
+	ctx context.Context,
+	playlistID string,
+) ([]youtube.PlaylistItem, error) {
+	items, err := p.client.GetPlaylistItems(ctx, playlistID)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]youtube.PlaylistItem, 0, len(items))
+	for _, item := range items {
+		if item == nil || item.Snippet == nil || item.ContentDetails == nil {
+			continue
+		}
+		result = append(result, youtube.PlaylistItem{
+			VideoID:  item.ContentDetails.VideoId,
+			Position: int(item.Snippet.Position),
+			AddedAt:  p.parseTime(item.Snippet.PublishedAt),
+		})
+	}
+	return result, nil
 }

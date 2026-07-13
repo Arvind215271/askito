@@ -151,7 +151,7 @@ func debugPlaylist(
 		"\n================ PLAYLIST =================\n",
 	)
 
-	playlist, err := youtubeSvc.GetPlaylist(
+	playlist, err := youtubeSvc.GetPlaylistMetadata(
 		ctx,
 		playlistID,
 		metadata.ProviderAPI,
@@ -167,6 +167,30 @@ func debugPlaylist(
 		)
 
 		return
+	}
+
+	items, err := youtubeSvc.GetPlaylistItems(
+		ctx,
+		playlistID,
+		metadata.ProviderAPI,
+	)
+	if err != nil {
+		log.Error("failed to fetch playlist items", "playlist_id", playlistID, "error", err)
+		return
+	}
+
+	for _, item := range items {
+		video, err := youtubeSvc.GetVideo(ctx, item.VideoID, metadata.ProviderAPI)
+		if err != nil {
+			log.Warn("failed to fetch video", "video_id", item.VideoID, "error", err)
+			continue
+		}
+
+		playlist.Videos = append(playlist.Videos, youtube.PlaylistVideo{
+			Video:    video,
+			Position: item.Position,
+			AddedAt:  item.AddedAt,
+		})
 	}
 
 	// enrich playlist videos with chapter data

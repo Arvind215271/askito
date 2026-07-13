@@ -1,0 +1,247 @@
+package yt_bench
+
+import (
+	"bufio"
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"runtime"
+	"sync/atomic"
+	"time"
+
+	"github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp"
+	"github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp/python"
+)
+
+func BenchmarkPythonPoolWarm(ctx context.Context, playlistID string, outputDir string, workers int) (BenchmarkResult, error) {
+	benchmarkStart := time.Now()
+
+	// Memory tracking
+	var peakMemory uint64
+	ticker := time.NewTicker(100 * time.Millisecond)
+	go func() {
+		for range ticker.C {
+			var m runtime.MemStats
+			runtime.ReadMemStats(&m)
+			if m.Alloc > peakMemory {
+				atomic.StoreUint64(&peakMemory, m.Alloc)
+			}
+		}
+	}()
+	defer ticker.Stop()
+
+	// Ensure log directory exists
+	logDir := "debug/yt_bench/output/logs"
+	os.MkdirAll(logDir, 0755)
+	logFile, err := os.Create(filepath.Join(logDir, fmt.Sprintf("python_pool_warm_%d.log", workers)))
+	if err != nil {
+		return BenchmarkResult{}, err
+	}
+	defer logFile.Close()
+	logger := log.New(logFile, "", log.LstdFlags)
+
+	// Flat playlist fetch timing
+	flatFetchStart := time.Now()
+	flatOutput, err := FetchPlaylistFlatMetadata(ctx, playlistID)
+	flatFetchEnd := time.Now()
+	if err != nil {
+		return BenchmarkResult{}, err
+	}
+	var flat ytdlp.YTPlaylistOutput
+	scanner := bufio.NewScanner(bytes.NewReader(flatOutput))
+	for scanner.Scan() {
+		var entry ytdlp.YTPlaylistEntry
+		if err := json.Unmarshal(scanner.Bytes(), &entry); err == nil {
+			flat.Entries = append(flat.Entries, entry)
+		}
+	}
+
+	var aggregateWorkerTime int64 // nanoseconds
+	var diskWriteTime int64       // nanoseconds
+
+	// Atomic values for concurrent timing updates
+	var firstWorkerStartedAt atomic.Value // time.Time
+	var lastWorkerFinishedAt atomic.Value // time.Time
+	var firstDiskWriteAt atomic.Value     // time.Time
+	var lastDiskWriteAt atomic.Value      // time.Time
+
+	// Worker spawn timing
+	workerSpawnStart := time.Now()
+	pool, err := python.NewSinglePool(workers)
+	workerSpawnEnd := time.Now()
+	if err != nil {
+		return BenchmarkResult{}, err
+	}
+	defer pool.Close()
+
+	// Warmup timing
+	warmupStart := time.Now()
+	err = pool.WarmUp(ctx)
+	warmupEnd := time.Now()
+	if err != nil {
+		return BenchmarkResult{}, err
+	}
+
+	// Metadata dispatch timing
+	dispatchStart := time.Now()
+
+	pool.Start(ctx, func(id string, data map[string]any, execution python.WorkerExecution, err error) {
+		if err != nil {
+			logger.Printf("Error processing video %s: %v", id, err)
+			return
+		}
+
+		// Accumulate aggregate worker time
+		atomic.AddInt64(&aggregateWorkerTime, int64(execution.Duration))
+
+		// Update first worker start time (atomic)
+		if execution.StartedAt.After(time.Time{}) {
+			for {
+				old := firstWorkerStartedAt.Load()
+				if old == nil || execution.StartedAt.Before(old.(time.Time)) {
+					if firstWorkerStartedAt.CompareAndSwap(old, execution.StartedAt) {
+						break
+					}
+				} else {
+					break
+				}
+			}
+		}
+
+		// Update last worker finish time (atomic)
+		if execution.FinishedAt.After(time.Time{}) {
+			for {
+				old := lastWorkerFinishedAt.Load()
+				if old == nil || execution.FinishedAt.After(old.(time.Time)) {
+					if lastWorkerFinishedAt.CompareAndSwap(old, execution.FinishedAt) {
+						break
+					}
+				} else {
+					break
+				}
+			}
+		}
+
+		// Disk write timing
+		writeStart := time.Now()
+		fileName := filepath.Join(outputDir, fmt.Sprintf("D_%d_%s.json", workers, id))
+		respData, _ := json.Marshal(data)
+		os.WriteFile(fileName, respData, 0644)
+		writeDuration := time.Since(writeStart)
+		atomic.AddInt64(&diskWriteTime, int64(writeDuration))
+
+		// Update first/last disk write times
+		for {
+			old := firstDiskWriteAt.Load()
+			if old == nil || writeStart.Before(old.(time.Time)) {
+				if firstDiskWriteAt.CompareAndSwap(old, writeStart) {
+					break
+				}
+			} else {
+				break
+			}
+		}
+		for {
+			old := lastDiskWriteAt.Load()
+			if old == nil || writeStart.Add(writeDuration).After(old.(time.Time)) {
+				if lastDiskWriteAt.CompareAndSwap(old, writeStart.Add(writeDuration)) {
+					break
+				}
+			} else {
+				break
+			}
+		}
+
+		logger.Printf("Processed videoID=%s, dataLen=%d", id, len(respData))
+	})
+
+	dispatchEnd := time.Now()
+
+	// Submit all videos
+	for _, e := range flat.Entries {
+		logger.Printf("Submitting videoID=%s to worker", e.ID)
+		pool.Submit(e.ID)
+	}
+
+	// Wait for all workers to complete
+	pool.Close()
+
+	benchmarkEnd := time.Now()
+
+	// Calculate derived durations
+	firstWorkerStart := time.Time{}
+	if v := firstWorkerStartedAt.Load(); v != nil {
+		firstWorkerStart = v.(time.Time)
+	}
+	lastWorkerEnd := time.Time{}
+	if v := lastWorkerFinishedAt.Load(); v != nil {
+		lastWorkerEnd = v.(time.Time)
+	}
+	firstDiskWrite := time.Time{}
+	if v := firstDiskWriteAt.Load(); v != nil {
+		firstDiskWrite = v.(time.Time)
+	}
+	lastDiskWrite := time.Time{}
+	if v := lastDiskWriteAt.Load(); v != nil {
+		lastDiskWrite = v.(time.Time)
+	}
+
+	actualMetadataFetchDuration := time.Duration(0)
+	if !firstWorkerStart.IsZero() && !lastWorkerEnd.IsZero() {
+		actualMetadataFetchDuration = lastWorkerEnd.Sub(firstWorkerStart)
+	}
+
+	diskWriteDuration := time.Duration(0)
+	if !firstDiskWrite.IsZero() && !lastDiskWrite.IsZero() {
+		diskWriteDuration = lastDiskWrite.Sub(firstDiskWrite)
+	}
+
+	res := BenchmarkResult{
+		PlaylistID:            playlistID,
+		Strategy:              fmt.Sprintf("Python Pool Warm (%d)", workers),
+		PlaylistSize:          len(flat.Entries),
+		TotalExecutionTime:    benchmarkEnd.Sub(benchmarkStart),
+		StartedAt:             benchmarkStart,
+		ProcessesSpawned:      1 + workers + len(flat.Entries),
+		PeakMemoryUsage:       atomic.LoadUint64(&peakMemory),
+		FlatPlaylistFetchTime: flatFetchEnd.Sub(flatFetchStart),
+		VideoMetadataFetchTime: time.Duration(atomic.LoadInt64(&aggregateWorkerTime)), // Deprecated: aggregate time
+		DiskWriteTime:         time.Duration(atomic.LoadInt64(&diskWriteTime)),
+		WorkerSpawnTime:       workerSpawnEnd.Sub(workerSpawnStart),
+		WorkerWarmupTime:      warmupEnd.Sub(warmupStart),
+
+		// New detailed fields
+		BenchmarkStartedAt:      benchmarkStart,
+		BenchmarkFinishedAt:     benchmarkEnd,
+		FlatFetchStartedAt:      flatFetchStart,
+		FlatFetchFinishedAt:     flatFetchEnd,
+		WorkerSpawnStartedAt:    workerSpawnStart,
+		WorkerSpawnFinishedAt:   workerSpawnEnd,
+		MetadataDispatchStartedAt: dispatchStart,
+		MetadataDispatchFinishedAt: dispatchEnd,
+		FirstWorkerStartedAt:    firstWorkerStart,
+		LastWorkerFinishedAt:    lastWorkerEnd,
+		DiskWriteStartedAt:      firstDiskWrite,
+		DiskWriteFinishedAt:     lastDiskWrite,
+
+		// Warmup timing
+		WarmupStartedAt:  warmupStart,
+		WarmupFinishedAt: warmupEnd,
+		WarmupDuration:   warmupEnd.Sub(warmupStart),
+
+		// Derived durations
+		FlatFetchDuration:           flatFetchEnd.Sub(flatFetchStart),
+		WorkerSpawnDuration:         workerSpawnEnd.Sub(workerSpawnStart),
+		DispatchDuration:            dispatchEnd.Sub(dispatchStart),
+		ActualMetadataFetchDuration: actualMetadataFetchDuration,
+		DiskWriteDuration:           diskWriteDuration,
+		TotalBenchmarkDuration:      benchmarkEnd.Sub(benchmarkStart),
+		AggregateWorkerTime:         time.Duration(atomic.LoadInt64(&aggregateWorkerTime)),
+	}
+	SaveResult(res)
+	return res, nil
+}

@@ -7,10 +7,15 @@ import (
 )
 
 type Provider interface {
-	GetPlaylist(
+	GetPlaylistMetadata(
 		ctx context.Context,
 		playlistID string,
 	) (youtube.Playlist, error)
+
+	GetPlaylistItems(
+		ctx context.Context,
+		playlistID string,
+	) ([]youtube.PlaylistItem, error)
 
 	GetVideo(
 		ctx context.Context,
