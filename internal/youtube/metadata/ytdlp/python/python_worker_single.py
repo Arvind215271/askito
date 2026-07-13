@@ -43,41 +43,41 @@ def setup_logging():
 
 
 def log(msg):
-    logger.info("EVENT=" + msg)
+    logger.info(f"worker={WORKER_ID} {msg}")
 
 
 def log_request_failed(video_id, error):
-    log(f"REQUEST_FAILED worker={WORKER_ID} video={video_id}")
+    log(f"REQUEST_FAILED video={video_id}")
     logger.error(error)
 
 
 def log_worker_error(error):
-    log(f"WORKER_ERROR worker={WORKER_ID}")
+    log("WORKER_ERROR")
     logger.error(error)
 
 
 def log_worker_started():
-    log(f"WORKER_STARTED worker={WORKER_ID}")
+    log("WORKER_STARTED")
 
 
 def log_worker_initialized(duration):
-    log(f"INITIALIZED worker={WORKER_ID} duration={duration:.4f}")
+    log(f"INITIALIZED duration={duration:.4f}")
 
 
 def log_worker_warmup(duration):
-    log(f"WARMUP_DONE worker={WORKER_ID} duration={duration:.4f}")
+    log(f"WARMUP_DONE duration={duration:.4f}")
 
 
 def log_request_start(video_id):
-    log(f"REQUEST_START worker={WORKER_ID} video={video_id}")
+    log(f"REQUEST_START video={video_id}")
 
 
 def log_request_end(video_id):
-    log(f"REQUEST_END worker={WORKER_ID} video={video_id}")
+    log(f"REQUEST_END video={video_id}")
 
 
 def log_worker_shutdown():
-    log(f"WORKER_STOPPED worker={WORKER_ID}")
+    log("WORKER_STOPPED")
 
 
 def read_exact(n: int) -> bytes:
