@@ -39,6 +39,7 @@ AGENTS.md
 
 .venv
 myenv
-debug/yt_bench/debug/*
-debug/yt_bench/docs/*
-debug/yt_bench/output/*
+# Ignore benchmark generated/debug files
+debug/yt_bench/debug/
+debug/yt_bench/docs/
+debug/yt_bench/output/
