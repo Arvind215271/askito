@@ -16,7 +16,8 @@ func TestRunBenchmarks(t *testing.T) {
 		// "PLMWaZteqtEaI2Xd7-lnv2hsdMVteY7U1v",
 		// "PLHq_wPEVVWy0Vq72bS9wRkw_9Vqgqp0y5",
 		// "PLu0W_9lII9agwh1XjRt242xIpHhPT2llg",
-		"PLgUwDviBIf0oF6QL8m22w1hIDC1vJ_BHz",
+		// "PLgUwDviBIf0oF6QL8m22w1hIDC1vJ_BHz",
+		"PLdSukIYrTISE",
 	}
 	RunBenchmarks(playlistIDs)
 }

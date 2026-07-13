@@ -1,10 +1,13 @@
+#!/usr/bin/env python3
+
+import json
 import re
 import statistics
 from datetime import datetime
-import json
 
 
-LOG_FILE = "debug/yt_bench/debug/yt_bench/output/logs/kaggle.log"
+LOG_FILE = "debug/yt_bench/output/logs/python_worker_single.log"
+OUTPUT_FILE = "debug/yt_bench/output/logs/python_worker_stats.json"
 
 
 class BenchmarkRun:
@@ -12,223 +15,224 @@ class BenchmarkRun:
         self.start = start
         self.end = None
 
-        self.workers = 0
+        self.workers = set()
 
         self.init_times = []
         self.warmup_times = []
 
-        self.videos = []
         self.fetch_times = []
 
-        # Actual fetch window
         self.fetch_started_at = None
         self.fetch_finished_at = None
 
-
-    def runtime(self):
-        if self.end:
-            return (self.end - self.start).total_seconds()
-
-        return None
-
-
-    def fetch_cycle_time(self):
-        if self.fetch_started_at and self.fetch_finished_at:
-            return (
-                self.fetch_finished_at -
-                self.fetch_started_at
-            ).total_seconds()
-
-        return None
-
+        self.request_start = {}  # video -> timestamp
+        self.videos = set()
 
 
 def parse_time(line):
     return datetime.strptime(
         line[:23],
-        "%Y-%m-%d %H:%M:%S,%f"
+        "%Y-%m-%d %H:%M:%S,%f",
     )
 
 
 def percentile(values, p):
-
     if not values:
         return None
 
     values = sorted(values)
 
-    k = (len(values)-1) * (p/100)
-
+    k = (len(values) - 1) * p / 100
     f = int(k)
-    c = min(
-        f+1,
-        len(values)-1
-    )
+    c = min(f + 1, len(values) - 1)
 
     if f == c:
         return values[f]
 
-    return values[f] + (
-        values[c]-values[f]
-    ) * (k-f)
-
+    return values[f] + (values[c] - values[f]) * (k - f)
 
 
 def stats(values):
-
     if not values:
         return {
             "count": 0,
             "avg": None,
+            "min": None,
+            "max": None,
             "p50": None,
-            "p95": None
+            "p95": None,
         }
 
     return {
         "count": len(values),
         "avg": statistics.mean(values),
+        "min": min(values),
+        "max": max(values),
         "p50": percentile(values, 50),
-        "p95": percentile(values, 95)
+        "p95": percentile(values, 95),
     }
-
 
 
 runs = []
 current = None
 
+worker_re = re.compile(r"worker=(\d+)")
+duration_re = re.compile(r"duration=([0-9.]+)")
+video_re = re.compile(r"video=([A-Za-z0-9_-]+)")
 
-with open(LOG_FILE, "r") as f:
+with open(LOG_FILE) as f:
 
     for line in f:
 
-        t = parse_time(line)
+        timestamp = parse_time(line)
 
+        worker_match = worker_re.search(line)
+        worker = worker_match.group(1) if worker_match else None
 
-        if "Python worker started" in line:
+        #
+        # Start of benchmark
+        #
+        if "WORKER_STARTED" in line:
 
             if current is None:
-                current = BenchmarkRun(t)
+                current = BenchmarkRun(timestamp)
 
-            current.workers += 1
+            current.workers.add(worker)
+            continue
 
+        if current is None:
+            continue
 
+        #
+        # Initialization
+        #
+        if "INITIALIZED" in line:
 
-        elif current is not None:
+            m = duration_re.search(line)
+            if m:
+                current.init_times.append(float(m.group(1)))
 
+            continue
 
-            if "Initialization time:" in line:
+        #
+        # Warmup
+        #
+        if "WARMUP_DONE" in line:
 
-                value = float(
-                    re.search(
-                        r"Initialization time: ([0-9.]+)",
-                        line
-                    ).group(1)
-                )
+            m = duration_re.search(line)
+            if m:
+                current.warmup_times.append(float(m.group(1)))
 
-                current.init_times.append(value)
+            continue
 
+        #
+        # Request started
+        #
+        if "REQUEST_START" in line:
 
+            m = video_re.search(line)
+            if not m:
+                continue
 
-            elif "Warmup finished in" in line:
+            video = m.group(1)
 
-                value = float(
-                    re.search(
-                        r"Warmup finished in ([0-9.]+)",
-                        line
-                    ).group(1)
-                )
+            current.request_start[video] = timestamp
+            current.videos.add(video)
 
-                current.warmup_times.append(value)
+            if current.fetch_started_at is None:
+                current.fetch_started_at = timestamp
 
+            continue
 
+        #
+        # Request finished
+        #
+        if "REQUEST_END" in line:
 
-            elif "Processing video:" in line:
+            m = video_re.search(line)
+            if not m:
+                continue
 
-                if current.fetch_started_at is None:
-                    current.fetch_started_at = t
+            video = m.group(1)
 
+            current.fetch_finished_at = timestamp
 
-                video = line.split(
-                    "Processing video:"
-                )[1].strip()
+            if video in current.request_start:
 
+                latency = (
+                    timestamp - current.request_start.pop(video)
+                ).total_seconds()
 
-                current.videos.append(video)
+                current.fetch_times.append(latency)
 
+            continue
 
+        #
+        # Ignore failures for latency statistics
+        #
+        if "REQUEST_FAILED" in line:
 
-            elif "Finished metadata for" in line:
+            m = video_re.search(line)
 
+            if m:
+                current.request_start.pop(m.group(1), None)
 
-                current.fetch_finished_at = t
+            continue
 
+        #
+        # End benchmark once every worker exited
+        #
+        if "WORKER_STOPPED" in line:
 
-                match = re.search(
-                    r"Fetch: ([0-9.]+)",
-                    line
-                )
+            current.workers.discard(worker)
 
+            if not current.workers:
 
-                if match:
-
-                    current.fetch_times.append(
-                        float(match.group(1))
-                    )
-
-
-
-            elif "stdin closed" in line:
-
-                current.end = t
-
+                current.end = timestamp
                 runs.append(current)
-
                 current = None
-
 
 
 if current:
     runs.append(current)
 
 
-
 output = []
-
 
 for i, run in enumerate(runs, 1):
 
-    fetch_cycle = run.fetch_cycle_time()
+    runtime = (
+        (run.end - run.start).total_seconds()
+        if run.end
+        else None
+    )
+
+    fetch_duration = None
+
+    if run.fetch_started_at and run.fetch_finished_at:
+
+        fetch_duration = (
+            run.fetch_finished_at -
+            run.fetch_started_at
+        ).total_seconds()
 
     videos = len(run.videos)
 
-
-    data = {
+    output.append({
 
         "run": i,
 
-        "workers": run.workers,
+        "workers": len(run.init_times),
 
+        "runtime_seconds": runtime,
 
-        "runtime_seconds":
-            run.runtime(),
+        "videos_processed": videos,
 
-
-        "videos_processed":
-            videos,
-
-
-        #
-        # Entire process
-        #
         "overall_throughput":
-            videos / run.runtime()
-            if run.runtime()
+            videos / runtime
+            if runtime
             else None,
 
-
-        #
-        # Actual fetch window
-        #
         "fetch_cycle": {
 
             "start":
@@ -241,52 +245,27 @@ for i, run in enumerate(runs, 1):
                 if run.fetch_finished_at
                 else None,
 
-
             "duration_seconds":
-                fetch_cycle,
-
+                fetch_duration,
 
             "videos_per_second":
-                videos / fetch_cycle
-                if fetch_cycle
-                else None
+                videos / fetch_duration
+                if fetch_duration
+                else None,
         },
 
-
-        #
-        # Per video fetch latency
-        #
         "fetch_latency":
             stats(run.fetch_times),
-
-
 
         "initialization":
             stats(run.init_times),
 
-
-
         "warmup":
-            stats(run.warmup_times)
-    }
+            stats(run.warmup_times),
+    })
 
 
-    output.append(data)
+with open(OUTPUT_FILE, "w") as f:
+    json.dump(output, f, indent=4)
 
-
-
-with open(
-    "debug/yt_bench/debug/yt_bench/output/logs/kaggle_stats.json",
-    "w"
-) as f:
-
-    json.dump(
-        output,
-        f,
-        indent=4
-    )
-
-
-print(
-    "Saved stats to kaggle_stats.json"
-)
+print(f"Saved stats to {OUTPUT_FILE}")
