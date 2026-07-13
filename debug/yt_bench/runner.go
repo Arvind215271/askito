@@ -40,16 +40,16 @@ func RunBenchmarks(playlistIDs []string) {
 		// 	}
 		// 	fmt.Printf("Strategy C (Parallel %d) Time: %v\n", w, resC.TotalExecutionTime)
 		// }
-		workers := []int{32,64,128,256,512}
+		workers := []int{16,32,64,128,256}
 
 		// Strategy D
-		for _, w := range workers {
-			resD, err := BenchmarkPythonPool(ctx, playlistID, outputDir, w)
-			if err != nil {
-				log.Fatalf("Strategy D (%d) failed: %v", w, err)
-			}
-			fmt.Printf("Strategy D (Python Pool %d) Time: %v\n", w, resD.TotalBenchmarkDuration)
-		}
+		// for _, w := range workers {
+		// 	resD, err := BenchmarkPythonPool(ctx, playlistID, outputDir, w)
+		// 	if err != nil {
+		// 		log.Fatalf("Strategy D (%d) failed: %v", w, err)
+		// 	}
+		// 	fmt.Printf("Strategy D (Python Pool %d) Time: %v\n", w, resD.TotalBenchmarkDuration)
+		// }
 
 		for _, w := range workers {
 			resD, err := BenchmarkPythonPoolWarm(ctx, playlistID, outputDir, w)
@@ -59,13 +59,13 @@ func RunBenchmarks(playlistIDs []string) {
 			fmt.Printf("Strategy D.2 (Python Pool Warm %d) Time: %v\n", w, resD.TotalBenchmarkDuration)
 		}
 
-		for _, w := range workers {
-			resD, err := BenchmarkPythonPoolWarmSleep(ctx, playlistID, outputDir, w)
-			if err != nil {
-				log.Fatalf("Strategy D.3 (%d) failed: %v", w, err)
-			}
-			fmt.Printf("Strategy D.3 (Python Pool Warm Sleep %d) Time: %v\n", w, resD.TotalBenchmarkDuration)
-		}
+		// for _, w := range workers {
+		// 	resD, err := BenchmarkPythonPoolWarmSleep(ctx, playlistID, outputDir, w)
+		// 	if err != nil {
+		// 		log.Fatalf("Strategy D.3 (%d) failed: %v", w, err)
+		// 	}
+		// 	fmt.Printf("Strategy D.3 (Python Pool Warm Sleep %d) Time: %v\n", w, resD.TotalBenchmarkDuration)
+		// }
 
 		// // Strategy E
 		// for _, w := range []int{1,4,8,16} {

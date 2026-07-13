@@ -4,11 +4,11 @@ import statistics
 from datetime import datetime
 
 
-LOG_FILE = "debug/yt_bench/debug/yt_bench/output/logs/kaggle_worker.log"
+LOG_FILE = "debug/yt_bench/debug/yt_bench/output/logs/kaggle_worker_5k.log"
 
 OUTPUT_FILE = (
     "debug/yt_bench/debug/yt_bench/output/logs/"
-    "kaggle_stats_worker.json"
+    "kaggle_stats_worker_5k.json"
 )
 
 
@@ -58,11 +58,13 @@ class BenchmarkRun:
 
 
 def parse_time(line):
-
-    return datetime.strptime(
-        line[:23],
-        "%Y-%m-%d %H:%M:%S,%f",
-    )
+    try:
+        return datetime.strptime(
+            line[:23],
+            "%Y-%m-%d %H:%M:%S,%f",
+        )
+    except ValueError:
+        return None
 
 
 
