@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import json
 import logging
 import os
@@ -11,6 +12,12 @@ import time
 
 import yt_dlp
 
+# ----------------------------------------------------------------------
+# Configuration
+# ----------------------------------------------------------------------
+
+WORKER_ID = "unknown"
+
 stdin = sys.stdin.buffer
 stdout = sys.stdout.buffer
 
@@ -21,13 +28,56 @@ stdout = sys.stdout.buffer
 LOG_DIR = "debug/yt_bench/output/logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
-logging.basicConfig(
-    filename=os.path.join(LOG_DIR, "python_worker_single.log"),
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-)
+logger = None
 
-logger = logging.getLogger(__name__)
+def setup_logging():
+    global logger
+    log_path = os.path.join(LOG_DIR, "python_worker_single.log")
+
+    logging.basicConfig(
+        filename=log_path,
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+    )
+    logger = logging.getLogger(__name__)
+
+
+def log(msg):
+    logger.info("EVENT=" + msg)
+
+
+def log_request_failed(video_id, error):
+    log(f"REQUEST_FAILED worker={WORKER_ID} video={video_id}")
+    logger.error(error)
+
+
+def log_worker_error(error):
+    log(f"WORKER_ERROR worker={WORKER_ID}")
+    logger.error(error)
+
+
+def log_worker_started():
+    log(f"WORKER_STARTED worker={WORKER_ID}")
+
+
+def log_worker_initialized(duration):
+    log(f"INITIALIZED worker={WORKER_ID} duration={duration:.4f}")
+
+
+def log_worker_warmup(duration):
+    log(f"WARMUP_DONE worker={WORKER_ID} duration={duration:.4f}")
+
+
+def log_request_start(video_id):
+    log(f"REQUEST_START worker={WORKER_ID} video={video_id}")
+
+
+def log_request_end(video_id):
+    log(f"REQUEST_END worker={WORKER_ID} video={video_id}")
+
+
+def log_worker_shutdown():
+    log(f"WORKER_STOPPED worker={WORKER_ID}")
 
 
 def read_exact(n: int) -> bytes:
@@ -47,17 +97,22 @@ def recv():
 
 
 def send(obj):
-    start_send = time.time()
     payload = orjson.dumps(obj)
     stdout.write(struct.pack(">I", len(payload)))
     stdout.write(payload)
     stdout.flush()
-    send_time = time.time() - start_send
-    logger.info("Send time: %.4f seconds", send_time)
 
 
 def main():
-    logger.info("Python worker started")
+    global WORKER_ID
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--worker-id", help="Worker ID")
+    parser.add_argument("pos_worker_id", nargs="?", help="Worker ID")
+    args = parser.parse_args()
+    WORKER_ID = args.worker_id or args.pos_worker_id or "unknown"
+    setup_logging()
+
+    log_worker_started()
     
     start_init = time.perf_counter()
     ydl = yt_dlp.YoutubeDL(
@@ -92,13 +147,13 @@ def main():
         }
     )
     init_time = time.perf_counter() - start_init
-    logger.info("Initialization time: %.4f seconds", init_time)
+    log_worker_initialized(init_time)
 
     while True:
         try:
             req = recv()
         except EOFError:
-            logger.info("stdin closed")
+            log_worker_shutdown()
             break
         except Exception:
             logger.exception("Failed reading request")
@@ -111,7 +166,7 @@ def main():
                 start_warmup = time.time()
                 ydl.extract_info("https://www.youtube.com/watch?v=dQw4w9WgXcQ", download=False)
                 warmup_time = time.time() - start_warmup
-                logger.info("Warmup finished in %.4f seconds", warmup_time)
+                log_worker_warmup(warmup_time)
                 send({"ok": True})
                 continue
 
@@ -119,27 +174,23 @@ def main():
             if video_id is None:
                 raise ValueError("No id provided")
 
-            logger.info("Processing video: %s", video_id)
+            log_request_start(video_id)
             
-            start_fetch = time.time()
             info = ydl.extract_info(
                 f"https://www.youtube.com/watch?v={video_id}",
                 download=False,
             )
-            fetch_time = time.time() - start_fetch
             
-            start_extract = time.time()
-            extract_time = time.time() - start_extract
-            
-            logger.info("Finished metadata for %s. Fetch: %.4f, Extract: %.4f", video_id, fetch_time, extract_time)
+            log_request_end(video_id)
             send({"ok": True, "data": info})
 
         except Exception:
-            logger.exception("Failed to process command %s", req)
+            err = traceback.format_exc()
+            log_request_failed(req.get("id", "unknown"), err)
             send(
                 {
                     "ok": False,
-                    "error": traceback.format_exc(),
+                    "error": err,
                 }
             )
 

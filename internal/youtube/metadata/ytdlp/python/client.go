@@ -12,10 +12,10 @@ type SingleClient struct {
 	worker *PythonWorker
 }
 
-func NewSingleWorker() (*SingleClient, error) {
+func NewSingleWorker(workerID int) (*SingleClient, error) {
 	_, file, _, _ := runtime.Caller(0)
 	script := filepath.Join(filepath.Dir(file), "python_worker_single.py")
-	worker, err := NewWorker(script)
+	worker, err := NewWorker(script, workerID)
 	if err != nil {
 		return nil, err
 	}
@@ -73,10 +73,10 @@ type BatchClient struct {
 	worker *PythonWorker
 }
 
-func NewBatchWorker() (*BatchClient, error) {
+func NewBatchWorker(workerID int) (*BatchClient, error) {
 	_, file, _, _ := runtime.Caller(0)
 	script := filepath.Join(filepath.Dir(file), "python_worker_batch.py")
-	worker, err := NewWorker(script)
+	worker, err := NewWorker(script, workerID)
 	if err != nil {
 		return nil, err
 	}

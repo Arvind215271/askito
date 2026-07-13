@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import json
 import logging
 import os
@@ -20,13 +21,20 @@ stdout = sys.stdout.buffer
 LOG_DIR = "debug/yt_bench/output/logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
-logging.basicConfig(
-    filename=os.path.join(LOG_DIR, "python_worker.log"),
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-)
+logger = None
 
-logger = logging.getLogger(__name__)
+def setup_logging():
+    global logger
+    logging.basicConfig(
+        filename=os.path.join(LOG_DIR, "python_worker_batch.log"),
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+    )
+    logger = logging.getLogger(__name__)
+
+
+def log(msg):
+    logger.info("EVENT=" + msg)
 
 
 def read_exact(n: int) -> bytes:
@@ -53,7 +61,13 @@ def send(obj):
     stdout.flush()
 
 def main():
-    logger.info("Python worker started")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--worker-id", help="Worker ID")
+    args = parser.parse_args()
+    worker_id = args.worker_id or "unknown"
+    setup_logging()
+
+    log(f"WORKER_STARTED worker={worker_id}")
 
     ydl = yt_dlp.YoutubeDL(
         {
@@ -162,12 +176,14 @@ def main():
             send(results)
 
         except Exception:
-            logger.exception("Batch failed")
+            err = traceback.format_exc()
+            log(f"REQUEST_FAILED worker={worker_id} error={err}")
+            logger.error("Batch failed: %s", err)
 
             send(
                 {
                     "ok": False,
-                    "error": traceback.format_exc(),
+                    "error": err,
                 }
             )
 

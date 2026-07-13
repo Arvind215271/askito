@@ -23,7 +23,7 @@ type SinglePool struct {
 func NewSinglePool(workerCount int) (*SinglePool, error) {
 	workers := make([]*SingleClient, workerCount)
 	for i := 0; i < workerCount; i++ {
-		w, err := NewSingleWorker()
+		w, err := NewSingleWorker(i)
 		if err != nil {
 			return nil, err
 		}
@@ -97,7 +97,7 @@ type BatchPool struct {
 func NewBatchPool(workerCount int) (*BatchPool, error) {
 	workers := make([]*BatchClient, workerCount)
 	for i := 0; i < workerCount; i++ {
-		w, err := NewBatchWorker()
+		w, err := NewBatchWorker(i)
 		if err != nil {
 			return nil, err
 		}

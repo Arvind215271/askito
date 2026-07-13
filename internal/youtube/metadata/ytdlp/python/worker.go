@@ -3,6 +3,7 @@ package python
 import (
 	"encoding/binary"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os/exec"
 )
@@ -14,8 +15,8 @@ type PythonWorker struct {
 	stderr io.ReadCloser
 }
 
-func NewWorker(scriptPath string) (*PythonWorker, error) {
-	cmd := exec.Command("python3", "-u", scriptPath)
+func NewWorker(scriptPath string, workerID int) (*PythonWorker, error) {
+	cmd := exec.Command("python3", "-u", scriptPath, "--worker-id", fmt.Sprintf("%d", workerID))
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, err
