@@ -6,7 +6,7 @@ import (
 
 func TestRunBenchmarks(t *testing.T) {
 	playlistIDs := []string{
-		"PLQY2H8rRoyvzDbLUZkbudP-MFQZwNmU4S",
+		// "PLQY2H8rRoyvzDbLUZkbudP-MFQZwNmU4S",
 		// "PLOU2XLYxmsIIuiBfYad6rFYQU_jL2ryal",
 		// "PLf7L7Kg8_FNxHATtLwDceyh72QQL9pvpQ",
 		// "PLdOKnrf8EcP384Ilxra4UlK9BDJGwawg9",
@@ -16,7 +16,7 @@ func TestRunBenchmarks(t *testing.T) {
 		// "PLMWaZteqtEaI2Xd7-lnv2hsdMVteY7U1v",
 		// "PLHq_wPEVVWy0Vq72bS9wRkw_9Vqgqp0y5",
 		// "PLu0W_9lII9agwh1XjRt242xIpHhPT2llg",
-		// "PLgUwDviBIf0oF6QL8m22w1hIDC1vJ_BHz",
+		"PLgUwDviBIf0oF6QL8m22w1hIDC1vJ_BHz",
 	}
 	RunBenchmarks(playlistIDs)
 }
