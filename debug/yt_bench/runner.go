@@ -40,7 +40,7 @@ func RunBenchmarks(playlistIDs []string) {
 		// 	}
 		// 	fmt.Printf("Strategy C (Parallel %d) Time: %v\n", w, resC.TotalExecutionTime)
 		// }
-		workers := []int{1,2,4,8,16,32,64,128,256}
+		workers := []int{8,16,32,64,128,256}
 
 		// Strategy D
 		for _, w := range workers {
