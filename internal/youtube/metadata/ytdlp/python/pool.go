@@ -45,6 +45,16 @@ func (p *SinglePool) GetVideo(ctx context.Context, videoID string) (map[string]a
 	return p.manager.GetVideo(ctx, videoID)
 }
 
+func (p *SinglePool) GetPlaylist(
+	ctx context.Context,
+	playlistID string,
+) (map[string]any, error) {
+	return p.manager.GetPlaylist(
+		ctx,
+		playlistID,
+	)
+}
+
 func (p *SinglePool) GetSubtitle(ctx context.Context, videoID, language, subType, format string) ([]byte, error) {
 	return p.manager.GetSubtitle(ctx, videoID, language, subType, format)
 }

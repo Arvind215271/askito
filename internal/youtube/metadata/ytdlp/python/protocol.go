@@ -12,6 +12,12 @@ type WarmupRequest struct {
 	Cmd string          `json:"cmd"`
 }
 
+type PlaylistRequest struct {
+	Ctx        context.Context `json:"-"`
+	Cmd        string          `json:"cmd"`
+	PlaylistID string          `json:"playlist_id"`
+}
+
 type WorkerResponse struct {
 	Ok   bool           `json:"ok"`
 	Data map[string]any `json:"data"`
@@ -35,4 +41,3 @@ type SubtitleResponse struct {
 	Format   string `json:"format"`
 	Err      string `json:"error"`
 }
-

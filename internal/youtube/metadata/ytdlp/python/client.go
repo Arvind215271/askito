@@ -48,6 +48,69 @@ func NewSingleWorker(
 	}, nil
 }
 
+func (c *SingleClient) GetPlaylist(
+	ctx context.Context,
+	playlistID string,
+) (map[string]any, error) {
+	c.logger.Debug(
+		"fetching playlist metadata",
+		"playlist_id", playlistID,
+	)
+
+	req := PlaylistRequest{
+		Cmd:        "playlist",
+		PlaylistID: playlistID,
+	}
+
+	if err := c.worker.SendCommand(req); err != nil {
+		return nil, fmt.Errorf(
+			"send playlist request for playlist %s: %w",
+			playlistID,
+			err,
+		)
+	}
+
+	respData, err := c.worker.ReceiveResponse()
+	if err != nil {
+		return nil, fmt.Errorf(
+			"receive playlist response for playlist %s: %w",
+			playlistID,
+			err,
+		)
+	}
+
+	var resp WorkerResponse
+
+	if err := json.Unmarshal(respData, &resp); err != nil {
+		return nil, fmt.Errorf(
+			"decode playlist response for playlist %s: %w",
+			playlistID,
+			err,
+		)
+	}
+
+	if !resp.Ok {
+		c.logger.Warn(
+			"playlist request failed",
+			"playlist_id", playlistID,
+			"error", resp.Err,
+		)
+
+		return nil, fmt.Errorf(
+			"worker playlist error for playlist %s: %s",
+			playlistID,
+			resp.Err,
+		)
+	}
+
+	c.logger.Debug(
+		"playlist metadata fetched",
+		"playlist_id", playlistID,
+	)
+
+	return resp.Data, nil
+}
+
 func (c *SingleClient) GetVideo(
 	ctx context.Context,
 	id string,

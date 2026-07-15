@@ -89,6 +89,40 @@ def main():
 
             cmd = req.get("cmd")
 
+            if cmd == "playlist":
+
+                playlist_id = req["playlist_id"]
+
+                playlist_url = (
+                    "https://www.youtube.com/playlist?list="
+                    + playlist_id
+                )
+
+                old_extract_flat = ydl.params.get("extract_flat")
+
+                try:
+                    ydl.params["extract_flat"] = True
+
+                    info = ydl.extract_info(
+                        playlist_url,
+                        download=False,
+                    )
+
+                finally:
+                    if old_extract_flat is None:
+                        ydl.params.pop("extract_flat", None)
+                    else:
+                        ydl.params["extract_flat"] = old_extract_flat
+
+                send({
+                    "ok": True,
+                    "data": info,
+                })
+
+                del info
+
+                continue
+
             if cmd == "warmup":
                 ydl.extract_info(WARMUP_URL, download=False)
                 send({"ok": True})

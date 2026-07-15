@@ -248,6 +248,41 @@ func (m *WorkerManager) GetSubtitle(ctx context.Context, videoID, language, subT
 	return res.Result.([]byte), nil
 }
 
+func (m *WorkerManager) GetPlaylist(
+	ctx context.Context,
+	playlistID string,
+) (map[string]any, error) {
+	respCh := make(chan ManagerResponse, 1)
+
+	req := request{
+		execute: func(w *SingleClient) (any, error) {
+			return w.GetPlaylist(ctx, playlistID)
+		},
+		response: respCh,
+	}
+
+	m.mu.Lock()
+	if m.closing {
+		m.mu.Unlock()
+		return nil, ErrManagerClosed
+	}
+	m.mu.Unlock()
+
+	select {
+	case m.queue <- req:
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+
+	res := <-respCh
+
+	if res.Err != nil {
+		return nil, res.Err
+	}
+
+	return res.Result.(map[string]any), nil
+}
+
 func (m *WorkerManager) Close() error {
 	m.mu.Lock()
 	m.closing = true
