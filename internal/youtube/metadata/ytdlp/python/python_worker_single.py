@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
 import gc
+import os
 import struct
 import sys
 
 import orjson
 import yt_dlp
+import traceback
+
 
 stdin = sys.stdin.buffer
 stdout = sys.stdout.buffer
@@ -73,21 +76,92 @@ def main():
     requests = 0
 
     while True:
+
         try:
             req = recv()
         except EOFError:
             break
         except Exception:
+            traceback.print_exc(file=sys.stderr)
             break
 
         try:
-            if req.get("cmd") == "warmup":
+
+            cmd = req.get("cmd")
+
+            if cmd == "warmup":
                 ydl.extract_info(WARMUP_URL, download=False)
                 send({"ok": True})
                 continue
 
+            if cmd == "subtitle":
+
+                video_id = req["video_id"]
+                language = req.get("language", "en")
+                subtitle_type = req.get("type", "manual")
+                fmt = req.get("format", "json3")
+
+                # Check for CacheDir passed in the request
+                if "cache_dir" not in req:
+                    raise RuntimeError("cache_dir missing in subtitle request")
+
+                cache_dir = req["cache_dir"]
+                video_dir = os.path.join(cache_dir, video_id)
+                os.makedirs(video_dir, exist_ok=True)
+
+                # old_write = ydl.params["writesubtitles"]
+                # old_auto = ydl.params["writeautomaticsub"]
+                # old_langs = ydl.params["subtitleslangs"]
+                # old_fmt = ydl.params["subtitlesformat"]
+                old_outtmpl = dict(ydl.params["outtmpl"])
+
+                outtmpl = dict(old_outtmpl)
+                outtmpl["default"] = os.path.join(video_dir, "%(id)s")
+
+                try:
+                    ydl.params["writesubtitles"] = subtitle_type == "manual"
+                    ydl.params["writeautomaticsub"] = subtitle_type == "automatic"
+                    ydl.params["subtitleslangs"] = [language]
+                    ydl.params["subtitlesformat"] = fmt
+                    ydl.params["outtmpl"] = outtmpl
+
+                    ydl.download([YT_URL + video_id])
+
+                finally:
+                    # ydl.params["writesubtitles"] = old_write
+                    # ydl.params["writeautomaticsub"] = old_auto
+                    # ydl.params["subtitleslangs"] = old_langs
+                    # ydl.params["subtitlesformat"] = old_fmt
+                    ydl.params["outtmpl"] = old_outtmpl
+
+                downloaded = None
+
+                for name in os.listdir(video_dir):
+                    if (
+                        name.startswith(video_id + ".")
+                        and name.endswith("." + fmt)
+                    ):
+                        downloaded = os.path.join(video_dir, name)
+                        break
+
+                if downloaded is None:
+                    raise RuntimeError("subtitle file not created")
+
+                final_name = f"subtitles.{language}.{fmt}"
+                final_path = os.path.join(video_dir, final_name)
+
+                if downloaded != final_path:
+                    os.replace(downloaded, final_path)
+
+                send({
+                    "ok": True,
+                    "filename": final_name,
+                })
+
+                continue
+
             info = ydl.extract_info(
-                YT_URL + req["id"],
+                YT_URL + req["video_id"],
                 download=False,
             )
 
@@ -98,16 +172,18 @@ def main():
 
             del info
 
-        except Exception as exc:
+        except Exception:
             send({
                 "ok": False,
-                "error": str(exc),
+                "error": traceback.format_exc(),
             })
 
         finally:
+
             del req
 
             requests += 1
+
             if requests >= 50:
                 gc.collect()
                 requests = 0

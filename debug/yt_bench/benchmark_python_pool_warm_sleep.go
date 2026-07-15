@@ -94,46 +94,17 @@ func BenchmarkPythonPoolWarmSleep(ctx context.Context, playlistID string, output
 	// Metadata dispatch timing
 	dispatchStart := time.Now()
 
-	pool.Start(ctx, func(id string, data map[string]any, execution python.WorkerExecution, err error) {
+	for _, e := range flat.Entries {
+		logger.Printf("Submitting videoID=%s to worker", e.ID)
+		data, err := pool.GetVideo(ctx, e.ID)
 		if err != nil {
-			logger.Printf("Error processing video %s: %v", id, err)
-			return
-		}
-
-		// Accumulate aggregate worker time
-		atomic.AddInt64(&aggregateWorkerTime, int64(execution.Duration))
-
-		// Update first worker start time (atomic)
-		if execution.StartedAt.After(time.Time{}) {
-			for {
-				old := firstWorkerStartedAt.Load()
-				if old == nil || execution.StartedAt.Before(old.(time.Time)) {
-					if firstWorkerStartedAt.CompareAndSwap(old, execution.StartedAt) {
-						break
-					}
-				} else {
-					break
-				}
-			}
-		}
-
-		// Update last worker finish time (atomic)
-		if execution.FinishedAt.After(time.Time{}) {
-			for {
-				old := lastWorkerFinishedAt.Load()
-				if old == nil || execution.FinishedAt.After(old.(time.Time)) {
-					if lastWorkerFinishedAt.CompareAndSwap(old, execution.FinishedAt) {
-						break
-					}
-				} else {
-					break
-				}
-			}
+			logger.Printf("Error processing video %s: %v", e.ID, err)
+			continue
 		}
 
 		// Disk write timing
 		writeStart := time.Now()
-		fileName := filepath.Join(outputDir, fmt.Sprintf("D_%d_%s.json", workers, id))
+		fileName := filepath.Join(outputDir, fmt.Sprintf("D_%d_%s.json", workers, e.ID))
 		respData, _ := json.Marshal(data)
 		os.WriteFile(fileName, respData, 0644)
 		writeDuration := time.Since(writeStart)
@@ -161,16 +132,10 @@ func BenchmarkPythonPoolWarmSleep(ctx context.Context, playlistID string, output
 			}
 		}
 
-		logger.Printf("Processed videoID=%s, dataLen=%d", id, len(respData))
-	})
+		logger.Printf("Processed videoID=%s, dataLen=%d", e.ID, len(respData))
+	}
 
 	dispatchEnd := time.Now()
-
-	// Submit all videos
-	for _, e := range flat.Entries {
-		logger.Printf("Submitting videoID=%s to worker", e.ID)
-		pool.Submit(e.ID)
-	}
 
 	// Wait for all workers to complete
 	pool.Close()

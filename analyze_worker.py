@@ -4,7 +4,8 @@ import statistics
 
 
 NUM_WORKERS = 17
-FILE_PATTERN = "debug/yt_bench/output/lite_worker/worker_memory_{}.csv"
+# debug/yt_bench/output/lite_worker/
+FILE_PATTERN = "worker_memory_{}.csv"
 
 
 def read_memory_csv(filename):

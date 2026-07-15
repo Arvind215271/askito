@@ -5,14 +5,16 @@ import struct
 import subprocess
 import threading
 import time
-from pathlib import Path
 
 
-VIDEO_ID = "dQw4w9WgXcQ"   # Never Gonna Give You Up
+VIDEO_ID = "dQw4w9WgXcQ"
 N = 50
 
-WORKER = "internal/youtube/metadata/ytdlp/python/python_worker_single_lite.py"
+WORKER = "internal/youtube/metadata/ytdlp/python/python_worker_single.py"
+import os
 
+CACHE_DIR = os.path.join(os.getcwd(), ".cache", "ytdlp")
+os.makedirs(CACHE_DIR, exist_ok=True)
 
 def send(proc, obj):
     payload = json.dumps(obj).encode()
@@ -43,8 +45,9 @@ def sampler(pid, stop_event, rows):
                         vsz = int(line.split()[1])
         except FileNotFoundError:
             break
+
         rows.append((time.time(), rss, vsz))
-        time.sleep(0.02)  # 20ms
+        time.sleep(0.02)
 
 
 def main():
@@ -59,19 +62,74 @@ def main():
 
     rows = []
     stop = threading.Event()
-    t = threading.Thread(target=sampler, args=(proc.pid, stop, rows), daemon=True)
+    t = threading.Thread(
+        target=sampler,
+        args=(proc.pid, stop, rows),
+        daemon=True,
+    )
     t.start()
 
     start = time.perf_counter()
 
     for i in range(N):
-        send(proc, {"id": VIDEO_ID})
-        resp = recv(proc)
-        if not resp.get("ok"):
-            print("Request", i + 1, "failed")
-            print(resp.get("error"))
+
+        # -------------------------
+        # 1. Fetch metadata
+        # -------------------------
+
+        send(proc, {
+            "cmd": "metadata",
+            "video_id": VIDEO_ID,
+        })
+
+        metadata_resp = recv(proc)
+
+        if not metadata_resp.get("ok"):
+            print(f"Metadata request {i + 1} failed")
+            print(metadata_resp.get("error"))
             break
-        print(f"{i+1}/{N}")
+
+        metadata = metadata_resp["data"]
+
+        print(
+            f"{i + 1}/{N} metadata fetched: "
+            f"{metadata.get('id')}"
+        )
+
+
+        # -------------------------
+        # 2. Fetch subtitles
+        # -------------------------
+
+        send(proc, {
+            "cmd": "subtitle",
+            "video_id": VIDEO_ID,
+            "language": "en",
+            "type": "manual",
+            "format": "json3",
+            "cache_dir": CACHE_DIR,
+        })
+
+        subtitle_resp = recv(proc)
+
+        if not subtitle_resp.get("ok"):
+            print(f"Subtitle request {i + 1} failed")
+            print(subtitle_resp.get("error"))
+            break
+
+        filename = subtitle_resp["filename"]
+
+        path = os.path.join(
+            CACHE_DIR,
+            VIDEO_ID,
+            filename,
+        )
+
+        with open(path, "r", encoding="utf-8") as f:
+            preview = "".join(f.readlines()[:500])
+
+        print(f"{i + 1}/{N} subtitle fetched")
+        print(preview)
 
     elapsed = time.perf_counter() - start
 
