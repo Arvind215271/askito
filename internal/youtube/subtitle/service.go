@@ -29,62 +29,172 @@ func (s *SubtitleService) DownloadSubtitle(
 	meta SubtitleMetadata,
 ) (*SubtitleResult, error) {
 
-	if req.Format == "" {
-		req.Format = "json3"
+	req, err := validateRequest(req)
+	if err != nil {
+		return nil, err
 	}
 
-	subtitleFilename := fmt.Sprintf("subtitle.%s.%s", req.Language, req.Format)
+	if err := validateTrack(req, meta); err != nil {
+		return nil, err
+	}
 
-	// Try cache
-	if cachedData, err := s.cache.Get(req.VideoID, subtitleFilename); err == nil {
-		s.logger.Debug("subtitle cache hit", "videoID", req.VideoID, "lang", req.Language)
+	cacheKey := subtitleCacheKey(req)
+
+	if cached, err := s.cache.Get(req.VideoID, cacheKey); err == nil {
+		s.logger.Debug(
+			"subtitle cache hit",
+			"videoID", req.VideoID,
+			"language", req.Language,
+		)
+
 		return &SubtitleResult{
-			Content:  cachedData,
+			Content:  cached,
 			Format:   req.Format,
 			Language: req.Language,
 		}, nil
 	}
 
-	// Validate subtitle type and language.
-	var found bool
-
-	switch req.Type {
-	case "manual":
-		for _, t := range meta.Manual {
-			if t.LanguageCode == req.Language {
-				found = true
-				break
-			}
-		}
-
-	case "automatic":
-		for _, t := range meta.Automatic {
-			if t.LanguageCode == req.Language {
-				found = true
-				break
-			}
-		}
-
-	default:
-		return nil, fmt.Errorf("invalid subtitle type: %s", req.Type)
+	data, err := s.download(ctx, req)
+	if err != nil {
+		return nil, err
 	}
 
-	if !found {
-		return nil, fmt.Errorf(
-			"subtitle track not found for type %s and language %s",
-			req.Type,
-			req.Language,
+	if err := s.cache.Save(req.VideoID, cacheKey, data); err != nil {
+		s.logger.Warn(
+			"failed to cache subtitle",
+			"videoID", req.VideoID,
+			"error", err,
 		)
 	}
 
-	// Create a temporary directory for yt-dlp output.
-	tempDir, err := os.MkdirTemp("", "askito-subtitles-*")
-	if err != nil {
-		return nil, fmt.Errorf("failed to create temp directory: %w", err)
+	return &SubtitleResult{
+		Content:  data,
+		Format:   req.Format,
+		Language: req.Language,
+	}, nil
+}
+
+func validateRequest(req DownloadRequest) (DownloadRequest, error) {
+
+	if req.VideoID == "" {
+		return req, fmt.Errorf("video ID is required")
 	}
+
+	if req.Language == "" {
+		return req, fmt.Errorf("subtitle language is required")
+	}
+
+	switch req.Type {
+	case "manual", "automatic":
+	default:
+		return req, fmt.Errorf(
+			"invalid subtitle type: %s",
+			req.Type,
+		)
+	}
+
+	if req.Format == "" {
+		req.Format = "json3"
+	}
+
+	switch req.Format {
+	case "json3", "vtt":
+	default:
+		return req, fmt.Errorf(
+			"unsupported subtitle format: %s",
+			req.Format,
+		)
+	}
+
+	return req, nil
+}
+
+func validateTrack(
+	req DownloadRequest,
+	meta SubtitleMetadata,
+) error {
+
+	var tracks []SubtitleTrack
+
+	switch req.Type {
+	case "manual":
+		tracks = meta.Manual
+
+	case "automatic":
+		tracks = meta.Automatic
+	}
+
+	for _, track := range tracks {
+		if track.LanguageCode != req.Language {
+			continue
+		}
+
+		if !formatSupported(track, req.Format) {
+			return fmt.Errorf(
+				"subtitle format %s is not available for language %s",
+				req.Format,
+				req.Language,
+			)
+		}
+
+		return nil
+	}
+
+	return fmt.Errorf(
+		"subtitle track not found for type %s and language %s",
+		req.Type,
+		req.Language,
+	)
+}
+
+func formatSupported(
+	track SubtitleTrack,
+	format string,
+) bool {
+
+	if len(track.Formats) == 0 {
+		return true
+	}
+
+	for _, supported := range track.Formats {
+		if supported == format {
+			return true
+		}
+	}
+
+	return false
+}
+
+func subtitleCacheKey(req DownloadRequest) string {
+	return fmt.Sprintf(
+		"subtitle.%s.%s",
+		req.Language,
+		req.Format,
+	)
+}
+
+func (s *SubtitleService) download(
+	ctx context.Context,
+	req DownloadRequest,
+) ([]byte, error) {
+
+	tempDir, err := os.MkdirTemp(
+		"",
+		"askito-subtitles-*",
+	)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to create subtitle temp directory: %w",
+			err,
+		)
+	}
+
 	defer os.RemoveAll(tempDir)
 
-	outputTemplate := filepath.Join(tempDir, "%(id)s")
+	outputTemplate := filepath.Join(
+		tempDir,
+		"%(id)s",
+	)
 
 	args := []string{
 		"--skip-download",
@@ -96,13 +206,18 @@ func (s *SubtitleService) DownloadSubtitle(
 	switch req.Type {
 	case "manual":
 		args = append(args, "--write-sub")
+
 	case "automatic":
 		args = append(args, "--write-auto-sub")
 	}
 
 	args = append(args, req.VideoID)
 
-	cmd := exec.CommandContext(ctx, "yt-dlp", args...)
+	cmd := exec.CommandContext(
+		ctx,
+		"yt-dlp",
+		args...,
+	)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -113,36 +228,53 @@ func (s *SubtitleService) DownloadSubtitle(
 		)
 	}
 
-	// Find the downloaded subtitle file.
+	return readDownloadedSubtitle(
+		tempDir,
+		req,
+	)
+}
+
+func readDownloadedSubtitle(
+	tempDir string,
+	req DownloadRequest,
+) ([]byte, error) {
+
 	pattern := filepath.Join(
 		tempDir,
-		fmt.Sprintf("*.%s.%s", req.Language, req.Format),
+		fmt.Sprintf(
+			"*.%s.%s",
+			req.Language,
+			req.Format,
+		),
 	)
 
 	matches, err := filepath.Glob(pattern)
 	if err != nil {
-		return nil, fmt.Errorf("failed to locate subtitle file: %w", err)
+		return nil, fmt.Errorf(
+			"failed to locate subtitle file: %w",
+			err,
+		)
 	}
 
 	if len(matches) == 0 {
-		return nil, fmt.Errorf("subtitle file was not created")
+		return nil, fmt.Errorf(
+			"subtitle file was not created",
+		)
 	}
 
 	if len(matches) > 1 {
-		return nil, fmt.Errorf("multiple subtitle files found")
+		return nil, fmt.Errorf(
+			"multiple subtitle files found",
+		)
 	}
 
 	data, err := os.ReadFile(matches[0])
 	if err != nil {
-		return nil, fmt.Errorf("failed to read subtitle file: %w", err)
+		return nil, fmt.Errorf(
+			"failed to read subtitle file: %w",
+			err,
+		)
 	}
 
-	// Save to cache
-	_ = s.cache.Save(req.VideoID, subtitleFilename, data)
-
-	return &SubtitleResult{
-		Content:  data,
-		Format:   req.Format,
-		Language: req.Language,
-	}, nil
+	return data, nil
 }
