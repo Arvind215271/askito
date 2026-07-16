@@ -3,23 +3,23 @@ package subtitle
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/exec"
-	"path/filepath"
 
 	"github.com/Arvind215271/askito/internal/cache"
 	"github.com/Arvind215271/askito/internal/logger"
+	"github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp/python"
 )
 
 type SubtitleService struct {
 	cache  *cache.Manager
 	logger *logger.Logger
+	pool   *python.SinglePool
 }
 
-func NewSubtitleService(cache *cache.Manager, logger *logger.Logger) *SubtitleService {
+func NewSubtitleService(cache *cache.Manager, logger *logger.Logger, pool *python.SinglePool) *SubtitleService {
 	return &SubtitleService{
 		cache:  cache,
 		logger: logger,
+		pool:   pool,
 	}
 }
 
@@ -54,7 +54,7 @@ func (s *SubtitleService) DownloadSubtitle(
 		}, nil
 	}
 
-	data, err := s.download(ctx, req)
+	data, err := s.pool.GetSubtitle(ctx, req.VideoID, req.Language, req.Type, req.Format)
 	if err != nil {
 		return nil, err
 	}
@@ -171,110 +171,4 @@ func subtitleCacheKey(req DownloadRequest) string {
 		req.Language,
 		req.Format,
 	)
-}
-
-func (s *SubtitleService) download(
-	ctx context.Context,
-	req DownloadRequest,
-) ([]byte, error) {
-
-	tempDir, err := os.MkdirTemp(
-		"",
-		"askito-subtitles-*",
-	)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to create subtitle temp directory: %w",
-			err,
-		)
-	}
-
-	defer os.RemoveAll(tempDir)
-
-	outputTemplate := filepath.Join(
-		tempDir,
-		"%(id)s",
-	)
-
-	args := []string{
-		"--skip-download",
-		"--sub-lang", req.Language,
-		"--sub-format", req.Format,
-		"-o", outputTemplate,
-	}
-
-	switch req.Type {
-	case "manual":
-		args = append(args, "--write-sub")
-
-	case "automatic":
-		args = append(args, "--write-auto-sub")
-	}
-
-	args = append(args, req.VideoID)
-
-	cmd := exec.CommandContext(
-		ctx,
-		"yt-dlp",
-		args...,
-	)
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to download subtitle: %w\n%s",
-			err,
-			string(output),
-		)
-	}
-
-	return readDownloadedSubtitle(
-		tempDir,
-		req,
-	)
-}
-
-func readDownloadedSubtitle(
-	tempDir string,
-	req DownloadRequest,
-) ([]byte, error) {
-
-	pattern := filepath.Join(
-		tempDir,
-		fmt.Sprintf(
-			"*.%s.%s",
-			req.Language,
-			req.Format,
-		),
-	)
-
-	matches, err := filepath.Glob(pattern)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to locate subtitle file: %w",
-			err,
-		)
-	}
-
-	if len(matches) == 0 {
-		return nil, fmt.Errorf(
-			"subtitle file was not created",
-		)
-	}
-
-	if len(matches) > 1 {
-		return nil, fmt.Errorf(
-			"multiple subtitle files found",
-		)
-	}
-
-	data, err := os.ReadFile(matches[0])
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to read subtitle file: %w",
-			err,
-		)
-	}
-
-	return data, nil
 }

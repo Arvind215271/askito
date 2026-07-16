@@ -13,11 +13,13 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/Arvind215271/askito/internal/cache"
+	"github.com/Arvind215271/askito/internal/logger"
 	"github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp"
 	"github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp/python"
 )
 
-func BenchmarkPythonPoolWarmSleep(ctx context.Context, playlistID string, outputDir string, workers int) (BenchmarkResult, error) {
+func BenchmarkPythonPoolWarmSleep(ctx context.Context, playlistID string, outputDir string, workers int, cacheMgr *cache.Manager, loggerInstance *log.Logger) (BenchmarkResult, error) {
 	benchmarkStart := time.Now()
 
 	// Memory tracking
@@ -33,16 +35,6 @@ func BenchmarkPythonPoolWarmSleep(ctx context.Context, playlistID string, output
 		}
 	}()
 	defer ticker.Stop()
-
-	// Ensure log directory exists
-	logDir := "debug/yt_bench/output/logs"
-	os.MkdirAll(logDir, 0755)
-	logFile, err := os.Create(filepath.Join(logDir, fmt.Sprintf("python_pool_warm_sleep_%d.log", workers)))
-	if err != nil {
-		return BenchmarkResult{}, err
-	}
-	defer logFile.Close()
-	logger := log.New(logFile, "", log.LstdFlags)
 
 	// Flat playlist fetch timing
 	flatFetchStart := time.Now()
@@ -71,7 +63,8 @@ func BenchmarkPythonPoolWarmSleep(ctx context.Context, playlistID string, output
 
 	// Worker spawn timing
 	workerSpawnStart := time.Now()
-	pool, err := python.NewSinglePool(workers)
+	l := logger.New("development")
+	pool, err := python.NewSinglePool(workers, l, cacheMgr)
 	workerSpawnEnd := time.Now()
 	if err != nil {
 		return BenchmarkResult{}, err
@@ -95,10 +88,10 @@ func BenchmarkPythonPoolWarmSleep(ctx context.Context, playlistID string, output
 	dispatchStart := time.Now()
 
 	for _, e := range flat.Entries {
-		logger.Printf("Submitting videoID=%s to worker", e.ID)
+		loggerInstance.Printf("Submitting videoID=%s to worker", e.ID)
 		data, err := pool.GetVideo(ctx, e.ID)
 		if err != nil {
-			logger.Printf("Error processing video %s: %v", e.ID, err)
+			loggerInstance.Printf("Error processing video %s: %v", e.ID, err)
 			continue
 		}
 
@@ -132,7 +125,7 @@ func BenchmarkPythonPoolWarmSleep(ctx context.Context, playlistID string, output
 			}
 		}
 
-		logger.Printf("Processed videoID=%s, dataLen=%d", e.ID, len(respData))
+		loggerInstance.Printf("Processed videoID=%s, dataLen=%d", e.ID, len(respData))
 	}
 
 	dispatchEnd := time.Now()

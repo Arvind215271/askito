@@ -7,12 +7,12 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/Arvind215271/askito/internal/cache"
 	"github.com/Arvind215271/askito/internal/logger"
+	"github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp/python"
 )
 
 type Client struct {
-	cache  *cache.Manager
+	pool   *python.SinglePool
 	logger *logger.Logger
 }
 
@@ -21,16 +21,16 @@ const (
 	timeout    = 30 * time.Second
 )
 
-func NewClient(cfg cache.Config, logger *logger.Logger) *Client {
+func NewClient(pool *python.SinglePool, logger *logger.Logger) *Client {
 	return &Client{
-		cache:  cache.NewManager(cfg, logger),
+		pool:   pool,
 		logger: logger,
 	}
 }
 
 // Cleanup runs the cache cleanup routine.
 func (c *Client) Cleanup() error {
-	return c.cache.Cleanup("metadata.json")
+	return nil
 }
 
 // ValidateYTDLP checks if ytdlp is present.
@@ -67,34 +67,15 @@ func (c *Client) Fetch(ctx context.Context, args ...string) ([]byte, error) {
 }
 
 func (c *Client) GetVideo(ctx context.Context, videoID string) (YTOutput, error) {
-	// Try cache
-	if cachedData, err := c.cache.Get(videoID, "metadata.json"); err == nil {
-		var meta YTOutput
-		if err := json.Unmarshal(cachedData, &meta); err == nil {
-			return meta, nil
-		}
-	}
-
-	url := "https://www.youtube.com/watch?v=" + videoID
-
-	c.logger.Debug("fetching video metadata from ytdlp", "videoID", videoID)
-
-	// Fetch if cache miss
-	output, err := c.Fetch(
-		ctx,
-		"--skip-download",
-		"--dump-single-json",
-		url,
-	)
-
+	result, err := c.pool.GetVideo(ctx, videoID)
 	if err != nil {
 		return YTOutput{}, err
 	}
 
-	c.logger.Info("fetched video metadata from ytdlp", "videoID", videoID)
-
-	// Save to cache
-	_ = c.cache.Save(videoID, "metadata.json", output)
+	output, err := json.Marshal(result)
+	if err != nil {
+		return YTOutput{}, err
+	}
 
 	var meta YTOutput
 	err = json.Unmarshal(output, &meta)
@@ -102,21 +83,15 @@ func (c *Client) GetVideo(ctx context.Context, videoID string) (YTOutput, error)
 }
 
 func (c *Client) GetPlaylist(ctx context.Context, playlistID string) (YTPlaylistOutput, error) {
-	url := "https://www.youtube.com/playlist?list=" + playlistID
-
-	c.logger.Debug("fetching playlist from ytdlp", "playlistID", playlistID)
-
-	output, err := c.Fetch(
-		ctx,
-		"-j",
-		"--flat-playlist",
-		url,
-	)
+	result, err := c.pool.GetPlaylist(ctx, playlistID)
 	if err != nil {
 		return YTPlaylistOutput{}, err
 	}
 
-	c.logger.Info("fetched playlist from ytdlp", "playlistID", playlistID)
+	output, err := json.Marshal(result)
+	if err != nil {
+		return YTPlaylistOutput{}, err
+	}
 
 	var meta YTPlaylistOutput
 	err = json.Unmarshal(output, &meta)

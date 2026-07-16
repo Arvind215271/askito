@@ -219,11 +219,11 @@ func (m *WorkerManager) GetVideo(ctx context.Context, videoID string) (map[strin
 	return res.Result.(map[string]any), nil
 }
 
-func (m *WorkerManager) GetSubtitle(ctx context.Context, videoID, language, subType, format string) ([]byte, error) {
+func (m *WorkerManager) GetSubtitle(ctx context.Context, videoID, language, subType, format, outputPath string) ([]byte, error) {
 	respCh := make(chan ManagerResponse, 1)
 	req := request{
 		execute: func(w *SingleClient) (any, error) {
-			return w.GetSubtitle(ctx, videoID, language, subType, format)
+			return w.GetSubtitle(ctx, videoID, language, subType, format, outputPath)
 		},
 		response: respCh,
 	}
@@ -245,7 +245,8 @@ func (m *WorkerManager) GetSubtitle(ctx context.Context, videoID, language, subT
 	if res.Err != nil {
 		return nil, res.Err
 	}
-	return res.Result.([]byte), nil
+	// Note: result is nil now, but the worker writes the file to outputPath
+	return nil, nil
 }
 
 func (m *WorkerManager) GetPlaylist(

@@ -14,6 +14,7 @@ import (
 	"github.com/Arvind215271/askito/internal/logger"
 	"github.com/Arvind215271/askito/internal/youtube"
 	"github.com/Arvind215271/askito/internal/youtube/metadata"
+	"github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp/python"
 	"github.com/Arvind215271/askito/internal/youtube/transcript"
 	youtubeurl "github.com/Arvind215271/askito/internal/youtube/input"
 	"github.com/Arvind215271/askito/internal/youtube/description"
@@ -36,6 +37,11 @@ func DebugInput(
 		TTLDays:  1,
 		MaxFiles: 10,
 	}, log)
+
+	pythonPool, err := python.NewSinglePool(1, log, cacheManager)
+	if err != nil {
+		log.Fatal("failed to create python pool", "error", err)
+	}
 
 	inputStr := `
 https://youtube.com/playlist?list=PLKnIA16_Rmvbr7zKYQuBfsVkjoLcJgxHH
@@ -133,6 +139,7 @@ random garbage text
 				exportSvc,
 				item.ID,
 				cacheManager,
+				pythonPool,
 			)
 
 		}
@@ -358,6 +365,7 @@ func debugVideo(
 	exportSvc *export.Service,
 	videoID string,
 	cacheManager *cache.Manager,
+	pythonPool *python.SinglePool,
 ) {
 	fmt.Printf("\n================ VIDEO =================\n")
 
@@ -378,7 +386,7 @@ func debugVideo(
 	fmt.Println("Channel    :", video.ChannelTitle)
 	
 	// Transcript fetch
-	subService := subtitle.NewSubtitleService(cacheManager, log)
+	subService := subtitle.NewSubtitleService(cacheManager, log, pythonPool)
 	result, err := subService.DownloadSubtitle(ctx, subtitle.DownloadRequest{
 		VideoID:  videoID,
 		Type:     "automatic",

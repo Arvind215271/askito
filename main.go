@@ -25,6 +25,7 @@ import (
 	"github.com/Arvind215271/askito/internal/youtube/metadata"
 	youtubeapi "github.com/Arvind215271/askito/internal/youtube/metadata/youtube_api"
 	ytdlpmetadata "github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp"
+	"github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp/python"
 	"github.com/Arvind215271/askito/internal/youtube/subtitle"
 
 	// transcript
@@ -91,17 +92,32 @@ func main() {
 			err,
 		)
 	}
-
+	
 	youtubeProvider := youtubeapi.NewProvider(
 		youtubeClient,
 		logger,
 	)
-
+	
 	// cache manager
 	cacheManager := cache.NewManager(config.YtdlpCache, logger)
 
-	ytdlpMetadataClient := ytdlpmetadata.NewClient(config.YtdlpCache, logger)
+	// cleanup.
+	// cacheManager.Cleanup()
+
+	pythonPool, err := python.NewSinglePool(64, logger, cacheManager)
+	if err != nil {
+		logger.Fatal("failed to create python pool", "error", err)
+	}
+	
+	ytdlpMetadataClient := ytdlpmetadata.NewClient(pythonPool, logger)
+
+
+
 	ytdlpMetadataProvider := ytdlpmetadata.NewProvider(ytdlpMetadataClient, logger)
+
+
+	
+
 
 	// run cleanup on startup
 	if err := ytdlpMetadataClient.Cleanup(); err != nil {
@@ -115,7 +131,7 @@ func main() {
 		ytdlpMetadataProvider,
 	)
 
-	subtitleService := subtitle.NewSubtitleService(cacheManager, logger)
+	subtitleService := subtitle.NewSubtitleService(cacheManager, logger, pythonPool)
 	transcriptService := transcript.NewService()
 	signalService := signal.NewSignalService()
 

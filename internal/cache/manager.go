@@ -48,6 +48,22 @@ func (m *Manager) Save(id, filename string, data []byte) error {
 	return os.WriteFile(m.GetPath(id, filename), data, 0644)
 }
 
+func (m *Manager) VideoKey() string {
+	return "metadata." +  ".json"
+}
+
+func (m *Manager) PlaylistKey() string {
+	return "playlist." + ".json"
+}
+
+func (m *Manager) SubtitleKey(subType, language, format string) string {
+	return "subtitles." + subType + "." + language + "." + format
+}
+
+func (m *Manager) SubtitlePath(subType string) string {
+	return "subtitles." + subType
+}
+
 // Cleanup generalizes the cleanup logic to remove expired directories
 // based on the age of a specific "marker" file (e.g., metadata.json).
 func (m *Manager) Cleanup(markerFilename string) error {

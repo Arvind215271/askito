@@ -4,17 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"runtime"
 
-	"github.com/Arvind215271/askito/internal/cache"
 	"github.com/Arvind215271/askito/internal/logger"
 )
 
 type SingleClient struct {
 	worker *PythonWorker
-	cache  *cache.Manager
 	logger *logger.Logger
 }
 
@@ -42,34 +39,8 @@ func NewSingleWorker(
 		)
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		return nil, fmt.Errorf("get current working directory: %w", err)
-	}
-
-	cacheDir := filepath.Join(
-		cwd,
-		".cache",
-		"ytdlp",
-	)
-
-	if err := os.MkdirAll(cacheDir, 0755); err != nil {
-		return nil, fmt.Errorf(
-			"create yt-dlp cache directory %s: %w",
-			cacheDir,
-			err,
-		)
-	}
-
-	cacheManager := cache.NewManager(cache.Config{
-		CacheDir: cacheDir,
-		TTLDays:  7, // Default
-		MaxFiles: 100,
-	}, log)
-
 	return &SingleClient{
 		worker: worker,
-		cache:  cacheManager,
 		logger: log.With(
 			"worker_id", workerID,
 		),
@@ -199,35 +170,13 @@ func (c *SingleClient) GetVideo(
 	return resp.Data, nil
 }
 
-func getYTDLPCacheDir() (string, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return "", fmt.Errorf("get current working directory: %w", err)
-	}
-
-	cacheDir := filepath.Join(
-		cwd,
-		".cache",
-		"ytdlp",
-	)
-
-	if err := os.MkdirAll(cacheDir, 0755); err != nil {
-		return "", fmt.Errorf(
-			"create yt-dlp cache directory %s: %w",
-			cacheDir,
-			err,
-		)
-	}
-
-	return cacheDir, nil
-}
-
 func (c *SingleClient) GetSubtitle(
 	ctx context.Context,
 	videoID,
 	language,
 	subType,
-	format string,
+	format,
+	outputPath string,
 ) ([]byte, error) {
 	c.logger.Debug(
 		"fetching subtitle",
@@ -235,28 +184,8 @@ func (c *SingleClient) GetSubtitle(
 		"language", language,
 		"type", subType,
 		"format", format,
+		"output_path", outputPath,
 	)
-
-	filename := fmt.Sprintf(
-		"subtitles.%s.%s.%s",
-		subType,
-		language,
-		format,
-	)
-
-	content, err := c.cache.Get(videoID, filename)
-	if err == nil {
-		c.logger.Debug(
-			"subtitle cache hit",
-			"video_id", videoID,
-			"filename", filename,
-		)
-		return content, nil
-	}
-
-	if !os.IsNotExist(err) {
-		return nil, fmt.Errorf("read subtitle cache: %w", err)
-	}
 
 	req := SubtitleRequest{
 		Cmd:        "subtitle",
@@ -264,7 +193,7 @@ func (c *SingleClient) GetSubtitle(
 		Language:   language,
 		Type:       subType,
 		Format:     format,
-		OutputPath: c.cache.GetPath(videoID, filename),
+		OutputPath: outputPath,
 	}
 
 	if err := c.worker.SendCommand(req); err != nil {
@@ -311,24 +240,14 @@ func (c *SingleClient) GetSubtitle(
 		)
 	}
 
-	content, err = c.cache.Get(videoID, filename)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"read downloaded subtitle from cache for video %s: %w",
-			videoID,
-			err,
-		)
-	}
-
 	c.logger.Debug(
 		"subtitle fetched",
 		"video_id", videoID,
 		"language", language,
 		"format", format,
-		"bytes", len(content),
 	)
 
-	return content, nil
+	return nil, nil // Return nil, caller reads the output path
 }
 
 func (c *SingleClient) WarmUp(ctx context.Context) error {
