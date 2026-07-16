@@ -25,13 +25,13 @@ type WorkerResponse struct {
 }
 
 type SubtitleRequest struct {
-	Ctx      context.Context `json:"-"`
-	Cmd      string          `json:"cmd"`
-	VideoID  string          `json:"video_id"`
-	Language string          `json:"language"`
-	Type     string          `json:"type"`   // manual | automatic
-	Format   string          `json:"format"` // json3, vtt...
-	CacheDir string          `json:"cache_dir"`
+	Ctx        context.Context `json:"-"`
+	Cmd        string          `json:"cmd"`
+	VideoID    string          `json:"video_id"`
+	Language   string          `json:"language"`
+	Type       string          `json:"type"`   // manual | automatic
+	Format     string          `json:"format"` // json3, vtt...
+	OutputPath string          `json:"output_path"`
 }
 
 type SubtitleResponse struct {

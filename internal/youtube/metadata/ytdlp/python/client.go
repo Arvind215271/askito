@@ -8,11 +8,13 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/Arvind215271/askito/internal/cache"
 	"github.com/Arvind215271/askito/internal/logger"
 )
 
 type SingleClient struct {
 	worker *PythonWorker
+	cache  *cache.Manager
 	logger *logger.Logger
 }
 
@@ -40,8 +42,34 @@ func NewSingleWorker(
 		)
 	}
 
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("get current working directory: %w", err)
+	}
+
+	cacheDir := filepath.Join(
+		cwd,
+		".cache",
+		"ytdlp",
+	)
+
+	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+		return nil, fmt.Errorf(
+			"create yt-dlp cache directory %s: %w",
+			cacheDir,
+			err,
+		)
+	}
+
+	cacheManager := cache.NewManager(cache.Config{
+		CacheDir: cacheDir,
+		TTLDays:  7, // Default
+		MaxFiles: 100,
+	}, log)
+
 	return &SingleClient{
 		worker: worker,
+		cache:  cacheManager,
 		logger: log.With(
 			"worker_id", workerID,
 		),
@@ -209,21 +237,34 @@ func (c *SingleClient) GetSubtitle(
 		"format", format,
 	)
 
-	cacheDir, err := getYTDLPCacheDir()
-	if err != nil {
-		return nil, fmt.Errorf(
-			"resolve yt-dlp cache directory: %w",
-			err,
+	filename := fmt.Sprintf(
+		"subtitles.%s.%s.%s",
+		subType,
+		language,
+		format,
+	)
+
+	content, err := c.cache.Get(videoID, filename)
+	if err == nil {
+		c.logger.Debug(
+			"subtitle cache hit",
+			"video_id", videoID,
+			"filename", filename,
 		)
+		return content, nil
+	}
+
+	if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("read subtitle cache: %w", err)
 	}
 
 	req := SubtitleRequest{
-		Cmd:      "subtitle",
-		VideoID:  videoID,
-		Language: language,
-		Type:     subType,
-		Format:   format,
-		CacheDir: cacheDir,
+		Cmd:        "subtitle",
+		VideoID:    videoID,
+		Language:   language,
+		Type:       subType,
+		Format:     format,
+		OutputPath: c.cache.GetPath(videoID, filename),
 	}
 
 	if err := c.worker.SendCommand(req); err != nil {
@@ -270,31 +311,11 @@ func (c *SingleClient) GetSubtitle(
 		)
 	}
 
-	if resp.Filename == "" {
-		return nil, fmt.Errorf(
-			"worker returned empty subtitle filename for video %s",
-			videoID,
-		)
-	}
-
-	subtitlePath := filepath.Join(
-		cacheDir,
-		videoID,
-		resp.Filename,
-	)
-
-	content, err := os.ReadFile(subtitlePath)
+	content, err = c.cache.Get(videoID, filename)
 	if err != nil {
-		c.logger.Error(
-			"failed to read downloaded subtitle",
-			"video_id", videoID,
-			"path", subtitlePath,
-			"error", err,
-		)
-
 		return nil, fmt.Errorf(
-			"read subtitle file %s: %w",
-			subtitlePath,
+			"read downloaded subtitle from cache for video %s: %w",
+			videoID,
 			err,
 		)
 	}

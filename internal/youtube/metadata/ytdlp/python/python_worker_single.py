@@ -25,7 +25,7 @@ YDL_OPTS = {
     "quiet": True,
     "no_warnings": True,
     "ignoreconfig": True,
-    "cachedir": False,
+    "cachedir": True,
     "check_formats": False,
     "ignore_no_formats_error": True,
     "socket_timeout": 10,
@@ -134,23 +134,18 @@ def main():
                 language = req.get("language", "en")
                 subtitle_type = req.get("type", "manual")
                 fmt = req.get("format", "json3")
+                output_path = req.get("output_path")
 
-                # Check for CacheDir passed in the request
-                if "cache_dir" not in req:
-                    raise RuntimeError("cache_dir missing in subtitle request")
+                if not output_path:
+                    raise RuntimeError("output_path missing in subtitle request")
 
-                cache_dir = req["cache_dir"]
-                video_dir = os.path.join(cache_dir, video_id)
-                os.makedirs(video_dir, exist_ok=True)
+                output_dir = os.path.dirname(output_path)
+                os.makedirs(output_dir, exist_ok=True)
 
-                # old_write = ydl.params["writesubtitles"]
-                # old_auto = ydl.params["writeautomaticsub"]
-                # old_langs = ydl.params["subtitleslangs"]
-                # old_fmt = ydl.params["subtitlesformat"]
                 old_outtmpl = dict(ydl.params["outtmpl"])
 
                 outtmpl = dict(old_outtmpl)
-                outtmpl["default"] = os.path.join(video_dir, "%(id)s")
+                outtmpl["subtitle"] = output_path
 
                 try:
                     ydl.params["writesubtitles"] = subtitle_type == "manual"
@@ -162,34 +157,10 @@ def main():
                     ydl.download([YT_URL + video_id])
 
                 finally:
-                    # ydl.params["writesubtitles"] = old_write
-                    # ydl.params["writeautomaticsub"] = old_auto
-                    # ydl.params["subtitleslangs"] = old_langs
-                    # ydl.params["subtitlesformat"] = old_fmt
                     ydl.params["outtmpl"] = old_outtmpl
-
-                downloaded = None
-
-                for name in os.listdir(video_dir):
-                    if (
-                        name.startswith(video_id + ".")
-                        and name.endswith("." + fmt)
-                    ):
-                        downloaded = os.path.join(video_dir, name)
-                        break
-
-                if downloaded is None:
-                    raise RuntimeError("subtitle file not created")
-
-                final_name = f"subtitles.{language}.{fmt}"
-                final_path = os.path.join(video_dir, final_name)
-
-                if downloaded != final_path:
-                    os.replace(downloaded, final_path)
 
                 send({
                     "ok": True,
-                    "filename": final_name,
                 })
 
                 continue
