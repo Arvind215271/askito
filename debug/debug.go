@@ -410,7 +410,7 @@ func debugVideo(
 			)
 
 			tmp := transcriptData.GroupByDuration(30)
-			transcriptData.Segments = tmp
+			transcriptData.Segments = tmp.Segments
 
 			if err := saveFile(
 				transcriptPath,

@@ -1,9 +1,9 @@
-// ./internal/youtube/transcript.go
+// ./internal/youtube/transcript/transcript.go
 package transcript
 
 import (
-	"strings"
 	"fmt"
+	"strings"
 )
 
 func (t *Transcript) ToTimelineText() string {
@@ -21,7 +21,6 @@ func (t *Transcript) ToTimelineText() string {
 	return strings.TrimSpace(b.String())
 }
 
-
 func (t *Transcript) ToPlainText() string {
 	var b strings.Builder
 
@@ -35,10 +34,9 @@ func (t *Transcript) ToPlainText() string {
 	return strings.TrimSpace(b.String())
 }
 
-
-func (t *Transcript) GroupByDuration(windowSeconds float64) []TranscriptSegment {
+func (t *Transcript) GroupByDuration(windowSeconds float64) *Transcript {
 	if len(t.Segments) == 0 {
-		return nil
+		return &Transcript{Language: t.Language, Segments: nil}
 	}
 
 	var result []TranscriptSegment
@@ -78,5 +76,8 @@ func (t *Transcript) GroupByDuration(windowSeconds float64) []TranscriptSegment 
 		result = append(result, current)
 	}
 
-	return result
+	return &Transcript{
+		Language: t.Language,
+		Segments: result,
+	}
 }

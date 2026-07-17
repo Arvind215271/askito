@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Arvind215271/askito/internal/youtube/subtitle"
-	)
+)
 
 type Service struct{}
 
@@ -32,5 +32,26 @@ func (s *Service) Parse(result *subtitle.SubtitleResult) (*Transcript, error) {
 
 	default:
 		return nil, fmt.Errorf("unsupported subtitle format: %s", result.Format)
+	}
+}
+
+func (s *Service) Process(t *Transcript, req *ProcessingRequest) (string, error) {
+	if req == nil {
+		return "", fmt.Errorf("transcript processing request is nil")
+	}
+
+	processed := t
+	if req.WindowSize > 0 {
+		processed = t.GroupByDuration(req.WindowSize)
+	}
+
+	switch req.Output {
+	
+	case "plain-text":
+		return processed.ToPlainText(), nil
+	case "timeline-text":
+		return processed.ToTimelineText(), nil
+	default:
+		return "", fmt.Errorf("unsupported output format: %s", req.Output)
 	}
 }

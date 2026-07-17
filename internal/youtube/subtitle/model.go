@@ -1,5 +1,6 @@
 package subtitle
 
+
 type SubtitleTrack struct {
 	LanguageCode string   `json:"languageCode"`
 	LanguageName string   `json:"languageName"`
@@ -17,6 +18,7 @@ type DownloadRequest struct {
 	Language string `json:"language"`
 	Format   string `json:"format"`
 }
+
 
 type SubtitleResult struct {
 	Content  []byte `json:"-"`
