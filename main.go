@@ -104,7 +104,9 @@ func main() {
 	// cleanup.
 	// cacheManager.Cleanup()
 
-	pythonPool, err := python.NewSinglePool(64, logger, cacheManager)
+	pythonPool, err := python.NewSinglePool(config.PythonWorkers, logger, cacheManager)
+	pythonPool.WarmUp(ctx) 
+
 	if err != nil {
 		logger.Fatal("failed to create python pool", "error", err)
 	}
@@ -147,7 +149,7 @@ func main() {
 	descriptionService := description.NewService()
 
 	// pipeline
-	pipelineService := pipeline.NewService(youtubeService, descriptionService, subtitleService, transcriptService, signalService)
+	pipelineService := pipeline.NewService(youtubeService, descriptionService, subtitleService, transcriptService, signalService, 2 * config.PythonWorkers)
 
 	// export
 
@@ -159,7 +161,7 @@ func main() {
 	)
 
 	// Export handler
-	exportHandler := export.NewHandler(pipelineService, exportService)
+	exportHandler := export.NewHandler(youtubeService,pipelineService, exportService)
 	export.RegisterRoutes(e.Group("/export"), exportHandler)
 
 	// only run debug in development

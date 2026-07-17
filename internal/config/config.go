@@ -14,6 +14,7 @@ type Config struct {
 
 	YouTubeAPIKey string
 	YtdlpCache    cache.Config
+	PythonWorkers int
 }
 
 // Load reads environment variables once and builds the config
@@ -32,6 +33,8 @@ func Load() Config {
 			TTLDays:  getEnvAsInt("YTDLP_CACHE_TTL_DAYS", 28),
 			MaxFiles: getEnvAsInt("YTDLP_CACHE_MAX_FILES", 2000), // Updated to 2000
 		},
+
+		PythonWorkers: getEnvAsInt("PYTHON_WORKERS", 16),
 	}
 }
 

@@ -88,4 +88,7 @@ type Video struct {
 
 	PrivacyStatus       string `json:"privacy_status"`
 	LiveBroadcastStatus string `json:"live_broadcast_status"`
+
+	Errors []string `json:"errors,omitempty"`
+
 }

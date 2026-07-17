@@ -46,11 +46,16 @@ func (p *SinglePool) WarmUp(ctx context.Context) error {
 	return p.manager.WarmUp(ctx)
 }
 
-func (p *SinglePool) GetVideo(ctx context.Context, videoID string) (map[string]any, error) {
+func (p *SinglePool) GetVideo(
+	ctx context.Context,
+	videoID string,
+) (map[string]any, error) {
 	key := p.cache.VideoKey()
+
 	data, err := p.cache.Get(videoID, key)
 	if err == nil {
 		var result map[string]any
+
 		if err := json.Unmarshal(data, &result); err == nil {
 			return result, nil
 		}
@@ -61,11 +66,48 @@ func (p *SinglePool) GetVideo(ctx context.Context, videoID string) (map[string]a
 		return nil, err
 	}
 
-	// serialize and cache
 	jsonData, _ := json.Marshal(result)
 	_ = p.cache.Save(videoID, key, jsonData)
 
 	return result, nil
+}
+
+func (p *SinglePool) GetVideos(
+	ctx context.Context,
+	videoIDs []string,
+) ([]map[string]any, error) {
+	results := make([]map[string]any, len(videoIDs))
+
+	var wg sync.WaitGroup
+	errCh := make(chan error, 1)
+
+	for i, videoID := range videoIDs {
+		wg.Add(1)
+
+		go func(index int, id string) {
+			defer wg.Done()
+
+			result, err := p.GetVideo(ctx, id)
+			if err != nil {
+				select {
+				case errCh <- err:
+				default:
+				}
+				return
+			}
+
+			results[index] = result
+		}(i, videoID)
+	}
+
+	wg.Wait()
+
+	select {
+	case err := <-errCh:
+		return nil, err
+	default:
+		return results, nil
+	}
 }
 
 func (p *SinglePool) GetPlaylist(
@@ -73,9 +115,11 @@ func (p *SinglePool) GetPlaylist(
 	playlistID string,
 ) (map[string]any, error) {
 	key := p.cache.PlaylistKey()
+
 	data, err := p.cache.Get(playlistID, key)
 	if err == nil {
 		var result map[string]any
+
 		if err := json.Unmarshal(data, &result); err == nil {
 			return result, nil
 		}
@@ -100,9 +144,11 @@ func (p *SinglePool) GetSubtitle(
 	format string,
 ) ([]byte, error) {
 	key := p.cache.SubtitleKey(subType, language, format)
-	// We use the path derived from the SubtitlePath method.
-	// We append language and format because yt-dlp appends them.
-	outputPath := p.cache.GetPath(videoID, p.cache.SubtitlePath(subType))
+
+	outputPath := p.cache.GetPath(
+		videoID,
+		p.cache.SubtitlePath(subType),
+	)
 
 	content, err := p.cache.Get(videoID, key)
 	if err == nil {
@@ -121,21 +167,59 @@ func (p *SinglePool) GetSubtitle(
 		return nil, err
 	}
 
-	// Reading the file after the worker writes it
-	// Retry loop to handle potential filesystem lag
-	var data []byte
-	// for i := 0; i < 5; i++ {
-	data, err = p.cache.Get(videoID, key)
-		// if err == nil {
-			// break
-		// }
-		// time.Sleep(100 * time.Millisecond)
-	// }
+	data, err := p.cache.Get(videoID, key)
 	if err != nil {
 		return nil, err
 	}
 
 	return data, nil
+}
+
+func (p *SinglePool) GetSubtitles(
+	ctx context.Context,
+	videoIDs []string,
+	language,
+	subType,
+	format string,
+) ([][]byte, error) {
+	results := make([][]byte, len(videoIDs))
+
+	var wg sync.WaitGroup
+	errCh := make(chan error, 1)
+
+	for i, videoID := range videoIDs {
+		wg.Add(1)
+
+		go func(index int, id string) {
+			defer wg.Done()
+
+			result, err := p.GetSubtitle(
+				ctx,
+				id,
+				language,
+				subType,
+				format,
+			)
+			if err != nil {
+				select {
+				case errCh <- err:
+				default:
+				}
+				return
+			}
+
+			results[index] = result
+		}(i, videoID)
+	}
+
+	wg.Wait()
+
+	select {
+	case err := <-errCh:
+		return nil, err
+	default:
+		return results, nil
+	}
 }
 
 func (p *SinglePool) Close() {
