@@ -17,7 +17,16 @@ func TestRunBenchmarks(t *testing.T) {
 		// "PLHq_wPEVVWy0Vq72bS9wRkw_9Vqgqp0y5",
 		// "PLu0W_9lII9agwh1XjRt242xIpHhPT2llg",
 		// "PLgUwDviBIf0oF6QL8m22w1hIDC1vJ_BHz",
-		"PLdSukIYrTISE",
+		// "PLakjEKwjPZDYZMtzRfB26Un77KI2xI_oB" // 100
+		// "PLiy0XOfUv4hFH2HbflPOARBXA6qN90mHt" //200
+		// "PLtJCksbabIPyfutcI3Kx9mg6h87p2DXzE" //500
+		// "PL-CA1f0J88gDsSdoXFz3vIefI8SnBan1s" // 584
+
+
+		// "PLoaTDHRuxwgxk0WTXRJJJlXUYuHBSrbcF" //1000
+		// "PL5fRL6A4m-DFddDPJU5Ugr3NRhxrm5GtR" //1000
+		// "PL0dTxWJ6ngUKlBw5eDv7qYylA3xP3Asef" //2198
+		"PLdSukIYrTISE", //5000
 	}
 	RunBenchmarks(playlistIDs)
 }

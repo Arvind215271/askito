@@ -86,12 +86,14 @@ func main() {
 		logger,
 	)
 	if err != nil {
-		logger.Fatal(
+		logger.Warn(
 			"failed to create youtube client",
 			"error",
 			err,
 		)
+		youtubeClient = nil
 	}
+
 	
 	youtubeProvider := youtubeapi.NewProvider(
 		youtubeClient,
@@ -117,6 +119,7 @@ func main() {
 
 	ytdlpMetadataProvider := ytdlpmetadata.NewProvider(ytdlpMetadataClient, logger)
 
+	// validate ytdlp ig? IDK...
 
 	
 

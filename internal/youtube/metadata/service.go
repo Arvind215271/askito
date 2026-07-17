@@ -26,9 +26,10 @@ func (s *Service) GetPlaylistMetadata(
 	playlistID string,
 	providerType ProviderType,
 ) (youtube.Playlist, error) {
-	if providerType == ProviderAPI {
+	if providerType == ProviderAPI && s.apiProvider != nil {
 		return s.apiProvider.GetPlaylistMetadata(ctx, playlistID)
 	}
+
 	return s.ytdlpProvider.GetPlaylistMetadata(ctx, playlistID)
 }
 
@@ -37,9 +38,10 @@ func (s *Service) GetPlaylistItems(
 	playlistID string,
 	providerType ProviderType,
 ) ([]youtube.PlaylistItem, error) {
-	if providerType == ProviderAPI {
+	if providerType == ProviderAPI && s.apiProvider != nil {
 		return s.apiProvider.GetPlaylistItems(ctx, playlistID)
 	}
+
 	return s.ytdlpProvider.GetPlaylistItems(ctx, playlistID)
 }
 
@@ -48,8 +50,9 @@ func (s *Service) GetVideo(
 	videoID string,
 	providerType ProviderType,
 ) (youtube.Video, error) {
-	if providerType == ProviderAPI {
+	if providerType == ProviderAPI && s.apiProvider != nil {
 		return s.apiProvider.GetVideo(ctx, videoID)
 	}
+
 	return s.ytdlpProvider.GetVideo(ctx, videoID)
 }
