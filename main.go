@@ -16,7 +16,10 @@ import (
 	// api
 	"github.com/Arvind215271/askito/internal/api"
 	"github.com/Arvind215271/askito/internal/api/export"
-	"github.com/Arvind215271/askito/internal/api/video"
+	apiSignal "github.com/Arvind215271/askito/internal/api/signal"
+	apiSubtitle "github.com/Arvind215271/askito/internal/api/subtitle"
+	apiTranscript "github.com/Arvind215271/askito/internal/api/transcript"
+	apiVideo "github.com/Arvind215271/askito/internal/api/video"
 
 	// cache
 	"github.com/Arvind215271/askito/internal/cache"
@@ -26,13 +29,13 @@ import (
 	youtubeapi "github.com/Arvind215271/askito/internal/youtube/metadata/youtube_api"
 	ytdlpmetadata "github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp"
 	"github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp/python"
-	"github.com/Arvind215271/askito/internal/youtube/subtitle"
+	ytSubtitle "github.com/Arvind215271/askito/internal/youtube/subtitle"
 
 	// transcript
-	"github.com/Arvind215271/askito/internal/youtube/transcript"
+	ytTranscript "github.com/Arvind215271/askito/internal/youtube/transcript"
 
 	// signal
-	"github.com/Arvind215271/askito/internal/youtube/signal"
+	ytSignal "github.com/Arvind215271/askito/internal/youtube/signal"
 
 	// export
 	exportservice "github.com/Arvind215271/askito/internal/youtube/export"
@@ -94,12 +97,11 @@ func main() {
 		youtubeClient = nil
 	}
 
-	
 	youtubeProvider := youtubeapi.NewProvider(
 		youtubeClient,
 		logger,
 	)
-	
+
 	// cache manager
 	cacheManager := cache.NewManager(config.YtdlpCache, logger)
 
@@ -107,22 +109,17 @@ func main() {
 	cacheManager.Cleanup()
 
 	pythonPool, err := python.NewSinglePool(config.PythonWorkers, logger, cacheManager)
-	pythonPool.WarmUp(ctx) 
+	pythonPool.WarmUp(ctx)
 
 	if err != nil {
 		logger.Fatal("failed to create python pool", "error", err)
 	}
-	
+
 	ytdlpMetadataClient := ytdlpmetadata.NewClient(pythonPool, logger)
-
-
 
 	ytdlpMetadataProvider := ytdlpmetadata.NewProvider(ytdlpMetadataClient, logger)
 
 	// validate ytdlp ig? IDK...
-
-	
-
 
 	// run cleanup on startup
 	if err := ytdlpMetadataClient.Cleanup(); err != nil {
@@ -136,23 +133,27 @@ func main() {
 		ytdlpMetadataProvider,
 	)
 
-	subtitleService := subtitle.NewSubtitleService(cacheManager, logger, pythonPool)
-	transcriptService := transcript.NewService()
-	signalService := signal.NewSignalService()
+	subtitleService := ytSubtitle.NewSubtitleService(cacheManager, logger, pythonPool)
+	transcriptService := ytTranscript.NewService()
+	signalService := ytSignal.NewSignalService()
 
-	// video handler
-	videoHandler := video.NewHandler(youtubeService, subtitleService, transcriptService, signalService)
+	// handlers
+	videoHandler := apiVideo.NewHandler(youtubeService)
+	subtitleHandler := apiSubtitle.NewHandler(youtubeService, subtitleService)
+	transcriptHandler := apiTranscript.NewHandler(youtubeService, subtitleService, transcriptService)
+	signalHandler := apiSignal.NewHandler(youtubeService, subtitleService, transcriptService, signalService)
 
-	video.RegisterVideoRoutes(e.Group("/videos"), videoHandler)
-	video.RegisterSubtitleRoutes(e.Group("/subtitles"), videoHandler)
-
-	e.POST("/transcripts", videoHandler.GetTranscript)
+	// routes
+	apiVideo.RegisterVideoRoutes(e.Group("/videos"), videoHandler)
+	apiSubtitle.RegisterSubtitleRoutes(e.Group("/subtitles"), subtitleHandler)
+	e.POST("/transcripts", transcriptHandler.GetTranscript)
+	e.POST("/signals", signalHandler.GetVideoSignals)
 
 	// description
 	descriptionService := description.NewService()
 
 	// pipeline
-	pipelineService := pipeline.NewService(youtubeService, descriptionService, subtitleService, transcriptService, signalService, logger,2 * config.PythonWorkers)
+	pipelineService := pipeline.NewService(youtubeService, descriptionService, subtitleService, transcriptService, signalService, logger, 2*config.PythonWorkers)
 
 	// export
 
@@ -164,7 +165,7 @@ func main() {
 	)
 
 	// Export handler
-	exportHandler := export.NewHandler(youtubeService,pipelineService, exportService)
+	exportHandler := export.NewHandler(youtubeService, pipelineService, exportService)
 	export.RegisterRoutes(e.Group("/export"), exportHandler)
 
 	// only run debug in development
