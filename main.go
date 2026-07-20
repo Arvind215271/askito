@@ -104,7 +104,7 @@ func main() {
 	cacheManager := cache.NewManager(config.YtdlpCache, logger)
 
 	// cleanup.
-	// cacheManager.Cleanup()
+	cacheManager.Cleanup()
 
 	pythonPool, err := python.NewSinglePool(config.PythonWorkers, logger, cacheManager)
 	pythonPool.WarmUp(ctx) 
@@ -152,7 +152,7 @@ func main() {
 	descriptionService := description.NewService()
 
 	// pipeline
-	pipelineService := pipeline.NewService(youtubeService, descriptionService, subtitleService, transcriptService, signalService, 2 * config.PythonWorkers)
+	pipelineService := pipeline.NewService(youtubeService, descriptionService, subtitleService, transcriptService, signalService, logger,2 * config.PythonWorkers)
 
 	// export
 

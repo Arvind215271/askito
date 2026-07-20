@@ -33,9 +33,10 @@ YDL_OPTS = {
     "retries": 0,
     "lazy_playlist": True,
     "noprogress": True,
+    # "cookiefile": "/home/arvind-saini/Projects/askito/cookies.txt",    
     "extractor_args": {
         "youtube": {
-            "player_client": ["android_vr"],
+            "player_client": ["android"],
         }
     },
 }

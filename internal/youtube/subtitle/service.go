@@ -15,7 +15,11 @@ type SubtitleService struct {
 	pool   *python.SinglePool
 }
 
-func NewSubtitleService(cache *cache.Manager, logger *logger.Logger, pool *python.SinglePool) *SubtitleService {
+func NewSubtitleService(
+	cache *cache.Manager,
+	logger *logger.Logger,
+	pool *python.SinglePool,
+) *SubtitleService {
 	return &SubtitleService{
 		cache:  cache,
 		logger: logger,
@@ -29,22 +33,74 @@ func (s *SubtitleService) DownloadSubtitle(
 	meta SubtitleMetadata,
 ) (*SubtitleResult, error) {
 
+	s.logger.Debug(
+		"subtitle download requested",
+		"videoID", req.VideoID,
+		"language", req.Language,
+		"type", req.Type,
+		"format", req.Format,
+	)
+
 	req, err := validateRequest(req)
 	if err != nil {
+		s.logger.Warn(
+			"subtitle request validation failed",
+			"videoID", req.VideoID,
+			"language", req.Language,
+			"type", req.Type,
+			"format", req.Format,
+			"error", err,
+		)
+
 		return nil, err
 	}
 
+	s.logger.Debug(
+		"subtitle request validated",
+		"videoID", req.VideoID,
+		"language", req.Language,
+		"type", req.Type,
+		"format", req.Format,
+	)
+
 	if err := validateTrack(req, meta); err != nil {
+		s.logger.Warn(
+			"subtitle track validation failed",
+			"videoID", req.VideoID,
+			"language", req.Language,
+			"type", req.Type,
+			"format", req.Format,
+			"error", err,
+		)
+
 		return nil, err
 	}
+
+	s.logger.Debug(
+		"subtitle track validated",
+		"videoID", req.VideoID,
+		"language", req.Language,
+		"type", req.Type,
+		"format", req.Format,
+	)
 
 	cacheKey := subtitleCacheKey(req)
 
+	s.logger.Debug(
+		"checking subtitle cache",
+		"videoID", req.VideoID,
+		"cacheKey", cacheKey,
+	)
+
 	if cached, err := s.cache.Get(req.VideoID, cacheKey); err == nil {
+
 		s.logger.Debug(
 			"subtitle cache hit",
 			"videoID", req.VideoID,
 			"language", req.Language,
+			"type", req.Type,
+			"format", req.Format,
+			"cacheKey", cacheKey,
 		)
 
 		return &SubtitleResult{
@@ -52,20 +108,81 @@ func (s *SubtitleService) DownloadSubtitle(
 			Format:   req.Format,
 			Language: req.Language,
 		}, nil
-	}
 
-	data, err := s.pool.GetSubtitle(ctx, req.VideoID, req.Language, req.Type, req.Format)
-	if err != nil {
-		return nil, err
-	}
+	} else {
 
-	if err := s.cache.Save(req.VideoID, cacheKey, data); err != nil {
-		s.logger.Warn(
-			"failed to cache subtitle",
+		s.logger.Debug(
+			"subtitle cache miss",
 			"videoID", req.VideoID,
+			"cacheKey", cacheKey,
 			"error", err,
 		)
 	}
+
+	s.logger.Debug(
+		"downloading subtitle",
+		"videoID", req.VideoID,
+		"language", req.Language,
+		"type", req.Type,
+		"format", req.Format,
+	)
+
+	data, err := s.pool.GetSubtitle(
+		ctx,
+		req.VideoID,
+		req.Language,
+		req.Type,
+		req.Format,
+	)
+	if err != nil {
+
+		s.logger.Warn(
+			"subtitle download failed",
+			"videoID", req.VideoID,
+			"language", req.Language,
+			"type", req.Type,
+			"format", req.Format,
+			"error", err,
+		)
+
+		return nil, err
+	}
+
+	s.logger.Debug(
+		"subtitle downloaded",
+		"videoID", req.VideoID,
+		"language", req.Language,
+		"type", req.Type,
+		"format", req.Format,
+		"bytes", len(data),
+	)
+
+	if err := s.cache.Save(req.VideoID, cacheKey, data); err != nil {
+
+		s.logger.Warn(
+			"failed to cache subtitle",
+			"videoID", req.VideoID,
+			"cacheKey", cacheKey,
+			"error", err,
+		)
+
+	} else {
+
+		s.logger.Debug(
+			"subtitle cached",
+			"videoID", req.VideoID,
+			"cacheKey", cacheKey,
+		)
+	}
+
+	s.logger.Debug(
+		"subtitle download completed",
+		"videoID", req.VideoID,
+		"language", req.Language,
+		"type", req.Type,
+		"format", req.Format,
+		"bytes", len(data),
+	)
 
 	return &SubtitleResult{
 		Content:  data,
@@ -125,6 +242,7 @@ func validateTrack(
 	}
 
 	for _, track := range tracks {
+
 		if track.LanguageCode != req.Language {
 			continue
 		}
@@ -157,6 +275,7 @@ func formatSupported(
 	}
 
 	for _, supported := range track.Formats {
+
 		if supported == format {
 			return true
 		}

@@ -64,54 +64,92 @@ func (m *Manager) SubtitlePath(subType string) string {
 	return "subtitles." + subType
 }
 
-// Cleanup generalizes the cleanup logic to remove expired directories
-// based on the age of a specific "marker" file (e.g., metadata.json).
-func (m *Manager) Cleanup(markerFilename string) error {
+
+
+
+// Cleanup removes expired and excess cache entries.
+//
+// Each direct child of the cache directory is treated as one cache entry.
+// Cache entries may be either files or directories. Expiration and capacity
+// are determined using the modification time of the entry itself.
+func (m *Manager) Cleanup() error {
 	entries, err := os.ReadDir(m.config.CacheDir)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil
 		}
+
 		return err
 	}
 
-	type fileInfo struct {
+	type cacheEntry struct {
 		path    string
 		modTime time.Time
 	}
-	var directories []fileInfo
+
+	var entriesToKeep []cacheEntry
+
+	ttl := time.Duration(
+		m.config.TTLDays,
+	) * 24 * time.Hour
+
+	now := time.Now()
 
 	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
-		}
-		markerPath := filepath.Join(m.config.CacheDir, entry.Name(), markerFilename)
-		info, err := os.Stat(markerPath)
+
+		path := filepath.Join(
+			m.config.CacheDir,
+			entry.Name(),
+		)
+
+		info, err := entry.Info()
 		if err != nil {
 			continue
 		}
 
-		// TTL-based eviction
-		if time.Since(info.ModTime()) > time.Duration(m.config.TTLDays)*24*time.Hour {
-			os.RemoveAll(filepath.Join(m.config.CacheDir, entry.Name()))
+		// TTL-based eviction.
+		if now.Sub(info.ModTime()) > ttl {
+			if err := os.RemoveAll(path); err != nil {
+				return err
+			}
+
 			continue
 		}
 
-		directories = append(directories, fileInfo{
-			path:    filepath.Join(m.config.CacheDir, entry.Name()),
-			modTime: info.ModTime(),
-		})
+		entriesToKeep = append(
+			entriesToKeep,
+			cacheEntry{
+				path:    path,
+				modTime: info.ModTime(),
+			},
+		)
 	}
 
-	// Capacity-based eviction
-	if len(directories) > m.config.MaxFiles {
-		sort.Slice(directories, func(i, j int) bool {
-			return directories[i].modTime.Before(directories[j].modTime)
-		})
+	// Capacity-based eviction.
+	if len(entriesToKeep) <= m.config.MaxFiles {
+		return nil
+	}
 
-		numToDelete := len(directories) - (m.config.MaxFiles * 9 / 10) // Keep 90%
-		for i := 0; i < numToDelete; i++ {
-			os.RemoveAll(directories[i].path)
+	sort.Slice(
+		entriesToKeep,
+		func(i, j int) bool {
+			return entriesToKeep[i].modTime.Before(
+				entriesToKeep[j].modTime,
+			)
+		},
+	)
+
+	// Keep 90% of the configured capacity after cleanup.
+	targetSize := m.config.MaxFiles * 9 / 10
+
+	numToDelete := len(entriesToKeep) - targetSize
+
+	for i := 0; i < numToDelete; i++ {
+
+		if err := os.RemoveAll(
+			entriesToKeep[i].path,
+		); err != nil {
+			return err
 		}
 	}
 
