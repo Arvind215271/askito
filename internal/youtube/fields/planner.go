@@ -20,6 +20,8 @@ func NewPlanner(fields []string) (*Planner, error) {
 	for _, f := range fields {
 		fieldSet[f] = true
 	}
+	// Always include errors
+	fieldSet[FieldErrors] = true
 
 	return &Planner{
 		fields:   fields,

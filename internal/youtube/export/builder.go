@@ -65,3 +65,26 @@ func BuildVideoExport(
 
 	return data, nil
 }
+
+// this is common function that we will be using to export multiple videos and convert it to a simple format that can be used by an export TYPE like JSON, CSV, etc.
+//
+// It is the filter layer actually. We are already getting the data in our Domain Model.
+// The only thing left is to filter what is needed from Video ONLY.
+func BuildBatchVideoExport(
+	videos []youtube.Video,
+	planner *fields.Planner,
+) (ExportData, error) {
+	exportedVideos := make([]any, 0, len(videos))
+
+	for _, v := range videos {
+		videoData, err := exportStruct(v, planner)
+		if err != nil {
+			return nil, youtube.Err.Export.MarshalFailed().Wrap(err)
+		}
+		exportedVideos = append(exportedVideos, videoData)
+	}
+
+	return ExportData{
+		"videos": exportedVideos,
+	}, nil
+}

@@ -27,11 +27,13 @@ var ValidFields = map[string]struct{}{
 	FieldCaptionAvailable:    {},
 	FieldPrivacyStatus:       {},
 	FieldLiveBroadcastStatus: {},
+	FieldErrors:            {},
 }
 
 // Metadata fields
 const (
 	FieldID                  = "id"
+	FieldErrors              = "errors"
 	FieldTitle               = "title"
 	FieldDescription         = "description"
 	FieldChannelID           = "channel_id"

@@ -13,15 +13,21 @@ const (
 type ExportData map[string]any
 
 type PlaylistExportRequest struct {
-	PlaylistID  string            `json:"playlist_id"`
-	VideoFields *fields.Planner   `json:"-"`
-	Format      Format            `json:"format"`
+	PlaylistID  string          `json:"playlist_id"`
+	VideoFields *fields.Planner `json:"-"`
+	Format      Format          `json:"format"`
 }
 
 type VideoExportRequest struct {
 	VideoID string          `json:"video_id"`
 	Fields  *fields.Planner `json:"-"`
 	Format  Format          `json:"format"`
+}
+
+type BatchVideoExportRequest struct {
+	VideoIDs    []string        `json:"video_ids"`
+	VideoFields *fields.Planner `json:"-"`
+	Format      Format          `json:"format"`
 }
 
 type ExportResponse struct {

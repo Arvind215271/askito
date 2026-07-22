@@ -2,6 +2,8 @@ package fields
 
 var (
 	MetadataFields = []string{
+		FieldID,
+		FieldErrors,
 		FieldTitle,
 		FieldDescription,
 		FieldChannelID,

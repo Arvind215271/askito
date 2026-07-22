@@ -55,6 +55,20 @@ func (s *Service) ExportVideo(
 	return s.exportData(req.Format, data)
 }
 
+// ExportBatchVideos is the main orchestration function.
+func (s *Service) ExportBatchVideos(
+	videos []youtube.Video,
+	req BatchVideoExportRequest,
+) ([]byte, error) {
+
+	data, err := BuildBatchVideoExport(videos, req.VideoFields)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.exportData(req.Format, data)
+}
+
 // internal shared logic
 func (s *Service) exportData(format Format, data ExportData) ([]byte, error) {
 	s.mu.RLock()

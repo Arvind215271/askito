@@ -6,22 +6,25 @@ import (
 	"github.com/Arvind215271/askito/internal/youtube/transcript"
 )
 
-type VideoExportRequest struct {
-	Input  string   `json:"input"`
-	Fields []string `json:"fields,omitempty"`
-	Format string   `json:"format"`
-
-	Subtitle   *subtitle.DownloadRequest    `json:"subtitle,omitempty"`
+type CommonExportFields struct {
+	Subtitle   *subtitle.DownloadRequest     `json:"subtitle,omitempty"`
 	Transcript *transcript.ProcessingRequest `json:"transcript,omitempty"`
-	Signal     *signal.SignalRequest       `json:"signal,omitempty"`
+	Signal     *signal.SignalRequest        `json:"signal,omitempty"`
+	Format     string                       `json:"format"`
+	Fields     []string                     `json:"fields,omitempty"`
+}
+
+type VideoExportRequest struct {
+	CommonExportFields
+	Input string `json:"input"`
 }
 
 type PlaylistExportRequest struct {
-	Input       string   `json:"input"`
-	VideoFields []string `json:"video_fields,omitempty"`
-	Format      string   `json:"format"`
+	CommonExportFields
+	Input string `json:"input"`
+}
 
-	Subtitle   *subtitle.DownloadRequest      `json:"subtitle,omitempty"`
-	Transcript *transcript.ProcessingRequest  `json:"transcript,omitempty"`
-	Signal     *signal.SignalRequest         `json:"signal,omitempty"`
+type VideosExportRequest struct {
+	CommonExportFields
+	Inputs []string `json:"inputs"`
 }
