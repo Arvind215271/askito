@@ -9,14 +9,9 @@ import (
 type CommonExportFields struct {
 	Subtitle   *subtitle.DownloadRequest     `json:"subtitle,omitempty"`
 	Transcript *transcript.ProcessingRequest `json:"transcript,omitempty"`
-	Signal     *signal.SignalRequest        `json:"signal,omitempty"`
-	Format     string                       `json:"format"`
-	Fields     []string                     `json:"fields,omitempty"`
-}
-
-type VideoExportRequest struct {
-	CommonExportFields
-	Input string `json:"input"`
+	Signal     *signal.SignalRequest         `json:"signal,omitempty"`
+	Format     string                        `json:"format"`
+	Fields     []string                      `json:"fields,omitempty"`
 }
 
 type PlaylistExportRequest struct {

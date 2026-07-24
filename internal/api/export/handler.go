@@ -48,80 +48,6 @@ func parseFormat(s string) (export.Format, error) {
 	}
 }
 
-func (h *Handler) ExportVideo(c *echo.Context) error {
-	var req VideoExportRequest
-
-	if err := c.Bind(&req); err != nil {
-		return api.Err.Common.
-			BadRequest("invalid request body").
-			Wrap(err)
-	}
-
-	if req.Input == "" {
-		return ErrInputRequired
-	}
-
-	_, err := parseFormat(req.CommonExportFields.Format)
-	if err != nil {
-		return err
-	}
-
-	parsedInput, err := youtubeurl.Parse(req.Input)
-	if err != nil {
-		return api.Err.Common.
-			BadRequest("invalid youtube input: " + req.Input).
-			Wrap(err)
-	}
-
-	if parsedInput.InputType != youtubeurl.InputTypeVideo {
-		return ErrInvalidInputType
-	}
-
-	fieldPlanner, err := fields.NewPlanner(req.Fields)
-	if err != nil {
-		return err
-	}
-
-	pipelinePlanner := pipeline.NewPlanner(fieldPlanner)
-
-	pipelineReq := &pipeline.Request{
-		Fields:     req.Fields,
-		Subtitle:   req.Subtitle,
-		Transcript: req.Transcript,
-		Signal:     req.Signal,
-	}
-
-	video, err := h.pipelineService.Process(
-		c.Request().Context(),
-		parsedInput.ID,
-		pipelineReq,
-		pipelinePlanner,
-	)
-	if err != nil {
-		return err
-	}
-
-	exportReq := export.VideoExportRequest{
-		VideoID: video.ID,
-		Fields:  fieldPlanner,
-		Format:  export.Format(req.CommonExportFields.Format),
-	}
-
-	data, err := h.exportService.ExportVideo(
-		*video,
-		exportReq,
-	)
-	if err != nil {
-		return err
-	}
-
-	return c.Blob(
-		http.StatusOK,
-		"application/json",
-		data,
-	)
-}
-
 func (h *Handler) ExportVideos(c *echo.Context) error {
 	var req VideosExportRequest
 
@@ -155,7 +81,7 @@ func (h *Handler) ExportVideos(c *echo.Context) error {
 	pipelinePlanner := pipeline.NewPlanner(fieldPlanner)
 
 	ctx := c.Request().Context()
-	
+
 	videos := make([]*youtube.Video, len(req.Inputs))
 	validVideoIDs := make([]string, 0, len(req.Inputs))
 	idToIndex := make(map[string]int)
@@ -169,7 +95,7 @@ func (h *Handler) ExportVideos(c *echo.Context) error {
 			}
 			continue
 		}
-		
+
 		validVideoIDs = append(validVideoIDs, parsedInput.ID)
 		idToIndex[parsedInput.ID] = i
 	}
@@ -180,7 +106,7 @@ func (h *Handler) ExportVideos(c *echo.Context) error {
 		pipelineReq,
 		pipelinePlanner,
 	)
-	
+
 	for _, video := range processedVideos {
 		index := idToIndex[video.ID]
 		videos[index] = video
