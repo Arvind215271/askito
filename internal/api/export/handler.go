@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v5"
 
 	"github.com/Arvind215271/askito/internal/api"
+	subtitleapi "github.com/Arvind215271/askito/internal/api/subtitle"
 	"github.com/Arvind215271/askito/internal/youtube"
 	"github.com/Arvind215271/askito/internal/youtube/export"
 	"github.com/Arvind215271/askito/internal/youtube/fields"
@@ -71,11 +72,18 @@ func (h *Handler) ExportVideos(c *echo.Context) error {
 		return err
 	}
 
+	preferences, err := subtitleapi.BuildPreferences(req.Preferences)
+	if err != nil {
+		return api.Err.Common.BadRequest("invalid subtitle preferences").Wrap(err)
+	}
+
 	pipelineReq := &pipeline.Request{
-		Fields:     req.Fields,
-		Subtitle:   req.Subtitle,
-		Transcript: req.Transcript,
-		Signal:     req.Signal,
+		Fields:      req.Fields,
+		Subtitle:    req.Subtitle,
+		Preferences: preferences,
+		Format:      "json3",
+		Transcript:  req.Transcript,
+		Signal:      req.Signal,
 	}
 
 	pipelinePlanner := pipeline.NewPlanner(fieldPlanner)
@@ -173,11 +181,18 @@ func (h *Handler) ExportPlaylist(c *echo.Context) error {
 		return err
 	}
 
+	preferences, err := subtitleapi.BuildPreferences(req.Preferences)
+	if err != nil {
+		return api.Err.Common.BadRequest("invalid subtitle preferences").Wrap(err)
+	}
+
 	pipelineReq := &pipeline.Request{
-		Fields:     req.Fields,
-		Subtitle:   req.Subtitle,
-		Transcript: req.Transcript,
-		Signal:     req.Signal,
+		Fields:      req.Fields,
+		Subtitle:    req.Subtitle,
+		Preferences: preferences,
+		Format:      "json3",
+		Transcript:  req.Transcript,
+		Signal:      req.Signal,
 	}
 
 	pipelinePlanner := pipeline.NewPlanner(fieldPlanner)

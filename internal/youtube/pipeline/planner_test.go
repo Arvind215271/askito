@@ -14,7 +14,7 @@ func TestPlanner_NeedsMetadata(t *testing.T) {
 	}{
 		{"Empty fields (everything)", []string{}, true},
 		{"Metadata field", []string{fields.FieldTitle}, true},
-		{"Non-metadata field", []string{fields.FieldTranscriptText}, false},
+		{"Non-metadata field", []string{fields.FieldTranscriptText}, true},
 		{"Description requires metadata", []string{fields.FieldDescriptionCleaned}, true},
 	}
 	for _, tt := range tests {

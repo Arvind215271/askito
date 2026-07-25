@@ -103,11 +103,52 @@ func (s *Service) Process(
 	var trans *transcript.Transcript
 
 	if planner.NeedsTranscript() || planner.NeedsSignal() {
-		subReq := req.Subtitle
 
-		if subReq == nil {
-			defaultReq := subtitle.DefaultDownloadRequest(video.ID)
-			subReq = &defaultReq
+		var subReq subtitle.DownloadRequest
+
+		if req.Subtitle != nil {
+			// Copy the shared request before setting the per-video ID.
+			subReq = *req.Subtitle
+			subReq.VideoID = video.ID
+
+			s.logDebug(
+				"using requested subtitle configuration",
+				"videoID",
+				videoID,
+				"language",
+				subReq.Language,
+				"type",
+				subReq.Type,
+				"format",
+				subReq.Format,
+			)
+		} else {
+			prefs := req.Preferences
+			if len(prefs) == 0 {
+				prefs = subtitle.DefaultPreferences()
+			}
+			resolvedReq, err := s.subtitleService.ResolveDownloadRequest(video.SubtitleMetadata, prefs, req.Format)
+			if err != nil {
+				return nil, fmt.Errorf(
+					"failed to resolve subtitle download request for video %s: %w",
+					videoID,
+					err,
+				)
+			}
+			resolvedReq.VideoID = video.ID
+			subReq = resolvedReq
+
+			s.logDebug(
+				"resolved subtitle request using preferences",
+				"videoID",
+				videoID,
+				"language",
+				subReq.Language,
+				"type",
+				subReq.Type,
+				"format",
+				subReq.Format,
+			)
 		}
 
 		if err := subReq.Validate(); err != nil {
@@ -120,7 +161,7 @@ func (s *Service) Process(
 
 		sub, err := s.subtitleService.DownloadSubtitle(
 			ctx,
-			*subReq,
+			subReq,
 			video.SubtitleMetadata,
 		)
 		if err != nil {
@@ -310,14 +351,14 @@ func (s *Service) ProcessFaultTolerant(
 
 		var subReq subtitle.DownloadRequest
 
-		if req.Subtitle == nil {
+		if req.Subtitle != nil {
 
-			subReq = subtitle.DefaultDownloadRequest(
-				video.ID,
-			)
+			// Copy the shared request before setting the per-video ID.
+			subReq = *req.Subtitle
+			subReq.VideoID = video.ID
 
 			s.logDebug(
-				"using default subtitle request",
+				"using requested subtitle configuration",
 				"videoID",
 				videoID,
 				"language",
@@ -330,12 +371,40 @@ func (s *Service) ProcessFaultTolerant(
 
 		} else {
 
-			// Copy the shared request before setting the per-video ID.
-			subReq = *req.Subtitle
-			subReq.VideoID = video.ID
+			prefs := req.Preferences
+			if len(prefs) == 0 {
+				prefs = subtitle.DefaultPreferences()
+			}
+
+			resolvedReq, err := s.subtitleService.ResolveDownloadRequest(
+				video.SubtitleMetadata,
+				prefs,
+				req.Format,
+			)
+			if err != nil {
+				s.logError(
+					"subtitle preference resolution failed",
+					"videoID",
+					videoID,
+					"error",
+					err,
+				)
+				video.Errors = append(
+					video.Errors,
+					fmt.Sprintf(
+						"subtitle request validation failed: %v",
+						err,
+					),
+				)
+				// Skip the rest of the subtitle + transcript block
+				goto transcriptDone
+			}
+
+			resolvedReq.VideoID = video.ID
+			subReq = resolvedReq
 
 			s.logDebug(
-				"using requested subtitle configuration",
+				"resolved subtitle request using preferences",
 				"videoID",
 				videoID,
 				"language",
@@ -509,6 +578,8 @@ func (s *Service) ProcessFaultTolerant(
 			}
 		}
 	}
+
+	transcriptDone:
 
 	// 4. Signal
 

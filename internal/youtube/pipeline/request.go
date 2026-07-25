@@ -17,6 +17,12 @@ type Request struct {
 	// Owned by the subtitle package; validation happens there.
 	Subtitle *subtitle.DownloadRequest
 
+	// Preferences for subtitle resolution.
+	Preferences []subtitle.SubtitlePreference
+
+	// Format for the subtitle download (e.g., json3, vtt).
+	Format string
+
 	// Transcript request for processing an already-parsed transcript.
 	// Owned by the transcript package; validation happens there.
 	Transcript *transcript.ProcessingRequest
