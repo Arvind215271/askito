@@ -29,7 +29,7 @@ go mod download
 ```
 
 ### 3. Python Virtual Environment & Dependencies Setup
-Askito communicates with a persistent Python worker pool [`internal/youtube/metadata/ytdlp/python/python_worker_single.py`](internal/youtube/metadata/ytdlp/python/python_worker_single.py) which requires specialized Python packages (`yt-dlp` and `orjson`).
+Askito communicates with a persistent Python worker pool ([`internal/youtube/metadata/ytdlp/python/python_worker_single.py`](internal/youtube/metadata/ytdlp/python/python_worker_single.py)) which requires specialized Python packages (`yt-dlp` and `orjson`).
 
 Set up your virtual environment and install the required dependencies:
 
@@ -89,102 +89,185 @@ go build -o askito main.go
 
 ---
 
-## API Endpoints Reference & Examples
+## API Endpoints, Parameters & Options Reference
 
 Once the server is running at `http://localhost:8080`, you can access the following REST endpoints:
 
-### 1. Videos
-- **Get Video By ID** (`GET /videos/id`)
-  - **Query Parameters**: `id` (string, required), `provider` (`ytdlp` or `youtube_api`, optional).
-  - **Example**:
-    ```bash
-    curl -X GET "http://localhost:8080/videos/id?id=dQw4w9WgXcQ"
-    ```
+---
 
-- **Get Video By URL** (`GET /videos/url`)
-  - **Query Parameters**: `url` (string, required), `provider` (`ytdlp` or `youtube_api`, optional).
-  - **Example**:
-    ```bash
-    curl -X GET "http://localhost:8080/videos/url?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    ```
+### 1. Video Metadata API (`/videos`)
+
+#### Get Video By ID
+- **Endpoint**: `GET /videos/id`
+- **Query Parameters**:
+  - `id` (string, required): YouTube Video ID (`VIDEO_ID`, e.g., `dQw4w9WgXcQ`).
+  - `provider` (string, optional): Metadata provider (`ytdlp` or `youtube_api`).
+- **Example Request**:
+  ```bash
+  curl -X GET "http://localhost:8080/videos/id?id=dQw4w9WgXcQ&provider=ytdlp"
+  ```
+
+#### Get Video By URL
+- **Endpoint**: `GET /videos/url`
+- **Query Parameters**:
+  - `url` (string, required): Full YouTube video URL (`VIDEO_URL`, e.g., `https://www.youtube.com/watch?v=dQw4w9WgXcQ`).
+  - `provider` (string, optional): Metadata provider (`ytdlp` or `youtube_api`).
+- **Example Request**:
+  ```bash
+  curl -X GET "http://localhost:8080/videos/url?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ&provider=ytdlp"
+  ```
 
 ---
 
-### 2. Subtitles
-- **Get Subtitle Options** (`POST /subtitles/options`)
-  - **Request Body**:
-    ```json
-    {
-      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    }
-    ```
-  - **Example**:
-    ```bash
-    curl -X POST "http://localhost:8080/subtitles/options" \
-      -H "Content-Type: application/json" \
-      -d '{"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}'
-    ```
+### 2. Subtitles API (`/subtitles`)
 
-- **Download Subtitle** (`POST /subtitles/download`)
-  - **Request Body**:
-    ```json
-    {
+#### Get Subtitle Options
+- **Endpoint**: `POST /subtitles/options`
+- **Request Body Options (`JSON`)**:
+  - `url` (string, required): YouTube video URL (`VIDEO_URL`).
+- **Example Request**:
+  ```bash
+  curl -X POST "http://localhost:8080/subtitles/options" \
+    -H "Content-Type: application/json" \
+    -d '{"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}'
+  ```
+
+#### Download Subtitle
+- **Endpoint**: `POST /subtitles/download`
+- **Request Body Options (`JSON`)**:
+  - `url` (string, required): YouTube video URL (`VIDEO_URL`).
+  - `type` (string, required): Subtitle type (`manual` or `automatic`).
+  - `language` (string, required): Subtitle/track language code (e.g., `en`).
+  - `format` (string, optional): Desired output subtitle format (e.g., `vtt`, `json3`).
+- **Example Request**:
+  ```bash
+  curl -X POST "http://localhost:8080/subtitles/download" \
+    -H "Content-Type: application/json" \
+    -d '{
       "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "type": "manual",
       "language": "en",
       "format": "vtt"
-    }
-    ```
-  - **Example**:
-    ```bash
-    curl -X POST "http://localhost:8080/subtitles/download" \
-      -H "Content-Type: application/json" \
-      -d '{"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "language": "en", "format": "vtt"}'
-    ```
+    }'
+  ```
 
 ---
 
-### 3. Transcripts
-- **Get Transcript** (`POST /transcripts`)
-  - **Request Body**:
-    ```json
-    {
+### 3. Transcripts API (`/transcripts`)
+
+#### Get Transcript
+- **Endpoint**: `POST /transcripts`
+- **Request Body Options (`JSON`)**:
+  - `url` (string, required): YouTube video URL (`VIDEO_URL`).
+  - `type` (string, required): Transcript type (`manual` or `automatic`).
+  - `language` (string, required): Transcript language code (e.g., `en`).
+- **Example Request**:
+  ```bash
+  curl -X POST "http://localhost:8080/transcripts" \
+    -H "Content-Type: application/json" \
+    -d '{
       "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "type": "manual",
       "language": "en"
-    }
-    ```
-  - **Example**:
-    ```bash
-    curl -X POST "http://localhost:8080/transcripts" \
-      -H "Content-Type: application/json" \
-      -d '{"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "language": "en"}'
-    ```
+    }'
+  ```
 
 ---
 
-### 4. Signals & Statistics
-- **Get Video Signals** (`POST /signals`)
-  - **Request Body**:
-    ```json
-    {
-      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    }
-    ```
-  - **Example**:
-    ```bash
-    curl -X POST "http://localhost:8080/signals" \
-      -H "Content-Type: application/json" \
-      -d '{"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}'
-    ```
+### 4. Signals API (`/signals`)
+
+#### Get Video Signals
+- **Endpoint**: `POST /signals`
+- **Request Body Options (`JSON`)**:
+  - `url` (string, required): YouTube video URL (`VIDEO_URL`).
+  - `analysis` (string, required): Statistical analysis type (`word-stats` or `window-stats`).
+  - `type` (string, required): Transcript type (`manual` or `automatic`).
+  - `language` (string, required): Language code (e.g., `en`).
+  - `use_heavy_stopwords` (boolean, optional): Whether to filter out heavy stopwords (`true` or `false`).
+  - `min_freq` (integer, optional): Minimum occurrence frequency for words (`>= 0`).
+  - `depth` (float, optional): Analysis depth threshold (`0.0` to `1.0`).
+  - `window_size` (float, optional): Sliding window size (`> 0`).
+  - `bucket_count` (integer, optional): Number of statistical buckets (`> 0`).
+- **Example Request**:
+  ```bash
+  curl -X POST "http://localhost:8080/signals" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "analysis": "word-stats",
+      "type": "manual",
+      "language": "en",
+      "use_heavy_stopwords": true,
+      "min_freq": 2
+    }'
+  ```
 
 ---
 
-### 5. Export
-- **Export Single Video** (`POST /export/video`)
-- **Export Multiple Videos (Batch)** (`POST /export/videos`)
-- **Export Playlist** (`POST /export/playlist`)
-  - **Example (Playlist Export)**:
-    ```bash
-    curl -X POST "http://localhost:8080/export/playlist" \
-      -H "Content-Type: application/json" \
-      -d '{"url": "https://www.youtube.com/playlist?list=PL_EXAMPLE"}'
-    ```
+### 5. Export API (`/export`)
+
+#### Export Single Video
+- **Endpoint**: `POST /export/video`
+- **Request Body Options (`JSON`)**:
+  - `input` (string, required): YouTube Video URL or ID (`VIDEO_URL` or `VIDEO_ID`).
+  - `format` (string, required): Export output format (`json`).
+  - `fields` (array of strings, optional): Specific metadata/data fields to include.
+  - `subtitle` (object, optional): Nested subtitle download options:
+    - `url` (string)
+    - `type` (string: `manual` | `automatic`)
+    - `language` (string)
+    - `format` (string)
+  - `transcript` (object, optional): Nested transcript request options:
+    - `url` (string)
+    - `type` (string: `manual` | `automatic`)
+    - `language` (string)
+  - `signal` (object, optional): Nested signal analysis options:
+    - `url` (string)
+    - `analysis` (string: `word-stats` | `window-stats`)
+    - `type` (string: `manual` | `automatic`)
+    - `language` (string)
+    - `use_heavy_stopwords` (boolean)
+    - `min_freq` (integer)
+- **Example Request**:
+  ```bash
+  curl -X POST "http://localhost:8080/export/video" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "input": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "format": "json"
+    }'
+  ```
+
+#### Export Multiple Videos (Batch)
+- **Endpoint**: `POST /export/videos`
+- **Request Body Options (`JSON`)**:
+  - `inputs` (array of strings, required): List of YouTube video URLs or IDs (`VIDEO_URL` / `VIDEO_ID`).
+  - `format` (string, required): Export output format (`json`).
+  - `fields`, `subtitle`, `transcript`, `signal` (optional, same nested structures as single video export).
+- **Example Request**:
+  ```bash
+  curl -X POST "http://localhost:8080/export/videos" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "inputs": [
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      ],
+      "format": "json"
+    }'
+  ```
+
+#### Export Playlist
+- **Endpoint**: `POST /export/playlist`
+- **Request Body Options (`JSON`)**:
+  - `input` (string, required): YouTube Playlist URL or ID (`PLAYLIST_URL` or `PLAYLIST_ID`).
+  - `format` (string, required): Export output format (`json`).
+  - `fields`, `subtitle`, `transcript`, `signal` (optional, same nested structures as single video export).
+- **Example Request**:
+  ```bash
+  curl -X POST "http://localhost:8080/export/playlist" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "input": "https://www.youtube.com/playlist?list=PL_EXAMPLE",
+      "format": "json"
+    }'
+  ```

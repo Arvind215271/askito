@@ -27,6 +27,29 @@ func NewSubtitleService(
 	}
 }
 
+// ResolveDownloadRequest evaluates preferences against metadata to produce a concrete DownloadRequest.
+func (s *SubtitleService) ResolveDownloadRequest(
+	meta SubtitleMetadata,
+	preferences []SubtitlePreference,
+	format string,
+) (DownloadRequest, error) {
+	selected, err := SelectSubtitle(&meta, preferences)
+	if err != nil {
+		return DownloadRequest{}, err
+	}
+
+	reqFormat := format
+	if reqFormat == "" {
+		reqFormat = selected.Format
+	}
+
+	return DownloadRequest{
+		Language: selected.Language,
+		Type:     selected.Type,
+		Format:   reqFormat,
+	}, nil
+}
+
 func (s *SubtitleService) DownloadSubtitle(
 	ctx context.Context,
 	req DownloadRequest,

@@ -16,6 +16,7 @@ import (
 	// api
 	"github.com/Arvind215271/askito/internal/api"
 	"github.com/Arvind215271/askito/internal/api/export"
+	apiPlaylist "github.com/Arvind215271/askito/internal/api/playlist"
 	apiSignal "github.com/Arvind215271/askito/internal/api/signal"
 	apiSubtitle "github.com/Arvind215271/askito/internal/api/subtitle"
 	apiTranscript "github.com/Arvind215271/askito/internal/api/transcript"
@@ -142,10 +143,12 @@ func main() {
 	subtitleHandler := apiSubtitle.NewHandler(youtubeService, subtitleService)
 	transcriptHandler := apiTranscript.NewHandler(youtubeService, subtitleService, transcriptService)
 	signalHandler := apiSignal.NewHandler(youtubeService, subtitleService, transcriptService, signalService)
+	playlistHandler := apiPlaylist.NewHandler(youtubeService)
 
 	// routes
 	apiVideo.RegisterVideoRoutes(e.Group("/videos"), videoHandler)
 	apiSubtitle.RegisterSubtitleRoutes(e.Group("/subtitles"), subtitleHandler)
+	apiPlaylist.RegisterPlaylistRoutes(e.Group("/playlist"), playlistHandler)
 	e.POST("/transcripts", transcriptHandler.GetTranscript)
 	e.POST("/signals", signalHandler.GetVideoSignals)
 

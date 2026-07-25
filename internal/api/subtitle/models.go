@@ -4,9 +4,13 @@ type SubtitleOptionsRequest struct {
 	URL string `json:"url" validate:"required,url"`
 }
 
-type SubtitleDownloadRequest struct {
-	URL      string `json:"url" validate:"required,url"`
-	Type     string `json:"type" validate:"required,oneof=manual automatic"`
+type SubtitlePreferenceRequest struct {
 	Language string `json:"language" validate:"required"`
-	Format   string `json:"format" validate:"omitempty"`
+	Type     string `json:"type" validate:"required,oneof=manual automatic manual>automatic automatic>manual"`
+}
+
+type SubtitleDownloadRequest struct {
+	URL         string                      `json:"url" validate:"required,url"`
+	Preferences []SubtitlePreferenceRequest `json:"preferences"`
+	Format      string                      `json:"format,omitempty" validate:"omitempty,oneof=json3 vtt"`
 }

@@ -65,12 +65,18 @@ func (h *Handler) DownloadSubtitle(c *echo.Context) error {
 		return Err.FetchFailed(err)
 	}
 
-	result, err := h.subtitleService.DownloadSubtitle((*c).Request().Context(), subtitle.DownloadRequest{
-		VideoID:  video.ID,
-		Type:     req.Type,
-		Language: req.Language,
-		Format:   req.Format,
-	}, video.SubtitleMetadata)
+	preferences, err := BuildPreferences(req.Preferences)
+	if err != nil {
+		return Err.InvalidPreference(err)
+	}
+
+	downloadReq, err := h.subtitleService.ResolveDownloadRequest(video.SubtitleMetadata, preferences, req.Format)
+	if err != nil {
+		return Err.SubtitleNotFound(err)
+	}
+	downloadReq.VideoID = video.ID
+
+	result, err := h.subtitleService.DownloadSubtitle((*c).Request().Context(), downloadReq, video.SubtitleMetadata)
 	if err != nil {
 		return Err.InternalError(err)
 	}

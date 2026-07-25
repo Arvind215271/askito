@@ -22,6 +22,14 @@ func (SubtitleErrors) FetchFailed(err error) *api.AppError {
 	return api.NewError("FETCH_FAILED", "Failed to fetch video", http.StatusInternalServerError).Wrap(err)
 }
 
+func (SubtitleErrors) InvalidPreference(err error) *api.AppError {
+	return api.NewError("INVALID_PREFERENCE", "Invalid subtitle preference", http.StatusBadRequest).Wrap(err)
+}
+
+func (SubtitleErrors) SubtitleNotFound(err error) *api.AppError {
+	return api.NewError("SUBTITLE_NOT_FOUND", "No matching subtitle found", http.StatusNotFound).Wrap(err)
+}
+
 func (SubtitleErrors) InternalError(err error) *api.AppError {
 	return api.NewError("INTERNAL_ERROR", "Something went wrong", http.StatusInternalServerError).Wrap(err)
 }

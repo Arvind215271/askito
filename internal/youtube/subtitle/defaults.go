@@ -8,3 +8,16 @@ func DefaultDownloadRequest(videoID string) DownloadRequest {
 		Format:   "json3",
 	}
 }
+
+func DefaultPreferences() []SubtitlePreference {
+	return []SubtitlePreference{
+		{
+			Language: "en*",
+			Type:     ManualPreferred,
+		},
+		{
+			Language: "*",
+			Type:     ManualPreferred,
+		},
+	}
+}

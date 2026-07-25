@@ -1,5 +1,24 @@
 package subtitle
 
+type PreferenceType string
+
+const (
+	ManualOnly         PreferenceType = "manual"
+	AutomaticOnly      PreferenceType = "automatic"
+	ManualPreferred    PreferenceType = "manual>automatic"
+	AutomaticPreferred PreferenceType = "automatic>manual"
+)
+
+type SubtitlePreference struct {
+	Language string         `json:"language"`
+	Type     PreferenceType `json:"type"`
+}
+
+type SelectedSubtitle struct {
+	Language string `json:"language"`
+	Type     string `json:"type"` // manual | automatic
+	Format   string `json:"format"`
+}
 
 type SubtitleTrack struct {
 	LanguageCode string   `json:"languageCode"`
