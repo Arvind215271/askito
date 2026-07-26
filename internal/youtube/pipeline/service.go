@@ -254,10 +254,12 @@ func (s *Service) ProcessFaultTolerant(
 
 		video.Errors = append(
 			video.Errors,
-			fmt.Sprintf(
-				"metadata fetch failed: %v",
-				err,
-			),
+			youtube.Error{
+				Message: fmt.Sprintf(
+					"metadata fetch failed: %v",
+					err,
+				),
+			},
 		)
 
 		return video
@@ -282,10 +284,12 @@ func (s *Service) ProcessFaultTolerant(
 
 		video.Errors = append(
 			video.Errors,
-			fmt.Sprintf(
-				"metadata fetch failed: %v",
-				err,
-			),
+			youtube.Error{
+				Message: fmt.Sprintf(
+					"metadata fetch failed: %v",
+					err,
+				),
+			},
 		)
 
 	} else {
@@ -325,10 +329,12 @@ func (s *Service) ProcessFaultTolerant(
 
 			video.Errors = append(
 				video.Errors,
-				fmt.Sprintf(
-					"description processing failed: %v",
-					err,
-				),
+				youtube.Error{
+					Message: fmt.Sprintf(
+						"description processing failed: %v",
+						err,
+					),
+				},
 			)
 
 		} else {
@@ -391,10 +397,12 @@ func (s *Service) ProcessFaultTolerant(
 				)
 				video.Errors = append(
 					video.Errors,
-					fmt.Sprintf(
-						"subtitle request validation failed: %v",
-						err,
-					),
+					youtube.Error{
+						Message: fmt.Sprintf(
+							"subtitle request validation failed: %v",
+							err,
+						),
+					},
 				)
 				// Skip the rest of the subtitle + transcript block
 				goto transcriptDone
@@ -428,10 +436,12 @@ func (s *Service) ProcessFaultTolerant(
 
 			video.Errors = append(
 				video.Errors,
-				fmt.Sprintf(
-					"subtitle request validation failed: %v",
-					err,
-				),
+				youtube.Error{
+					Message: fmt.Sprintf(
+						"subtitle request validation failed: %v",
+						err,
+					),
+				},
 			)
 
 		} else {
@@ -472,10 +482,12 @@ func (s *Service) ProcessFaultTolerant(
 
 				video.Errors = append(
 					video.Errors,
-					fmt.Sprintf(
-						"subtitle fetch failed: %v",
-						err,
-					),
+					youtube.Error{
+						Message: fmt.Sprintf(
+							"subtitle fetch failed: %v",
+							err,
+						),
+					},
 				)
 
 			} else {
@@ -502,10 +514,12 @@ func (s *Service) ProcessFaultTolerant(
 
 					video.Errors = append(
 						video.Errors,
-						fmt.Sprintf(
-							"transcript parsing failed: %v",
-							err,
-						),
+						youtube.Error{
+							Message: fmt.Sprintf(
+								"transcript parsing failed: %v",
+								err,
+							),
+						},
 					)
 
 				} else {
@@ -548,10 +562,12 @@ func (s *Service) ProcessFaultTolerant(
 
 					video.Errors = append(
 						video.Errors,
-						fmt.Sprintf(
-							"transcript processing failed: %v",
-							err,
-						),
+						youtube.Error{
+							Message: fmt.Sprintf(
+								"transcript processing failed: %v",
+								err,
+							),
+						},
 					)
 
 				} else {
@@ -697,11 +713,13 @@ func (s *Service) ProcessVideos(
 
 				results[index] = &youtube.Video{
 					ID: id,
-					Errors: []string{
-						fmt.Sprintf(
-							"metadata fetch failed: %v",
-							err,
-						),
+					Errors: []youtube.Error{
+						{
+							Message: fmt.Sprintf(
+								"metadata fetch failed: %v",
+								err,
+							),
+						},
 					},
 				}
 

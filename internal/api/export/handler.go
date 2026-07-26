@@ -98,8 +98,12 @@ func (h *Handler) ExportVideos(c *echo.Context) error {
 		parsedInput, err := youtubeurl.Parse(input)
 		if err != nil || parsedInput.InputType != youtubeurl.InputTypeVideo {
 			videos[i] = &youtube.Video{
-				ID:     "",
-				Errors: []string{"invalid video input: " + input},
+				ID: "",
+				Errors: []youtube.Error{
+					{
+						Message: "invalid video input: " + input,
+					},
+				},
 			}
 			continue
 		}

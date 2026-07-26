@@ -10,33 +10,39 @@ import (
 	"github.com/Arvind215271/askito/internal/youtube/transcript"
 )
 
-type Playlist struct {
-	ID string `json:"id"`
+// ResourceType defines the type of resource wrapper (e.g. video or playlist).
+type ResourceType string
 
-	Title       string `json:"title"`
-	Description string `json:"description"`
+const (
+	ResourceTypeVideo    ResourceType = "video"
+	ResourceTypePlaylist ResourceType = "playlist"
+)
 
-	ChannelID    string `json:"channel_id"`
-	ChannelTitle string `json:"channel_title"`
-
-	Thumbnails []Thumbnail `json:"thumbnails,omitempty"`
-
-	Tags []string `json:"tags,omitempty"`
-
-	ItemCount int `json:"item_count"`
-
-	PrivacyStatus string `json:"privacy_status"`
-
-	PublishedAt time.Time `json:"published_at"`
-	ModifiedAt  time.Time `json:"modified_at"`
-
-	// Lightweight playlist entries.
-	Items []PlaylistItem `json:"items,omitempty"`
-
-	// Fully processed playlist videos.
-	Videos []PlaylistVideo `json:"videos,omitempty"`
+// Resource represents a mixed-resource API wrapper container.
+type Resource struct {
+	ID       string       `json:"id"`
+	Type     ResourceType `json:"type"`
+	Video    *Video       `json:"video,omitempty"`
+	Playlist *Playlist    `json:"playlist,omitempty"`
 }
 
+// Error represents an error encountered during video or playlist processing.
+type Error struct {
+	Code    string `json:"code,omitempty"`
+	Message string `json:"message"`
+}
+
+// Thumbnail represents a video or playlist thumbnail image at a specific resolution.
+type Thumbnail struct {
+	URL    string `json:"url"`
+	Width  int    `json:"width,omitempty"`
+	Height int    `json:"height,omitempty"`
+}
+
+// PlaylistItem is a lightweight snapshot returned by the playlist API.
+//
+// It exists only as an optimization during pipeline execution and is
+// never exposed directly by the public API.
 type PlaylistItem struct {
 	VideoID string `json:"video_id"`
 
@@ -65,12 +71,8 @@ type PlaylistItem struct {
 	PrivacyStatus string `json:"privacy_status,omitempty"`
 }
 
-type Thumbnail struct {
-	URL    string `json:"url"`
-	Width  int    `json:"width,omitempty"`
-	Height int    `json:"height,omitempty"`
-}
-
+// PlaylistVideo represents a fully processed video that belongs to a playlist,
+// including its playlist-specific context like position and added timestamp.
 type PlaylistVideo struct {
 	Video
 
@@ -78,52 +80,91 @@ type PlaylistVideo struct {
 	AddedAt  time.Time `json:"added_at"`
 }
 
-type Video struct {
+// Playlist represents a YouTube playlist along with its aggregated metadata,
+// statistics, internal snapshot items, and fully processed videos.
+type Playlist struct {
+	// Identity
 	ID string `json:"id"`
 
-	Title       string `json:"title"`
-	Description string `json:"description"`
+	// Metadata
+	Title         string      `json:"title"`
+	Description   string      `json:"description"`
+	ChannelID     string      `json:"channel_id"`
+	ChannelTitle  string      `json:"channel_title"`
+	Thumbnails    []Thumbnail `json:"thumbnails,omitempty"`
+	Tags          []string    `json:"tags,omitempty"`
+	PrivacyStatus string      `json:"privacy_status"`
+	PublishedAt   time.Time   `json:"published_at"`
+	ModifiedAt    time.Time   `json:"modified_at"`
 
-	DescriptionMetadata description.Metadata `json:"description_metadata,omitempty"`
+	// Statistics
+	ItemCount int `json:"item_count"`
 
-	// Export fields
-	DescriptionChapters string   `json:"description_chapters"`
-	DescriptionLinks    []string `json:"description_links"`
-	DescriptionEmails   []string `json:"description_emails"`
-	DescriptionCleaned  string   `json:"description_cleaned"`
+	// Internal
+	// Items is a lightweight snapshot returned by the playlist API.
+	// It exists only as an optimization during pipeline execution and is
+	// never exposed directly by the public API.
+	Items []PlaylistItem `json:"-"`
 
-	Transcript *transcript.Transcript `json:"transcript,omitempty"`
-	// TranscriptText stores the final transcript representation.
-	TranscriptText   string `json:"transcript_text"`
-	TranscriptSignal string `json:"transcript_signal"`
+	// Public
+	Videos []PlaylistVideo `json:"videos,omitempty"`
 
-	SubtitleMetadata subtitle.SubtitleMetadata `json:"subtitle_metadata"`
+	// Errors
+	Errors []Error `json:"errors,omitempty"`
+}
 
+// Video represents everything known about a single YouTube video,
+// including metadata, transcripts, descriptions, subtitles, and errors.
+type Video struct {
+	// Identity
+	ID string `json:"id"`
+
+	// Basic metadata
+	Title       string    `json:"title"`
+	Tags        []string  `json:"tags,omitempty"`
+	CategoryID  string    `json:"category_id"`
+	PublishedAt time.Time `json:"published_at"`
+
+	// Channel
 	ChannelID    string `json:"channel_id"`
 	ChannelTitle string `json:"channel_title"`
 
-	Thumbnails []Thumbnail `json:"thumbnails,omitempty"`
+	// Statistics
+	ViewCount    uint64 `json:"view_count"`
+	LikeCount    uint64 `json:"like_count"`
+	CommentCount uint64 `json:"comment_count"`
 
-	PublishedAt time.Time `json:"published_at"`
-
+	// Duration
 	Duration          string  `json:"duration"`
 	DurationSeconds   int64   `json:"duration_seconds"`
 	DurationMinutes   float64 `json:"duration_minutes"`
 	DurationTimestamp string  `json:"duration_timestamp"`
 
-	ViewCount    uint64 `json:"view_count"`
-	LikeCount    uint64 `json:"like_count"`
-	CommentCount uint64 `json:"comment_count"`
+	// Description
+	Description         string               `json:"description"`
+	DescriptionMetadata description.Metadata `json:"description_metadata,omitempty"`
+	DescriptionChapters string               `json:"description_chapters"`
+	DescriptionLinks    []string             `json:"description_links"`
+	DescriptionEmails   []string             `json:"description_emails"`
+	DescriptionCleaned  string               `json:"description_cleaned"`
 
-	Tags []string `json:"tags,omitempty"`
+	// Subtitle
+	SubtitleMetadata subtitle.SubtitleMetadata `json:"subtitle_metadata"`
 
-	CategoryID string `json:"category_id"`
+	// Transcript
+	Transcript       *transcript.Transcript `json:"transcript,omitempty"`
+	TranscriptText   string                 `json:"transcript_text"`
+	TranscriptSignal string                 `json:"transcript_signal"`
 
-	CaptionAvailable bool `json:"caption_available"`
+	// Analysis
+	// (Reserved for future analysis extensions)
 
-	PrivacyStatus       string `json:"privacy_status"`
-	LiveBroadcastStatus string `json:"live_broadcast_status"`
+	// Misc
+	Thumbnails          []Thumbnail `json:"thumbnails,omitempty"`
+	CaptionAvailable    bool        `json:"caption_available"`
+	PrivacyStatus       string      `json:"privacy_status"`
+	LiveBroadcastStatus string      `json:"live_broadcast_status"`
 
-	Errors []string `json:"errors"`
-
+	// Errors
+	Errors []Error `json:"errors,omitempty"`
 }

@@ -26,7 +26,7 @@ func TestRunBenchmarks(t *testing.T) {
 		// "PLoaTDHRuxwgxk0WTXRJJJlXUYuHBSrbcF" //1000
 		// "PL5fRL6A4m-DFddDPJU5Ugr3NRhxrm5GtR" //1000
 		// "PL0dTxWJ6ngUKlBw5eDv7qYylA3xP3Asef" //2198
-		"PLdSukIYrTISE", //5000
+		// "PLdSukIYrTISE", //5000
 	}
 	RunBenchmarks(playlistIDs)
 }
