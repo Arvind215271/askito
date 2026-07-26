@@ -7,7 +7,12 @@ import (
 type Format string
 
 const (
-	FormatJSON Format = "json"
+	FormatJSON     Format = "json"
+	FormatCSV      Format = "csv"
+	FormatMarkdown Format = "markdown"
+	FormatExcel    Format = "excel"
+	FormatYAML     Format = "yaml"
+	FormatXML      Format = "xml"
 )
 
 type ExportData map[string]any
@@ -27,6 +32,12 @@ type VideoExportRequest struct {
 type BatchVideoExportRequest struct {
 	VideoIDs    []string        `json:"video_ids"`
 	VideoFields *fields.Planner `json:"-"`
+	Format      Format          `json:"format"`
+}
+
+type ResourceExportRequest struct {
+	ResourceIDs []string        `json:"resource_ids"`
+	Fields      *fields.Planner `json:"-"`
 	Format      Format          `json:"format"`
 }
 

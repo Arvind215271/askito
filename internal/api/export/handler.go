@@ -35,14 +35,14 @@ func NewHandler(
 }
 
 func parseFormat(s string) (export.Format, error) {
-	format := export.FormatJSON
-
-	if s != "" {
-		format = export.Format(s)
+	if s == "" {
+		return export.FormatJSON, nil
 	}
 
+	format := export.Format(s)
+
 	switch format {
-	case export.FormatJSON:
+	case export.FormatJSON, export.FormatCSV, export.FormatMarkdown, export.FormatExcel, export.FormatYAML, export.FormatXML:
 		return format, nil
 
 	default:

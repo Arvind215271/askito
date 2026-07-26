@@ -5,11 +5,8 @@ import (
 	"github.com/Arvind215271/askito/internal/youtube/fields"
 )
 
-// this is common function that we will be using to export playlist and convert it to a simple format that can be used by an export TYPE like JSON, CSV, etc.
-//
-// It is the filter layer actually. We are already getting the data in our Domain Model.
-// The only thing left is to filter what is needed from Video ONLY.
-func BuildPlaylistExport(
+// BuildPlaylist converts a playlist domain model into common ExportData.
+func BuildPlaylist(
 	playlist youtube.Playlist,
 	planner *fields.Planner,
 ) (ExportData, error) {
@@ -56,16 +53,12 @@ func BuildPlaylistExport(
 	return result, nil
 }
 
-// this is common function that we will be using to export video and convert it to a simple format that can be used by an export TYPE like JSON, CSV, etc.
-//
-// It is the filter layer actually. We are already getting the data in our Domain Model.
-// The only thing left is to filter what is needed from Video ONLY.
-func BuildVideoExport(
+// BuildVideo converts a video domain model into common ExportData.
+func BuildVideo(
 	video youtube.Video,
 	planner *fields.Planner,
 ) (ExportData, error) {
 
-	// ONLY Video is filterable
 	data, err := exportStruct(video, planner)
 	if err != nil {
 		return nil, youtube.Err.Export.MarshalFailed().Wrap(err)
@@ -74,11 +67,8 @@ func BuildVideoExport(
 	return data, nil
 }
 
-// this is common function that we will be using to export multiple videos and convert it to a simple format that can be used by an export TYPE like JSON, CSV, etc.
-//
-// It is the filter layer actually. We are already getting the data in our Domain Model.
-// The only thing left is to filter what is needed from Video ONLY.
-func BuildBatchVideoExport(
+// BuildBatchVideo converts multiple video domain models into common ExportData.
+func BuildBatchVideo(
 	videos []youtube.Video,
 	planner *fields.Planner,
 ) (ExportData, error) {
@@ -94,5 +84,49 @@ func BuildBatchVideoExport(
 
 	return ExportData{
 		"videos": exportedVideos,
+	}, nil
+}
+
+// BuildResource converts a single youtube.Resource container into common ExportData.
+func BuildResource(
+	resource youtube.Resource,
+	planner *fields.Planner,
+) (ExportData, error) {
+	switch resource.Type {
+	case youtube.ResourceTypePlaylist:
+		if resource.Playlist != nil {
+			return BuildPlaylist(*resource.Playlist, planner)
+		}
+	case youtube.ResourceTypeVideo:
+		fallthrough
+	default:
+		if resource.Video != nil {
+			return BuildVideo(*resource.Video, planner)
+		}
+	}
+
+	return ExportData{
+		"id":   resource.ID,
+		"type": resource.Type,
+	}, nil
+}
+
+// BuildBatchResource converts multiple youtube.Resource containers into common ExportData.
+func BuildBatchResource(
+	resources []youtube.Resource,
+	planner *fields.Planner,
+) (ExportData, error) {
+	exportedResources := make([]any, 0, len(resources))
+
+	for _, res := range resources {
+		resData, err := BuildResource(res, planner)
+		if err != nil {
+			return nil, err
+		}
+		exportedResources = append(exportedResources, resData)
+	}
+
+	return ExportData{
+		"resources": exportedResources,
 	}, nil
 }

@@ -2,7 +2,9 @@ package export
 
 import (
 	"sync"
+
 	"github.com/Arvind215271/askito/internal/youtube"
+	"github.com/Arvind215271/askito/internal/youtube/fields"
 )
 
 // Service is the application layer that orchestrates
@@ -14,12 +16,19 @@ type Service struct {
 
 // NewService creates the export service with registered exporters.
 func NewService() *Service {
-	return &Service{
+	s := &Service{
 		exporters: make(map[Format]Exporter),
 	}
+	s.RegisterExporter(FormatJSON, &JSONExporter{Pretty: true})
+	s.RegisterExporter(FormatCSV, &CSVExporter{})
+	s.RegisterExporter(FormatMarkdown, &MarkdownExporter{})
+	s.RegisterExporter(FormatExcel, &ExcelExporter{})
+	s.RegisterExporter(FormatYAML, &YAMLExporter{})
+	s.RegisterExporter(FormatXML, &XMLExporter{})
+	return s
 }
 
-// RegisterExporter allows plugging in new formats (JSON, CSV, etc.)
+// RegisterExporter allows plugging in new formats
 func (s *Service) RegisterExporter(format Format, exporter Exporter) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -27,13 +36,13 @@ func (s *Service) RegisterExporter(format Format, exporter Exporter) {
 	s.exporters[format] = exporter
 }
 
-// ExportPlaylist is the main orchestration function.
+// ExportPlaylist orchestrates playlist export.
 func (s *Service) ExportPlaylist(
 	playlist youtube.Playlist,
 	req PlaylistExportRequest,
 ) ([]byte, error) {
 
-	data, err := BuildPlaylistExport(playlist, req.VideoFields)
+	data, err := BuildPlaylist(playlist, req.VideoFields)
 	if err != nil {
 		return nil, err
 	}
@@ -41,13 +50,13 @@ func (s *Service) ExportPlaylist(
 	return s.exportData(req.Format, data)
 }
 
-// ExportVideo is the main orchestration function.
+// ExportVideo orchestrates video export.
 func (s *Service) ExportVideo(
 	video youtube.Video,
 	req VideoExportRequest,
 ) ([]byte, error) {
 
-	data, err := BuildVideoExport(video, req.Fields)
+	data, err := BuildVideo(video, req.Fields)
 	if err != nil {
 		return nil, err
 	}
@@ -55,18 +64,48 @@ func (s *Service) ExportVideo(
 	return s.exportData(req.Format, data)
 }
 
-// ExportBatchVideos is the main orchestration function.
+// ExportBatchVideos orchestrates batch video export.
 func (s *Service) ExportBatchVideos(
 	videos []youtube.Video,
 	req BatchVideoExportRequest,
 ) ([]byte, error) {
 
-	data, err := BuildBatchVideoExport(videos, req.VideoFields)
+	data, err := BuildBatchVideo(videos, req.VideoFields)
 	if err != nil {
 		return nil, err
 	}
 
 	return s.exportData(req.Format, data)
+}
+
+// ExportResource orchestrates a single youtube.Resource export.
+func (s *Service) ExportResource(
+	resource youtube.Resource,
+	format Format,
+	planner *fields.Planner,
+) ([]byte, error) {
+
+	data, err := BuildResource(resource, planner)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.exportData(format, data)
+}
+
+// ExportBatchResource orchestrates multiple youtube.Resource exports.
+func (s *Service) ExportBatchResource(
+	resources []youtube.Resource,
+	format Format,
+	planner *fields.Planner,
+) ([]byte, error) {
+
+	data, err := BuildBatchResource(resources, planner)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.exportData(format, data)
 }
 
 // internal shared logic
@@ -76,7 +115,13 @@ func (s *Service) exportData(format Format, data ExportData) ([]byte, error) {
 	s.mu.RUnlock()
 
 	if !ok {
-		return nil, youtube.Err.Export.InvalidFormat()
+		// Fallback to JSON if format is unspecified or unrecognized
+		s.mu.RLock()
+		exporter, ok = s.exporters[FormatJSON]
+		s.mu.RUnlock()
+		if !ok {
+			return nil, youtube.Err.Export.InvalidFormat()
+		}
 	}
 
 	return exporter.Export(data)

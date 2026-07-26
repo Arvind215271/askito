@@ -164,7 +164,27 @@ func main() {
 
 	exportService.RegisterExporter(
 		exportservice.FormatJSON,
-		exportservice.NewJSONExporter(),
+		&exportservice.JSONExporter{Pretty: true},
+	)
+	exportService.RegisterExporter(
+		exportservice.FormatCSV,
+		&exportservice.CSVExporter{},
+	)
+	exportService.RegisterExporter(
+		exportservice.FormatMarkdown,
+		&exportservice.MarkdownExporter{},
+	)
+	exportService.RegisterExporter(
+		exportservice.FormatExcel,
+		&exportservice.ExcelExporter{},
+	)
+	exportService.RegisterExporter(
+		exportservice.FormatYAML,
+		&exportservice.YAMLExporter{},
+	)
+	exportService.RegisterExporter(
+		exportservice.FormatXML,
+		&exportservice.XMLExporter{},
 	)
 
 	// Export handler
