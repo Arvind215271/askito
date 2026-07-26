@@ -1,36 +1,6 @@
 package fields
 
-// ValidFields maps allowed top-level field names to their JSON tag
-var ValidFields = map[string]struct{}{
-	FieldID:                  {},
-	FieldTitle:               {},
-	FieldDescription:         {},
-	FieldDescriptionChapters: {},
-	FieldDescriptionLinks:    {},
-	FieldDescriptionEmails:   {},
-	FieldDescriptionCleaned:  {},
-	FieldTranscriptText:      {},
-	FieldTranscriptSignal:    {},
-	FieldChannelID:           {},
-	FieldChannelTitle:        {},
-	FieldThumbnails:          {},
-	FieldPublishedAt:         {},
-	FieldDuration:            {},
-	FieldDurationSeconds:     {},
-	FieldDurationMinutes:     {},
-	FieldDurationTimestamp:   {},
-	FieldViewCount:           {},
-	FieldLikeCount:           {},
-	FieldCommentCount:        {},
-	FieldTags:                {},
-	FieldCategoryID:          {},
-	FieldCaptionAvailable:    {},
-	FieldPrivacyStatus:       {},
-	FieldLiveBroadcastStatus: {},
-	FieldErrors:            {},
-}
-
-// Metadata fields
+// Field constants
 const (
 	FieldID                  = "id"
 	FieldErrors              = "errors"
@@ -52,18 +22,146 @@ const (
 	FieldCaptionAvailable    = "caption_available"
 	FieldPrivacyStatus       = "privacy_status"
 	FieldLiveBroadcastStatus = "live_broadcast_status"
-)
 
-// Description fields
-const (
 	FieldDescriptionChapters = "description_chapters"
 	FieldDescriptionLinks    = "description_links"
 	FieldDescriptionEmails   = "description_emails"
 	FieldDescriptionCleaned  = "description_cleaned"
-)
 
-// Transcript fields
-const (
 	FieldTranscriptText   = "transcript_text"
 	FieldTranscriptSignal = "transcript_signal"
 )
+
+// Registry is the single source of truth for valid fields and their definitions.
+var Registry = map[string]FieldDefinition{
+	FieldID: {
+		Name:    FieldID,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldErrors: {
+		Name:    FieldErrors,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldTitle: {
+		Name:    FieldTitle,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldDescription: {
+		Name:    FieldDescription,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldChannelID: {
+		Name:    FieldChannelID,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldChannelTitle: {
+		Name:    FieldChannelTitle,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldThumbnails: {
+		Name:    FieldThumbnails,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldPublishedAt: {
+		Name:    FieldPublishedAt,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldDuration: {
+		Name:    FieldDuration,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldDurationSeconds: {
+		Name:    FieldDurationSeconds,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldDurationMinutes: {
+		Name:    FieldDurationMinutes,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldDurationTimestamp: {
+		Name:    FieldDurationTimestamp,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldViewCount: {
+		Name:    FieldViewCount,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldLikeCount: {
+		Name:    FieldLikeCount,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldCommentCount: {
+		Name:    FieldCommentCount,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldTags: {
+		Name:    FieldTags,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldCategoryID: {
+		Name:    FieldCategoryID,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldCaptionAvailable: {
+		Name:    FieldCaptionAvailable,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldPrivacyStatus: {
+		Name:    FieldPrivacyStatus,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldLiveBroadcastStatus: {
+		Name:    FieldLiveBroadcastStatus,
+		Group:   GroupMetadata,
+		Default: true,
+	},
+	FieldDescriptionChapters: {
+		Name:    FieldDescriptionChapters,
+		Group:   GroupDescription,
+		Default: true,
+	},
+	FieldDescriptionLinks: {
+		Name:    FieldDescriptionLinks,
+		Group:   GroupDescription,
+		Default: true,
+	},
+	FieldDescriptionEmails: {
+		Name:    FieldDescriptionEmails,
+		Group:   GroupDescription,
+		Default: true,
+	},
+	FieldDescriptionCleaned: {
+		Name:    FieldDescriptionCleaned,
+		Group:   GroupDescription,
+		Default: true,
+	},
+	FieldTranscriptText: {
+		Name:    FieldTranscriptText,
+		Group:   GroupTranscript,
+		Default: true,
+	},
+	FieldTranscriptSignal: {
+		Name:    FieldTranscriptSignal,
+		Group:   GroupSignal,
+		Default: true,
+	},
+}

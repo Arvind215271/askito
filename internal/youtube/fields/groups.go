@@ -1,5 +1,12 @@
 package fields
 
+const (
+	GroupMetadata    = "Metadata"
+	GroupDescription = "Description"
+	GroupTranscript  = "Transcript"
+	GroupSignal      = "Signal"
+)
+
 var (
 	MetadataFields = []string{
 		FieldID,
@@ -33,10 +40,10 @@ var (
 
 	TranscriptFields = []string{
 		FieldTranscriptText,
-		
 	}
 
 	SignalFields = []string{
 		FieldTranscriptSignal,
 	}
 )
+
