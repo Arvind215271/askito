@@ -13,6 +13,7 @@ import (
 	youtubeurl "github.com/Arvind215271/askito/internal/youtube/input"
 	"github.com/Arvind215271/askito/internal/youtube/metadata"
 	"github.com/Arvind215271/askito/internal/youtube/pipeline"
+	"github.com/Arvind215271/askito/internal/youtube/planner"
 )
 
 type Handler struct {
@@ -77,16 +78,27 @@ func (h *Handler) ExportVideos(c *echo.Context) error {
 		return api.Err.Common.BadRequest("invalid subtitle preferences").Wrap(err)
 	}
 
-	pipelineReq := &pipeline.Request{
-		Fields:      req.Fields,
-		Subtitle:    req.Subtitle,
-		Preferences: preferences,
-		Format:      "json3",
-		Transcript:  req.Transcript,
-		Signal:      req.Signal,
+	inputs := make([]youtubeurl.YouTubeInput, len(req.Inputs))
+	for i, in := range req.Inputs {
+		parsed, err := youtubeurl.Parse(in)
+		if err == nil {
+			inputs[i] = *parsed
+		} else {
+			inputs[i] = youtubeurl.YouTubeInput{InputType: youtubeurl.InputTypeVideo, ID: in}
+		}
 	}
 
-	pipelinePlanner := pipeline.NewPlanner(fieldPlanner)
+	executionPlan := planner.Build(inputs, fieldPlanner)
+
+	pipelineReq := &pipeline.Request{
+		FieldPlanner:  fieldPlanner,
+		ExecutionPlan: executionPlan,
+		Subtitle:      req.Subtitle,
+		Preferences:   preferences,
+		Format:        "json3",
+		Transcript:    req.Transcript,
+		Signal:        req.Signal,
+	}
 
 	ctx := c.Request().Context()
 
@@ -116,7 +128,6 @@ func (h *Handler) ExportVideos(c *echo.Context) error {
 		ctx,
 		validVideoIDs,
 		pipelineReq,
-		pipelinePlanner,
 	)
 
 	for _, video := range processedVideos {
@@ -190,16 +201,18 @@ func (h *Handler) ExportPlaylist(c *echo.Context) error {
 		return api.Err.Common.BadRequest("invalid subtitle preferences").Wrap(err)
 	}
 
-	pipelineReq := &pipeline.Request{
-		Fields:      req.Fields,
-		Subtitle:    req.Subtitle,
-		Preferences: preferences,
-		Format:      "json3",
-		Transcript:  req.Transcript,
-		Signal:      req.Signal,
-	}
+	inputs := []youtubeurl.YouTubeInput{*parsedInput}
+	executionPlan := planner.Build(inputs, fieldPlanner)
 
-	pipelinePlanner := pipeline.NewPlanner(fieldPlanner)
+	pipelineReq := &pipeline.Request{
+		FieldPlanner:  fieldPlanner,
+		ExecutionPlan: executionPlan,
+		Subtitle:      req.Subtitle,
+		Preferences:   preferences,
+		Format:        "json3",
+		Transcript:    req.Transcript,
+		Signal:        req.Signal,
+	}
 
 	ctx := c.Request().Context()
 
@@ -235,7 +248,6 @@ func (h *Handler) ExportPlaylist(c *echo.Context) error {
 		ctx,
 		videoIDs,
 		pipelineReq,
-		pipelinePlanner,
 	)
 
 	// 5. Wrap processed videos back into PlaylistVideo.
