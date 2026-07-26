@@ -19,21 +19,56 @@ type Playlist struct {
 	ChannelID    string `json:"channel_id"`
 	ChannelTitle string `json:"channel_title"`
 
-	ThumbnailURL string `json:"thumbnail_url"`
+	Thumbnails []Thumbnail `json:"thumbnails,omitempty"`
+
+	Tags []string `json:"tags,omitempty"`
 
 	ItemCount int `json:"item_count"`
 
 	PrivacyStatus string `json:"privacy_status"`
 
 	PublishedAt time.Time `json:"published_at"`
+	ModifiedAt  time.Time `json:"modified_at"`
 
+	// Lightweight playlist entries.
+	Items []PlaylistItem `json:"items,omitempty"`
+
+	// Fully processed playlist videos.
 	Videos []PlaylistVideo `json:"videos,omitempty"`
 }
 
 type PlaylistItem struct {
-	VideoID  string    `json:"video_id"`
+	VideoID string `json:"video_id"`
+
+	// Playlist metadata
 	Position int       `json:"position"`
 	AddedAt  time.Time `json:"added_at"`
+
+	// Video snapshot
+	Title       string `json:"title,omitempty"`
+	Description string `json:"description,omitempty"`
+
+	Duration  time.Duration `json:"duration,omitempty"`
+	ViewCount uint64        `json:"view_count,omitempty"`
+
+	// Channel snapshot
+	ChannelID    string `json:"channel_id,omitempty"`
+	ChannelTitle string `json:"channel_title,omitempty"`
+
+	// URLs
+	URL string `json:"url,omitempty"`
+
+	// Thumbnails
+	Thumbnails []Thumbnail `json:"thumbnails,omitempty"`
+
+	// Playlist/video status
+	PrivacyStatus string `json:"privacy_status,omitempty"`
+}
+
+type Thumbnail struct {
+	URL    string `json:"url"`
+	Width  int    `json:"width,omitempty"`
+	Height int    `json:"height,omitempty"`
 }
 
 type PlaylistVideo struct {
@@ -67,7 +102,7 @@ type Video struct {
 	ChannelID    string `json:"channel_id"`
 	ChannelTitle string `json:"channel_title"`
 
-	ThumbnailURL string `json:"thumbnail_url"`
+	Thumbnails []Thumbnail `json:"thumbnails,omitempty"`
 
 	PublishedAt time.Time `json:"published_at"`
 

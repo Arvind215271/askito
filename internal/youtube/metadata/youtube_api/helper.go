@@ -1,9 +1,10 @@
 package youtubeapi
 
 import (
-	"time"
 	"strconv"
+	"time"
 
+	youtube "github.com/Arvind215271/askito/internal/youtube"
 	yt "google.golang.org/api/youtube/v3"
 )
 
@@ -43,19 +44,32 @@ func (p *Provider) getPlaylistThumbnail(playlist *yt.Playlist) string {
 	return ""
 }
 
-func (p *Provider) getVideoThumbnail(video *yt.Video) string {
+func (p *Provider) getVideoThumbnails(video *yt.Video) []youtube.Thumbnail {
+	var thumbnails []youtube.Thumbnail
 	if video.Snippet == nil || video.Snippet.Thumbnails == nil {
-		return ""
+		return thumbnails
 	}
 
-	if video.Snippet.Thumbnails.High != nil {
-		return video.Snippet.Thumbnails.High.Url
+	if video.Snippet.Thumbnails.Default != nil {
+		thumbnails = append(thumbnails, youtube.Thumbnail{
+			URL:    video.Snippet.Thumbnails.Default.Url,
+			Width:  int(video.Snippet.Thumbnails.Default.Width),
+			Height: int(video.Snippet.Thumbnails.Default.Height),
+		})
 	}
 	if video.Snippet.Thumbnails.Medium != nil {
-		return video.Snippet.Thumbnails.Medium.Url
+		thumbnails = append(thumbnails, youtube.Thumbnail{
+			URL:    video.Snippet.Thumbnails.Medium.Url,
+			Width:  int(video.Snippet.Thumbnails.Medium.Width),
+			Height: int(video.Snippet.Thumbnails.Medium.Height),
+		})
 	}
-	if video.Snippet.Thumbnails.Default != nil {
-		return video.Snippet.Thumbnails.Default.Url
+	if video.Snippet.Thumbnails.High != nil {
+		thumbnails = append(thumbnails, youtube.Thumbnail{
+			URL:    video.Snippet.Thumbnails.High.Url,
+			Width:  int(video.Snippet.Thumbnails.High.Width),
+			Height: int(video.Snippet.Thumbnails.High.Height),
+		})
 	}
-	return ""
+	return thumbnails
 }

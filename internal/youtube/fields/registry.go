@@ -13,7 +13,7 @@ var ValidFields = map[string]struct{}{
 	FieldTranscriptSignal:    {},
 	FieldChannelID:           {},
 	FieldChannelTitle:        {},
-	FieldThumbnailURL:        {},
+	FieldThumbnails:          {},
 	FieldPublishedAt:         {},
 	FieldDuration:            {},
 	FieldDurationSeconds:     {},
@@ -38,7 +38,7 @@ const (
 	FieldDescription         = "description"
 	FieldChannelID           = "channel_id"
 	FieldChannelTitle        = "channel_title"
-	FieldThumbnailURL        = "thumbnail_url"
+	FieldThumbnails          = "thumbnails"
 	FieldPublishedAt         = "published_at"
 	FieldDuration            = "duration"
 	FieldDurationSeconds     = "duration_seconds"

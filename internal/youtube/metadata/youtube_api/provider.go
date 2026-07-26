@@ -38,6 +38,14 @@ func (p *Provider) GetPlaylistMetadata(
 		return youtube.Playlist{}, err
 	}
 
+	thumbnailURL := p.getPlaylistThumbnail(playlist)
+	var thumbnails []youtube.Thumbnail
+	if thumbnailURL != "" {
+		thumbnails = append(thumbnails, youtube.Thumbnail{
+			URL: thumbnailURL,
+		})
+	}
+
 	return youtube.Playlist{
 		ID:           playlist.Id,
 		Title:        playlist.Snippet.Title,
@@ -45,9 +53,7 @@ func (p *Provider) GetPlaylistMetadata(
 		ChannelID:    playlist.Snippet.ChannelId,
 		ChannelTitle: playlist.Snippet.ChannelTitle,
 
-		ThumbnailURL: p.getPlaylistThumbnail(
-			playlist,
-		),
+		Thumbnails: thumbnails,
 
 		ItemCount: int(playlist.ContentDetails.ItemCount),
 
@@ -96,10 +102,47 @@ func (p *Provider) GetPlaylistItems(
 		if item == nil || item.Snippet == nil || item.ContentDetails == nil {
 			continue
 		}
+
+		var thumbnails []youtube.Thumbnail
+		if item.Snippet.Thumbnails != nil {
+			if item.Snippet.Thumbnails.Default != nil {
+				thumbnails = append(thumbnails, youtube.Thumbnail{
+					URL:    item.Snippet.Thumbnails.Default.Url,
+					Width:  int(item.Snippet.Thumbnails.Default.Width),
+					Height: int(item.Snippet.Thumbnails.Default.Height),
+				})
+			}
+			if item.Snippet.Thumbnails.Medium != nil {
+				thumbnails = append(thumbnails, youtube.Thumbnail{
+					URL:    item.Snippet.Thumbnails.Medium.Url,
+					Width:  int(item.Snippet.Thumbnails.Medium.Width),
+					Height: int(item.Snippet.Thumbnails.Medium.Height),
+				})
+			}
+			if item.Snippet.Thumbnails.High != nil {
+				thumbnails = append(thumbnails, youtube.Thumbnail{
+					URL:    item.Snippet.Thumbnails.High.Url,
+					Width:  int(item.Snippet.Thumbnails.High.Width),
+					Height: int(item.Snippet.Thumbnails.High.Height),
+				})
+			}
+		}
+
+		var privacyStatus string
+		if item.Status != nil {
+			privacyStatus = item.Status.PrivacyStatus
+		}
+
 		result = append(result, youtube.PlaylistItem{
-			VideoID:  item.ContentDetails.VideoId,
-			Position: int(item.Snippet.Position),
-			AddedAt:  p.parseTime(item.Snippet.PublishedAt),
+			VideoID:       item.ContentDetails.VideoId,
+			Position:      int(item.Snippet.Position),
+			AddedAt:       p.parseTime(item.Snippet.PublishedAt),
+			Title:         item.Snippet.Title,
+			Description:   item.Snippet.Description,
+			ChannelID:     item.Snippet.ChannelId,
+			ChannelTitle:  item.Snippet.ChannelTitle,
+			Thumbnails:    thumbnails,
+			PrivacyStatus: privacyStatus,
 		})
 	}
 	return result, nil

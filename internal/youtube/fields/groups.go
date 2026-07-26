@@ -8,7 +8,7 @@ var (
 		FieldDescription,
 		FieldChannelID,
 		FieldChannelTitle,
-		FieldThumbnailURL,
+		FieldThumbnails,
 		FieldPublishedAt,
 		FieldDuration,
 		FieldDurationSeconds,

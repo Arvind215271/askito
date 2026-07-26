@@ -18,7 +18,7 @@ func (p *Provider) mapVideo(video *yt.Video) youtube.Video {
 		ChannelID:    video.Snippet.ChannelId,
 		ChannelTitle: video.Snippet.ChannelTitle,
 
-		ThumbnailURL: p.getVideoThumbnail(video),
+		Thumbnails: p.getVideoThumbnails(video),
 
 		PublishedAt: p.parseTime(video.Snippet.PublishedAt),
 

@@ -11,11 +11,11 @@ import (
 func MapVideo(meta YTOutput) youtube.Video {
 	durationSeconds := int64(meta.Duration)
 	duration := time.Duration(durationSeconds) * time.Second
-	
+
 	hours := int(duration.Hours())
 	minutes := int(duration.Minutes()) % 60
 	seconds := int(duration.Seconds()) % 60
-	
+
 	durationTimestamp := fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds)
 	if hours == 0 {
 		durationTimestamp = fmt.Sprintf("%02d:%02d", minutes, seconds)
@@ -34,12 +34,29 @@ func MapVideo(meta YTOutput) youtube.Video {
 		CommentCount:      meta.CommentCount,
 		ChannelTitle:      meta.Channel,
 		ChannelID:         meta.ChannelID,
-		ThumbnailURL:      meta.Thumbnail,
+		Thumbnails:        mapThumbnails(meta),
 		Tags:              meta.Tags,
 		CategoryID:        "", // Need to map categories if available
 		PrivacyStatus:     meta.Availability,
 		SubtitleMetadata:  mapSubtitleMetadata(meta),
 	}
+}
+
+func mapThumbnails(meta YTOutput) []youtube.Thumbnail {
+	var thumbnails []youtube.Thumbnail
+	for _, th := range meta.Thumbnails {
+		thumbnails = append(thumbnails, youtube.Thumbnail{
+			URL:    th.URL,
+			Width:  th.Width,
+			Height: th.Height,
+		})
+	}
+	if len(thumbnails) == 0 && meta.Thumbnail != "" {
+		thumbnails = append(thumbnails, youtube.Thumbnail{
+			URL: meta.Thumbnail,
+		})
+	}
+	return thumbnails
 }
 
 func mapSubtitleMetadata(meta YTOutput) subtitle.SubtitleMetadata {
@@ -70,12 +87,20 @@ func mapTracks(raw map[string][]SubtitleFormat) []subtitle.SubtitleTrack {
 }
 
 func MapPlaylist(meta YTPlaylistOutput) youtube.Playlist {
+	var thumbnails []youtube.Thumbnail
+	if meta.Thumbnail != "" {
+		thumbnails = append(thumbnails, youtube.Thumbnail{
+			URL: meta.Thumbnail,
+		})
+	}
 	return youtube.Playlist{
 		ID:           meta.ID,
 		Title:        meta.Title,
 		Description:  meta.Description,
 		ChannelTitle: meta.Channel,
 		ChannelID:    meta.ChannelID,
-		ThumbnailURL: meta.Thumbnail,
+		Thumbnails:   thumbnails,
+		Tags:         meta.Tags,
+		ItemCount:    len(meta.Entries),
 	}
 }

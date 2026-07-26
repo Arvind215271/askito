@@ -48,10 +48,45 @@ func (p *Provider) GetPlaylistItems(ctx context.Context, playlistID string) ([]y
 
 	result := make([]youtube.PlaylistItem, 0, len(meta.Entries))
 	for i, entry := range meta.Entries {
+		var thumbnails []youtube.Thumbnail
+		for _, th := range entry.Thumbnails {
+			thumbnails = append(thumbnails, youtube.Thumbnail{
+				URL:    th.URL,
+				Width:  th.Width,
+				Height: th.Height,
+			})
+		}
+		if len(thumbnails) == 0 && entry.Thumbnail != "" {
+			thumbnails = append(thumbnails, youtube.Thumbnail{
+				URL: entry.Thumbnail,
+			})
+		}
+
+		url := entry.WebpageURL
+		if url == "" {
+			url = entry.OriginalURL
+		}
+		if url == "" && entry.ID != "" {
+			url = "https://www.youtube.com/watch?v=" + entry.ID
+		}
+
+		channelID := entry.ChannelID
+		if channelID == "" {
+			channelID = entry.ChannelIDAlt
+		}
+
 		result = append(result, youtube.PlaylistItem{
-			VideoID:  entry.ID,
-			Position: i,
-			AddedAt:  time.Time{},
+			VideoID:      entry.ID,
+			Position:     i,
+			AddedAt:      time.Time{},
+			Title:        entry.Title,
+			Description:  entry.Description,
+			Duration:     time.Duration(entry.Duration) * time.Second,
+			ViewCount:    entry.ViewCount,
+			ChannelID:    channelID,
+			ChannelTitle: entry.Channel,
+			URL:          url,
+			Thumbnails:   thumbnails,
 		})
 	}
 	return result, nil

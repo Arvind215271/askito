@@ -19,7 +19,7 @@ func TestNewPlanner(t *testing.T) {
 		{"Duplicate fields", []string{FieldID, FieldID}, false},
 		{"All valid fields", []string{
 			FieldID, FieldTitle, FieldChannelID, FieldChannelTitle,
-			FieldThumbnailURL, FieldPublishedAt, FieldDuration, FieldDurationSeconds,
+			FieldThumbnails, FieldPublishedAt, FieldDuration, FieldDurationSeconds,
 			FieldDurationMinutes, FieldDurationTimestamp, FieldViewCount, FieldLikeCount,
 			FieldCommentCount, FieldTags, FieldCategoryID, FieldCaptionAvailable,
 			FieldPrivacyStatus, FieldLiveBroadcastStatus, FieldDescriptionChapters,
