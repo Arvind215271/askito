@@ -4,12 +4,12 @@ import (
 	"net/http"
 
 	"github.com/Arvind215271/askito/internal/api"
+	subtitleapi "github.com/Arvind215271/askito/internal/api/subtitle"
 )
 
 type TranscriptRequest struct {
-	URL      string `json:"url" validate:"required,url"`
-	Type     string `json:"type" validate:"required,oneof=manual automatic"`
-	Language string `json:"language" validate:"required"`
+	Inputs      []string                                `json:"inputs" validate:"required,min=1"`
+	Preferences []subtitleapi.SubtitlePreferenceRequest `json:"preferences,omitempty"`
 }
 
 type TranscriptErrors struct{}

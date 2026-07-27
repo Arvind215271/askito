@@ -1,7 +1,7 @@
 package subtitle
 
 type SubtitleOptionsRequest struct {
-	URL string `json:"url" validate:"required,url"`
+	Inputs []string `json:"inputs" validate:"required,min=1"`
 }
 
 type SubtitlePreferenceRequest struct {
@@ -10,7 +10,7 @@ type SubtitlePreferenceRequest struct {
 }
 
 type SubtitleDownloadRequest struct {
-	URL         string                      `json:"url" validate:"required,url"`
+	Inputs      []string                    `json:"inputs" validate:"required,min=1"`
 	Preferences []SubtitlePreferenceRequest `json:"preferences"`
 	Format      string                      `json:"format,omitempty" validate:"omitempty,oneof=json3 vtt"`
 }

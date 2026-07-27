@@ -30,6 +30,7 @@ const (
 
 	FieldTranscriptText   = "transcript_text"
 	FieldTranscriptSignal = "transcript_signal"
+	FieldSubtitleMetadata = "subtitle_metadata"
 )
 
 // Registry is the single source of truth for valid fields and their definitions.
@@ -162,6 +163,11 @@ var Registry = map[string]FieldDefinition{
 	FieldTranscriptSignal: {
 		Name:    FieldTranscriptSignal,
 		Group:   GroupSignal,
+		Default: true,
+	},
+	FieldSubtitleMetadata: {
+		Name:    FieldSubtitleMetadata,
+		Group:   GroupTranscript,
 		Default: true,
 	},
 }

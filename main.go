@@ -17,10 +17,8 @@ import (
 	"github.com/Arvind215271/askito/internal/api"
 	"github.com/Arvind215271/askito/internal/api/export"
 	apiPlaylist "github.com/Arvind215271/askito/internal/api/playlist"
-	apiSignal "github.com/Arvind215271/askito/internal/api/signal"
 	apiSubtitle "github.com/Arvind215271/askito/internal/api/subtitle"
 	apiTranscript "github.com/Arvind215271/askito/internal/api/transcript"
-	apiVideo "github.com/Arvind215271/askito/internal/api/video"
 
 	// cache
 	"github.com/Arvind215271/askito/internal/cache"
@@ -123,8 +121,6 @@ func main() {
 
 	ytdlpMetadataProvider := ytdlpmetadata.NewProvider(ytdlpMetadataClient, logger)
 
-	// validate ytdlp ig? IDK...
-
 	// run cleanup on startup
 	if err := ytdlpMetadataClient.Cleanup(); err != nil {
 		logger.Error("failed to perform ytdlp cache cleanup", "error", err)
@@ -141,28 +137,13 @@ func main() {
 	transcriptService := ytTranscript.NewService()
 	signalService := ytSignal.NewSignalService()
 
-	// handlers
-	videoHandler := apiVideo.NewHandler(youtubeService)
-	subtitleHandler := apiSubtitle.NewHandler(youtubeService, subtitleService)
-	transcriptHandler := apiTranscript.NewHandler(youtubeService, subtitleService, transcriptService)
-	signalHandler := apiSignal.NewHandler(youtubeService, subtitleService, transcriptService, signalService)
-	playlistHandler := apiPlaylist.NewHandler(youtubeService)
-
-	// routes
-	apiVideo.RegisterVideoRoutes(e.Group("/videos"), videoHandler)
-	apiSubtitle.RegisterSubtitleRoutes(e.Group("/subtitles"), subtitleHandler)
-	apiPlaylist.RegisterPlaylistRoutes(e.Group("/playlist"), playlistHandler)
-	e.POST("/transcripts", transcriptHandler.GetTranscript)
-	e.POST("/signals", signalHandler.GetVideoSignals)
-
 	// description
 	descriptionService := description.NewService()
 
 	// pipeline
 	pipelineService := pipeline.NewService(youtubeService, descriptionService, subtitleService, transcriptService, signalService, logger, 2*config.PythonWorkers)
 
-	// export
-
+	// export service
 	exportService := exportservice.NewService()
 
 	exportService.RegisterExporter(
@@ -193,9 +174,18 @@ func main() {
 	// resource service
 	resourceService := resource.NewService(youtubeService, pipelineService, logger, 2*config.PythonWorkers)
 
-	// Export handler
+	// handlers & routes
 	exportHandler := export.NewHandler(resourceService, exportService)
 	export.RegisterRoutes(e.Group("/export"), exportHandler)
+
+	subtitleHandler := apiSubtitle.NewHandler(resourceService, subtitleService, exportService)
+	apiSubtitle.RegisterSubtitleRoutes(e.Group("/subtitle"), subtitleHandler)
+
+	transcriptHandler := apiTranscript.NewHandler(resourceService)
+	e.POST("/transcript", transcriptHandler.GetTranscript)
+
+	playlistHandler := apiPlaylist.NewHandler(youtubeService)
+	apiPlaylist.RegisterPlaylistRoutes(e.Group("/playlist"), playlistHandler)
 
 	// only run debug in development
 	if config.Env == "dev" {

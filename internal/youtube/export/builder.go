@@ -92,23 +92,34 @@ func BuildResource(
 	resource youtube.Resource,
 	planner *fields.Planner,
 ) (ExportData, error) {
+	var data ExportData
+	var err error
+
 	switch resource.Type {
 	case youtube.ResourceTypePlaylist:
 		if resource.Playlist != nil {
-			return BuildPlaylist(*resource.Playlist, planner)
+			data, err = BuildPlaylist(*resource.Playlist, planner)
 		}
 	case youtube.ResourceTypeVideo:
 		fallthrough
 	default:
 		if resource.Video != nil {
-			return BuildVideo(*resource.Video, planner)
+			data, err = BuildVideo(*resource.Video, planner)
 		}
 	}
 
-	return ExportData{
-		"id":   resource.ID,
-		"type": resource.Type,
-	}, nil
+	if err != nil {
+		return nil, err
+	}
+
+	if data == nil {
+		data = make(ExportData)
+	}
+
+	data["id"] = resource.ID
+	data["type"] = resource.Type
+
+	return data, nil
 }
 
 // BuildBatchResource converts multiple youtube.Resource containers into common ExportData.

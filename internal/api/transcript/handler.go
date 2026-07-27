@@ -4,61 +4,69 @@ import (
 	"net/http"
 
 	"github.com/Arvind215271/askito/internal/api"
+	subtitleapi "github.com/Arvind215271/askito/internal/api/subtitle"
+	"github.com/Arvind215271/askito/internal/youtube/fields"
 	youtubeurl "github.com/Arvind215271/askito/internal/youtube/input"
-	"github.com/Arvind215271/askito/internal/youtube/metadata"
-	"github.com/Arvind215271/askito/internal/youtube/subtitle"
-	"github.com/Arvind215271/askito/internal/youtube/transcript"
+	"github.com/Arvind215271/askito/internal/youtube/pipeline"
+	"github.com/Arvind215271/askito/internal/youtube/planner"
+	"github.com/Arvind215271/askito/internal/youtube/resource"
+	// "github.com/Arvind215271/askito/internal/youtube/subtitle"
 	"github.com/labstack/echo/v5"
 )
 
 type Handler struct {
-	youtubeService    *metadata.Service
-	subtitleService   *subtitle.SubtitleService
-	transcriptService *transcript.Service
+	resourceService *resource.Service
 }
 
-func NewHandler(youtubeService *metadata.Service, subtitleService *subtitle.SubtitleService, transcriptService *transcript.Service) *Handler {
+func NewHandler(resourceService *resource.Service) *Handler {
 	return &Handler{
-		youtubeService:    youtubeService,
-		subtitleService:   subtitleService,
-		transcriptService: transcriptService,
+		resourceService: resourceService,
 	}
 }
 
 func (h *Handler) GetTranscript(c *echo.Context) error {
 	var req TranscriptRequest
-	if err := (*c).Bind(&req); err != nil {
-		return Err.BadRequest("Invalid request").Wrap(err)
+	if err := c.Bind(&req); err != nil {
+		return api.Err.Common.BadRequest("invalid request body").Wrap(err)
 	}
 
-	if err := api.Validate(req); err != nil {
+	if len(req.Inputs) == 0 {
+		return api.Err.Common.BadRequest("inputs required")
+	}
+
+	fieldPlanner, err := fields.NewPlanner([]string{"id", "transcript"})
+	if err != nil {
 		return err
 	}
 
-	parsed, err := youtubeurl.Parse(req.URL)
+	preferences, err := subtitleapi.BuildPreferences(req.Preferences)
 	if err != nil {
-		return Err.InvalidURL().Wrap(err)
+		return api.Err.Common.BadRequest("invalid subtitle preferences").Wrap(err)
 	}
 
-	video, err := h.youtubeService.GetVideo((*c).Request().Context(), parsed.ID, metadata.ProviderYTDLP)
-	if err != nil {
-		return Err.FetchFailed(err)
+	inputs := make([]youtubeurl.YouTubeInput, len(req.Inputs))
+	for i, in := range req.Inputs {
+		parsed, err := youtubeurl.Parse(in)
+		if err == nil && parsed != nil {
+			inputs[i] = *parsed
+		} else {
+			inputs[i] = youtubeurl.YouTubeInput{InputType: youtubeurl.InputTypeVideo, ID: in}
+		}
 	}
 
-	result, err := h.subtitleService.DownloadSubtitle((*c).Request().Context(), subtitle.DownloadRequest{
-		VideoID:  video.ID,
-		Type:     req.Type,
-		Language: req.Language,
-		Format:   "json3",
-	}, video.SubtitleMetadata)
-	if err != nil {
-		return Err.InternalError(err)
+	executionPlan := planner.Build(inputs, fieldPlanner)
+
+	pipelineReq := &pipeline.Request{
+		FieldPlanner:  fieldPlanner,
+		ExecutionPlan: executionPlan,
+		Subtitle: nil,
+		Preferences: preferences,
+		Format:      "json3",
+		Transcript:  nil,
 	}
 
-	t, err := h.transcriptService.Parse(result)
-	if err != nil {
-		return Err.InternalError(err)
-	}
+	ctx := c.Request().Context()
+	resources := h.resourceService.ProcessResources(ctx, inputs, pipelineReq)
 
-	return (*c).JSON(http.StatusOK, t)
+	return c.JSON(http.StatusOK, resources)
 }
