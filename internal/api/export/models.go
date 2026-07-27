@@ -16,12 +16,7 @@ type CommonExportFields struct {
 	Fields      []string                                  `json:"fields,omitempty"`
 }
 
-type PlaylistExportRequest struct {
-	CommonExportFields
-	Input string `json:"input"`
-}
-
-type VideosExportRequest struct {
-	CommonExportFields
+type ExportRequest struct {
 	Inputs []string `json:"inputs"`
+	CommonExportFields
 }

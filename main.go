@@ -49,6 +49,9 @@ import (
 
 	//pipeline
 	"github.com/Arvind215271/askito/internal/youtube/pipeline"
+
+	//resource
+	"github.com/Arvind215271/askito/internal/youtube/resource"
 )
 
 func main() {
@@ -187,8 +190,11 @@ func main() {
 		&exportservice.XMLExporter{},
 	)
 
+	// resource service
+	resourceService := resource.NewService(youtubeService, pipelineService, logger, 2*config.PythonWorkers)
+
 	// Export handler
-	exportHandler := export.NewHandler(youtubeService, pipelineService, exportService)
+	exportHandler := export.NewHandler(resourceService, exportService)
 	export.RegisterRoutes(e.Group("/export"), exportHandler)
 
 	// only run debug in development

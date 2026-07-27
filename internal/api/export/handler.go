@@ -7,29 +7,25 @@ import (
 
 	"github.com/Arvind215271/askito/internal/api"
 	subtitleapi "github.com/Arvind215271/askito/internal/api/subtitle"
-	"github.com/Arvind215271/askito/internal/youtube"
 	"github.com/Arvind215271/askito/internal/youtube/export"
 	"github.com/Arvind215271/askito/internal/youtube/fields"
 	youtubeurl "github.com/Arvind215271/askito/internal/youtube/input"
-	"github.com/Arvind215271/askito/internal/youtube/metadata"
 	"github.com/Arvind215271/askito/internal/youtube/pipeline"
 	"github.com/Arvind215271/askito/internal/youtube/planner"
+	"github.com/Arvind215271/askito/internal/youtube/resource"
 )
 
 type Handler struct {
-	metadataService *metadata.Service
-	pipelineService *pipeline.Service
+	resourceService *resource.Service
 	exportService   *export.Service
 }
 
 func NewHandler(
-	metadataService *metadata.Service,
-	pipelineService *pipeline.Service,
+	resourceService *resource.Service,
 	exportService *export.Service,
 ) *Handler {
 	return &Handler{
-		metadataService: metadataService,
-		pipelineService: pipelineService,
+		resourceService: resourceService,
 		exportService:   exportService,
 	}
 }
@@ -50,8 +46,8 @@ func parseFormat(s string) (export.Format, error) {
 	}
 }
 
-func (h *Handler) ExportVideos(c *echo.Context) error {
-	var req VideosExportRequest
+func (h *Handler) Export(c *echo.Context) error {
+	var req ExportRequest
 
 	if err := c.Bind(&req); err != nil {
 		return api.Err.Common.
@@ -63,7 +59,7 @@ func (h *Handler) ExportVideos(c *echo.Context) error {
 		return ErrInputRequired
 	}
 
-	_, err := parseFormat(req.CommonExportFields.Format)
+	exportFormat, err := parseFormat(req.Format)
 	if err != nil {
 		return err
 	}
@@ -81,7 +77,7 @@ func (h *Handler) ExportVideos(c *echo.Context) error {
 	inputs := make([]youtubeurl.YouTubeInput, len(req.Inputs))
 	for i, in := range req.Inputs {
 		parsed, err := youtubeurl.Parse(in)
-		if err == nil {
+		if err == nil && parsed != nil {
 			inputs[i] = *parsed
 		} else {
 			inputs[i] = youtubeurl.YouTubeInput{InputType: youtubeurl.InputTypeVideo, ID: in}
@@ -102,183 +98,30 @@ func (h *Handler) ExportVideos(c *echo.Context) error {
 
 	ctx := c.Request().Context()
 
-	videos := make([]*youtube.Video, len(req.Inputs))
-	validVideoIDs := make([]string, 0, len(req.Inputs))
-	idToIndex := make(map[string]int)
+	resources := h.resourceService.ProcessResources(ctx, inputs, pipelineReq)
 
-	for i, input := range req.Inputs {
-		parsedInput, err := youtubeurl.Parse(input)
-		if err != nil || parsedInput.InputType != youtubeurl.InputTypeVideo {
-			videos[i] = &youtube.Video{
-				ID: "",
-				Errors: []youtube.Error{
-					{
-						Message: "invalid video input: " + input,
-					},
-				},
-			}
-			continue
-		}
-
-		validVideoIDs = append(validVideoIDs, parsedInput.ID)
-		idToIndex[parsedInput.ID] = i
-	}
-
-	processedVideos := h.pipelineService.ProcessVideos(
-		ctx,
-		validVideoIDs,
-		pipelineReq,
-	)
-
-	for _, video := range processedVideos {
-		index := idToIndex[video.ID]
-		videos[index] = video
-	}
-
-	// dereference
-	derefVideos := make([]youtube.Video, 0, len(processedVideos))
-	for _, v := range processedVideos {
-		if v != nil {
-			derefVideos = append(derefVideos, *v)
-		}
-	}
-
-	data, err := h.exportService.ExportBatchVideos(
-		derefVideos,
-		export.BatchVideoExportRequest{
-			VideoIDs:    validVideoIDs,
-			VideoFields: fieldPlanner,
-			Format:      export.Format(req.CommonExportFields.Format),
-		},
-	)
+	data, err := h.exportService.ExportBatchResource(resources, exportFormat, fieldPlanner)
 	if err != nil {
 		return err
+	}
+
+	contentType := "application/json"
+	switch exportFormat {
+	case export.FormatCSV:
+		contentType = "text/csv"
+	case export.FormatMarkdown:
+		contentType = "text/markdown"
+	case export.FormatYAML:
+		contentType = "application/yaml"
+	case export.FormatXML:
+		contentType = "application/xml"
+	case export.FormatExcel:
+		contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 	}
 
 	return c.Blob(
 		http.StatusOK,
-		"application/json",
-		data,
-	)
-}
-
-func (h *Handler) ExportPlaylist(c *echo.Context) error {
-	var req PlaylistExportRequest
-
-	if err := c.Bind(&req); err != nil {
-		return api.Err.Common.
-			BadRequest("invalid request body").
-			Wrap(err)
-	}
-
-	if req.Input == "" {
-		return ErrInputRequired
-	}
-
-	_, err := parseFormat(req.CommonExportFields.Format)
-	if err != nil {
-		return err
-	}
-
-	parsedInput, err := youtubeurl.Parse(req.Input)
-	if err != nil {
-		return api.Err.Common.
-			BadRequest("invalid youtube input: " + req.Input).
-			Wrap(err)
-	}
-
-	if parsedInput.InputType != youtubeurl.InputTypePlaylist {
-		return ErrInvalidInputType
-	}
-
-	fieldPlanner, err := fields.NewPlanner(req.Fields)
-	if err != nil {
-		return err
-	}
-
-	preferences, err := subtitleapi.BuildPreferences(req.Preferences)
-	if err != nil {
-		return api.Err.Common.BadRequest("invalid subtitle preferences").Wrap(err)
-	}
-
-	inputs := []youtubeurl.YouTubeInput{*parsedInput}
-	executionPlan := planner.Build(inputs, fieldPlanner)
-
-	pipelineReq := &pipeline.Request{
-		FieldPlanner:  fieldPlanner,
-		ExecutionPlan: executionPlan,
-		Subtitle:      req.Subtitle,
-		Preferences:   preferences,
-		Format:        "json3",
-		Transcript:    req.Transcript,
-		Signal:        req.Signal,
-	}
-
-	ctx := c.Request().Context()
-
-	// 1. Fetch playlist metadata.
-	playlist, err := h.metadataService.GetPlaylistMetadata(
-		ctx,
-		parsedInput.ID,
-		metadata.ProviderYTDLP,
-	)
-	if err != nil {
-		return api.Err.Common.BadRequest("failed to fetch playlist metadata").Wrap(err)
-	}
-
-	// 2. Fetch playlist items.
-	items, err := h.metadataService.GetPlaylistItems(
-		ctx,
-		parsedInput.ID,
-		metadata.ProviderYTDLP,
-	)
-	if err != nil {
-		return api.Err.Common.BadRequest("failed to fetch playlist items").Wrap(err)
-	}
-
-	// 3. Extract video IDs in playlist order.
-	videoIDs := make([]string, len(items))
-
-	for i, item := range items {
-		videoIDs[i] = item.VideoID
-	}
-
-	// 4. Process all videos concurrently.
-	videos := h.pipelineService.ProcessVideos(
-		ctx,
-		videoIDs,
-		pipelineReq,
-	)
-
-	// 5. Wrap processed videos back into PlaylistVideo.
-	playlist.Videos = make([]youtube.PlaylistVideo, len(videos))
-
-	for i, video := range videos {
-		playlist.Videos[i] = youtube.PlaylistVideo{
-			Video:    *video,
-			Position: items[i].Position,
-			AddedAt:  items[i].AddedAt,
-		}
-	}
-
-	// 6. Return the processed playlist as JSON.
-	exportReq := export.PlaylistExportRequest{
-		PlaylistID:  playlist.ID,
-		VideoFields: fieldPlanner,
-		Format:      export.Format(req.CommonExportFields.Format),
-	}
-
-	data, err := h.exportService.ExportPlaylist(
-		playlist,
-		exportReq,
-	)
-	if err != nil {
-		return err
-	}
-
-	return c.Blob(
-		http.StatusOK,
-		"application/json",
+		contentType,
 		data,
 	)
 }
