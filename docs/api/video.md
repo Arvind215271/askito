@@ -17,13 +17,13 @@
 
 ## Phase 2: Field Selection
 
-- [ ] Support field selection
+- [x] Support field selection
   Return only the metadata fields requested by the user.
 
-- [ ] Support nested field selection
+- [x] Support nested field selection
   Allow users to request specific nested objects.
 
-- [ ] Validate requested fields
+- [x] Validate requested fields
   Ignore or report unsupported field names.
 
 ---
@@ -120,31 +120,31 @@
 
 ## Phase 8: Export
 
-- [ ] JSON export
+- [x] JSON export
 
-- [ ] CSV export
+- [x] CSV export
 
-- [ ] Markdown export
+- [x] Markdown export
 
-- [ ] HTML export
+- [x] HTML export
 
-- [ ] Excel export
+- [x] Excel export
 
-- [ ] SQLite export
+- [x] SQLite export
 
-- [ ] Custom field export
+- [x] Custom field export
   Export only the fields requested by the user.
 
-- [ ] Batch export
+- [x] Batch export
   Export multiple video analyses in a single request.
 
 ---
 
 ## Phase 9: Cache
 
-- [ ] Add cache at metadata and subtitle
+- [x] Add cache at metadata and subtitle
   These endpoints are going to be reasked unless we maintain session ID but works well tho.
 
-- [ ] Add file downloading at each of the endpoint and reuse them.
+- [x] Add file downloading at each of the endpoint and reuse them.
   Then flush those file to be automatically deleted after a period of days like a 28 days or 180 days. To reduce file size being stored.
 

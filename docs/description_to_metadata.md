@@ -29,48 +29,48 @@
   Also other stuff we can add is that atlesat 3 chapter must exist per youtube video.
   We cannot be sure if we extracted actual chapter or what. But whatever... 
 
-- [ ] Attach detected chapters to video metadata
+- [x] Attach detected chapters to video metadata
   Include description-derived chapters in the normalized structure.
-  
+   
 
 ---
 
 ## Phase 3: Link Extraction
 
-- [ ] Extract URLs from description
+- [x] Extract URLs from description
   Identify and collect all links present in the description.
 
-- [ ] Remove duplicate links
+- [x] Remove duplicate links
   Prevent duplicate entries from appearing in extracted metadata.
 
-- [ ] Preserve link context
+- [x] Preserve link context
   Store nearby text that may describe the purpose of each link.
 
-- [ ] Attach extracted links to video metadata
+- [x] Attach extracted links to video metadata
   Include link information within the normalized structure.
 
 ---
 
 ## Phase 4: Contact Information Extraction
 
-- [ ] Extract email addresses
+- [x] Extract email addresses
   Identify publicly shared contact information.
 
-- [ ] Validate extracted email addresses
+- [x] Validate extracted email addresses
   Filter obvious invalid matches.
 
-- [ ] Attach contact information to video metadata
+- [x] Attach contact information to video metadata
   Include extracted contact details in the normalized structure.
 
 ---
 
 ## Phase 5: Description Cleanup
 
-- [ ] Remove extracted metadata from description
+- [x] Remove extracted metadata from description
   Separate chapters, links, and contact information from the remaining content.
 
-- [ ] Generate cleaned description content
+- [x] Generate cleaned description content
   Produce a reduced version focused on meaningful text.
 
-- [ ] Preserve original description
+- [x] Preserve original description
   Ensure the raw description remains available for future processing.

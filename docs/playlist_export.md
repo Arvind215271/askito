@@ -18,81 +18,81 @@
 
 ## Phase 2: CSV Export
 
-- [ ] Export normalized data as CSV
+- [x] Export normalized data as CSV
   Convert metadata into a spreadsheet-friendly format.
 
-- [ ] Flatten nested structures
+- [x] Flatten nested structures
   Ensure playlist and video data can be represented as rows.
 
-- [ ] Support field selection
+- [x] Support field selection
   Include only the requested columns in the exported file.
 
 ---
 
 ## Phase 3: Multiple Export Support
 
-- [ ] Export multiple playlists in a single request
+- [x] Export multiple playlists in a single request
   Support batch exports without requiring multiple downloads.
 
-- [ ] Export multiple videos in a single request
+- [x] Export multiple videos in a single request
   Allow batch exports for video metadata.
 
-- [ ] Export mixed inputs
+- [x] Export mixed inputs
   Support exports containing both videos and playlists.
 
-- [ ] Generate ZIP archives
+- [x] Generate ZIP archives
   Package multiple exported files into a single download.
 
-- [ ] Support merged exports
+- [x] Support merged exports
   Combine all extracted data into a single export file when requested.
 
 ---
 
 ## Phase 4: Additional Export Formats
 
-- [ ] Markdown export
+- [x] Markdown export
   Generate readable markdown documents from extracted data.
 
-- [ ] HTML export
+- [x] HTML export
   Generate browser-friendly reports.
 
-- [ ] XML export
+- [x] XML export
   Support structured XML exports.
 
-- [ ] YAML export
+- [x] YAML export
   Support YAML exports for configuration and tooling workflows.
 
-- [ ] Text export
+- [x] Text export
   Generate simple text-based exports.
 
 ---
 
 ## Phase 5: Document-Based Exports
 
-- [ ] Excel export
+- [x] Excel export
   Generate spreadsheet exports for larger datasets.
 
-- [ ] Word export
+- [x] Word export
   Generate editable document exports.
 
-- [ ] SQLite export
+- [x] SQLite export
   Export extracted data into a portable database file.
 
 ---
 
 ## Phase 6: Enhanced Metadata Exports
 
-- [ ] Export native chapter information
+- [x] Export native chapter information
   Include creator-provided chapters when available.
 
-- [ ] Export generated chapter information
+- [x] Export generated chapter information
   Include AI-generated chapters derived from transcripts.
 
-- [ ] Export transcript content
+- [x] Export transcript content
   Include extracted transcript data.
 
-- [ ] Export translated transcripts
+- [x] Export translated transcripts
   Include normalized English transcripts when available.
 
-- [ ] Export future metadata fields
+- [x] Export future metadata fields
   Ensure new enrichment fields can be exported without redesigning the export layer.
