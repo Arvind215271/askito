@@ -5,6 +5,7 @@ Askito is a Go application for extracting and processing YouTube data.
 It can fetch video and playlist metadata, download subtitles, generate transcripts, analyze transcript statistics, and export the results in different formats.
 
 The application uses Go for the HTTP API and request handling. It runs persistent Python workers that use `yt-dlp` to fetch data from YouTube. Keeping the workers alive avoids starting a new Python process for every request, which reduces overhead when processing many videos.
+
 ---
 
 ## Requirements
@@ -16,6 +17,8 @@ Before running Askito, install:
 - pip
 - python3-venv
 - FFmpeg (recommended by `yt-dlp`)
+
+
 ---
 
 
