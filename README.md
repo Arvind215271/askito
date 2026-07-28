@@ -1,4 +1,5 @@
-# Askito
+Askito
+------------
 
 Askito is a Go application for extracting and processing YouTube data.
 
@@ -6,9 +7,8 @@ It can fetch video and playlist metadata, download subtitles, generate transcrip
 
 The application uses Go for the HTTP API and request handling. It runs persistent Python workers that use `yt-dlp` to fetch data from YouTube. Keeping the workers alive avoids starting a new Python process for every request, which reduces overhead when processing many videos.
 
----
-
-## Requirements
+Requirements
+------------
 
 Before running Askito, install:
 
@@ -18,11 +18,8 @@ Before running Askito, install:
 - python3-venv
 - FFmpeg (recommended by `yt-dlp`)
 
-
----
-
-
-## Installation
+Installation
+------------
 
 ### Clone the repository
 
@@ -58,16 +55,14 @@ pip install yt-dlp orjson
 
 Askito starts Python workers when the server launches. These workers require `yt-dlp` and `orjson`, so make sure they are installed inside the virtual environment.
 
----
-
-### 4. Configuration (`.env`)
+### Configuration ([`.env`](.env))
 
 Copy the sample environment configuration file:
 ```bash
 cp .env.sample .env
 ```
 
-Open `.env` and customize your configuration parameters:
+Open [`.env`](.env) and customize your configuration parameters:
 ```env
 APP_ENV=development
 PORT=8080
@@ -85,10 +80,8 @@ YTDLP_CACHE_MAX_FILES=2000
 PYTHON_WORKERS=16
 ```
 
-
----
-
-## Running
+Running
+-------
 
 Start the server:
 
@@ -103,13 +96,10 @@ go build -o askito main.go
 ./askito
 ```
 
----
+API Endpoints, Parameters & Models Reference
+---------------------------------------------
 
-## API Endpoints, Parameters & Models Reference
-
-Once the server is running at `http://localhost:8080`, you can access the following REST endpoints exposed by [`internal/api`](internal/api):
-
----
+Once the server is running at `http://localhost:8080`, you can access the following REST endpoints exposed by [`internal/api`](internal/api/):
 
 ### 1. Export API (`/export`)
 
@@ -162,8 +152,6 @@ Once the server is running at `http://localhost:8080`, you can access the follow
     }'
   ```
 
----
-
 ### 2. Playlist API (`/playlist`)
 
 #### Expand Playlist Videos
@@ -200,8 +188,6 @@ Once the server is running at `http://localhost:8080`, you can access the follow
       "output": "both"
     }'
   ```
-
----
 
 ### 3. Subtitle API (`/subtitle`)
 
@@ -246,8 +232,6 @@ Once the server is running at `http://localhost:8080`, you can access the follow
       "format": "vtt"
     }'
   ```
-
----
 
 ### 4. Transcript API (`/transcript`)
 
