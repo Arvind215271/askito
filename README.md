@@ -89,185 +89,171 @@ go build -o askito main.go
 
 ---
 
-## API Endpoints, Parameters & Options Reference
+## API Endpoints, Parameters & Models Reference
 
-Once the server is running at `http://localhost:8080`, you can access the following REST endpoints:
-
----
-
-### 1. Video Metadata API (`/videos`)
-
-#### Get Video By ID
-- **Endpoint**: `GET /videos/id`
-- **Query Parameters**:
-  - `id` (string, required): YouTube Video ID (`VIDEO_ID`, e.g., `dQw4w9WgXcQ`).
-  - `provider` (string, optional): Metadata provider (`ytdlp` or `youtube_api`).
-- **Example Request**:
-  ```bash
-  curl -X GET "http://localhost:8080/videos/id?id=dQw4w9WgXcQ&provider=ytdlp"
-  ```
-
-#### Get Video By URL
-- **Endpoint**: `GET /videos/url`
-- **Query Parameters**:
-  - `url` (string, required): Full YouTube video URL (`VIDEO_URL`, e.g., `https://www.youtube.com/watch?v=dQw4w9WgXcQ`).
-  - `provider` (string, optional): Metadata provider (`ytdlp` or `youtube_api`).
-- **Example Request**:
-  ```bash
-  curl -X GET "http://localhost:8080/videos/url?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ&provider=ytdlp"
-  ```
+Once the server is running at `http://localhost:8080`, you can access the following REST endpoints exposed by [`internal/api`](internal/api):
 
 ---
 
-### 2. Subtitles API (`/subtitles`)
+### 1. Export API (`/export`)
+
+#### Export Resources
+- **Endpoint**: `POST /export`
+- **Request Body Model**: [`internal/api/export/models.go`](internal/api/export/models.go)
+  ```json
+  {
+    "inputs": ["string"],
+    "subtitle": {
+      "video_id": "string",
+      "language": "string",
+      "type": "string",
+      "format": "string"
+    },
+    "preferences": [
+      {
+        "language": "string",
+        "type": "string" // options: "manual", "automatic", "manual>automatic", "automatic>manual"
+      }
+    ],
+    "transcript": {
+      "language": "string",
+      "type": "string"
+    },
+    "signal": {
+      "analysis": "string", // e.g. "word-stats", "window-stats"
+      "language": "string",
+      "type": "string",
+      "use_heavy_stopwords": true,
+      "min_freq": 0
+    },
+    "format": "string", // options: "json", "csv", "markdown", "excel", "yaml", "xml"
+    "fields": ["string"]
+  }
+  ```
+- **Available Fields**:
+  - Metadata: `id`, `errors`, `title`, `description`, `channel_id`, `channel_title`, `thumbnails`, `published_at`, `duration`, `duration_seconds`, `duration_minutes`, `duration_timestamp`, `view_count`, `like_count`, `comment_count`, `tags`, `category_id`, `caption_available`, `privacy_status`, `live_broadcast_status`
+  - Description: `description_chapters`, `description_links`, `description_emails`, `description_cleaned`
+  - Transcript/Subtitle: `transcript_text`, `transcript_signal`, `subtitle_metadata`
+
+- **Example Request**:
+  ```bash
+  curl -X POST "http://localhost:8080/export" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "inputs": ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
+      "format": "json",
+      "fields": ["id", "title", "duration"]
+    }'
+  ```
+
+---
+
+### 2. Playlist API (`/playlist`)
+
+#### Expand Playlist Videos
+- **Endpoint**: `POST /playlist/videos`
+- **Request Body Model**: [`internal/api/playlist/models.go`](internal/api/playlist/models.go)
+  ```json
+  {
+    "url": "string",
+    "provider": "string", // options: "ytdlp", "youtube_api"
+    "output": "string"    // options: "id", "url", "both"
+  }
+  ```
+- **Response Model**:
+  ```json
+  {
+    "playlist_id": "string",
+    "total": 0,
+    "videos": [
+      {
+        "id": "string",
+        "url": "string",
+        "position": 0,
+        "added_at": "string"
+      }
+    ]
+  }
+  ```
+- **Example Request**:
+  ```bash
+  curl -X POST "http://localhost:8080/playlist/videos" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "url": "https://www.youtube.com/playlist?list=PL_EXAMPLE",
+      "output": "both"
+    }'
+  ```
+
+---
+
+### 3. Subtitle API (`/subtitle`)
 
 #### Get Subtitle Options
-- **Endpoint**: `POST /subtitles/options`
-- **Request Body Options (`JSON`)**:
-  - `url` (string, required): YouTube video URL (`VIDEO_URL`).
+- **Endpoint**: `POST /subtitle/options`
+- **Request Body Model**: [`internal/api/subtitle/models.go`](internal/api/subtitle/models.go)
+  ```json
+  {
+    "inputs": ["string"]
+  }
+  ```
 - **Example Request**:
   ```bash
-  curl -X POST "http://localhost:8080/subtitles/options" \
+  curl -X POST "http://localhost:8080/subtitle/options" \
     -H "Content-Type: application/json" \
-    -d '{"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}'
+    -d '{
+      "inputs": ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"]
+    }'
   ```
 
 #### Download Subtitle
-- **Endpoint**: `POST /subtitles/download`
-- **Request Body Options (`JSON`)**:
-  - `url` (string, required): YouTube video URL (`VIDEO_URL`).
-  - `type` (string, required): Subtitle type (`manual` or `automatic`).
-  - `language` (string, required): Subtitle/track language code (e.g., `en`).
-  - `format` (string, optional): Desired output subtitle format (e.g., `vtt`, `json3`).
+- **Endpoint**: `POST /subtitle/download`
+- **Request Body Model**: [`internal/api/subtitle/models.go`](internal/api/subtitle/models.go)
+  ```json
+  {
+    "inputs": ["string"],
+    "preferences": [
+      {
+        "language": "string",
+        "type": "string" // options: "manual", "automatic", "manual>automatic", "automatic>manual"
+      }
+    ],
+    "format": "string" // options: "json3", "vtt", "srt", "srv1", "srv2", "srv3", "ttml"
+  }
+  ```
 - **Example Request**:
   ```bash
-  curl -X POST "http://localhost:8080/subtitles/download" \
+  curl -X POST "http://localhost:8080/subtitle/download" \
     -H "Content-Type: application/json" \
     -d '{
-      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      "type": "manual",
-      "language": "en",
+      "inputs": ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
       "format": "vtt"
     }'
   ```
 
 ---
 
-### 3. Transcripts API (`/transcripts`)
+### 4. Transcript API (`/transcript`)
 
 #### Get Transcript
-- **Endpoint**: `POST /transcripts`
-- **Request Body Options (`JSON`)**:
-  - `url` (string, required): YouTube video URL (`VIDEO_URL`).
-  - `type` (string, required): Transcript type (`manual` or `automatic`).
-  - `language` (string, required): Transcript language code (e.g., `en`).
-- **Example Request**:
-  ```bash
-  curl -X POST "http://localhost:8080/transcripts" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      "type": "manual",
-      "language": "en"
-    }'
+- **Endpoint**: `POST /transcript`
+- **Request Body Model**: [`internal/api/transcript/models.go`](internal/api/transcript/models.go)
+  ```json
+  {
+    "inputs": ["string"],
+    "preferences": [
+      {
+        "language": "string",
+        "type": "string" // options: "manual", "automatic", "manual>automatic", "automatic>manual"
+      }
+    ]
+  }
   ```
-
----
-
-### 4. Signals API (`/signals`)
-
-#### Get Video Signals
-- **Endpoint**: `POST /signals`
-- **Request Body Options (`JSON`)**:
-  - `url` (string, required): YouTube video URL (`VIDEO_URL`).
-  - `analysis` (string, required): Statistical analysis type (`word-stats` or `window-stats`).
-  - `type` (string, required): Transcript type (`manual` or `automatic`).
-  - `language` (string, required): Language code (e.g., `en`).
-  - `use_heavy_stopwords` (boolean, optional): Whether to filter out heavy stopwords (`true` or `false`).
-  - `min_freq` (integer, optional): Minimum occurrence frequency for words (`>= 0`).
-  - `depth` (float, optional): Analysis depth threshold (`0.0` to `1.0`).
-  - `window_size` (float, optional): Sliding window size (`> 0`).
-  - `bucket_count` (integer, optional): Number of statistical buckets (`> 0`).
 - **Example Request**:
   ```bash
-  curl -X POST "http://localhost:8080/signals" \
+  curl -X POST "http://localhost:8080/transcript" \
     -H "Content-Type: application/json" \
     -d '{
-      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      "analysis": "word-stats",
-      "type": "manual",
-      "language": "en",
-      "use_heavy_stopwords": true,
-      "min_freq": 2
-    }'
-  ```
-
----
-
-### 5. Export API (`/export`)
-
-#### Export Single Video
-- **Endpoint**: `POST /export/video`
-- **Request Body Options (`JSON`)**:
-  - `input` (string, required): YouTube Video URL or ID (`VIDEO_URL` or `VIDEO_ID`).
-  - `format` (string, required): Export output format (`json`).
-  - `fields` (array of strings, optional): Specific metadata/data fields to include.
-  - `subtitle` (object, optional): Nested subtitle download options:
-    - `url` (string)
-    - `type` (string: `manual` | `automatic`)
-    - `language` (string)
-    - `format` (string)
-  - `transcript` (object, optional): Nested transcript request options:
-    - `url` (string)
-    - `type` (string: `manual` | `automatic`)
-    - `language` (string)
-  - `signal` (object, optional): Nested signal analysis options:
-    - `url` (string)
-    - `analysis` (string: `word-stats` | `window-stats`)
-    - `type` (string: `manual` | `automatic`)
-    - `language` (string)
-    - `use_heavy_stopwords` (boolean)
-    - `min_freq` (integer)
-- **Example Request**:
-  ```bash
-  curl -X POST "http://localhost:8080/export/video" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "input": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      "format": "json"
-    }'
-  ```
-
-#### Export Multiple Videos (Batch)
-- **Endpoint**: `POST /export/videos`
-- **Request Body Options (`JSON`)**:
-  - `inputs` (array of strings, required): List of YouTube video URLs or IDs (`VIDEO_URL` / `VIDEO_ID`).
-  - `format` (string, required): Export output format (`json`).
-  - `fields`, `subtitle`, `transcript`, `signal` (optional, same nested structures as single video export).
-- **Example Request**:
-  ```bash
-  curl -X POST "http://localhost:8080/export/videos" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "inputs": [
-        "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-      ],
-      "format": "json"
-    }'
-  ```
-
-#### Export Playlist
-- **Endpoint**: `POST /export/playlist`
-- **Request Body Options (`JSON`)**:
-  - `input` (string, required): YouTube Playlist URL or ID (`PLAYLIST_URL` or `PLAYLIST_ID`).
-  - `format` (string, required): Export output format (`json`).
-  - `fields`, `subtitle`, `transcript`, `signal` (optional, same nested structures as single video export).
-- **Example Request**:
-  ```bash
-  curl -X POST "http://localhost:8080/export/playlist" \
-    -H "Content-Type: application/json" \
-    -d '{
-      "input": "https://www.youtube.com/playlist?list=PL_EXAMPLE",
-      "format": "json"
+      "inputs": ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"]
     }'
   ```

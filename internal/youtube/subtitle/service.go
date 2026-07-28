@@ -238,7 +238,7 @@ func validateRequest(req DownloadRequest) (DownloadRequest, error) {
 	}
 
 	switch req.Format {
-	case "json3", "vtt":
+	case "json3", "vtt", "srt", "srv1", "srv2", "srv3", "ttml":
 	default:
 		return req, fmt.Errorf(
 			"unsupported subtitle format: %s",

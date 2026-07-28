@@ -23,7 +23,7 @@ func (r *DownloadRequest) Validate() error {
 	}
 
 	switch r.Format {
-	case "json3", "vtt":
+	case "json3", "vtt", "srt", "srv1", "srv2", "srv3", "ttml":
 	default:
 		return fmt.Errorf("unsupported subtitle format: %s", r.Format)
 	}
