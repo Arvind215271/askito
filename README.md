@@ -1,56 +1,64 @@
 # Askito
 
-Askito is a high-performance backend application designed for deep YouTube video analysis, transcript extraction, subtitle downloading, statistical signaling, and batch exports. It combines Go for robust API routing and concurrency with persistent Python worker pools running `yt-dlp` and `orjson` for high-speed data retrieval.
+Askito is a Go application for extracting and processing YouTube data.
 
+It can fetch video and playlist metadata, download subtitles, generate transcripts, analyze transcript statistics, and export the results in different formats.
+
+The application uses Go for the HTTP API and request handling. It runs persistent Python workers that use `yt-dlp` to fetch data from YouTube. Keeping the workers alive avoids starting a new Python process for every request, which reduces overhead when processing many videos.
 ---
 
-## System Requirements & Prerequisites
+## Requirements
 
-Make sure your machine has:
-- **Go** (version 1.20 or higher)
-- **Python** (version 3.8 or higher) with `pip` and `python3-venv`
-- **FFmpeg** (Recommended for robust media handling by `yt-dlp`)
+Before running Askito, install:
 
+- Go 1.20 or later
+- Python 3.8 or later
+- pip
+- python3-venv
+- FFmpeg (recommended by `yt-dlp`)
 ---
 
-## Complete Installation & Setup Guide
 
-### 1. Clone the Repository
+## Installation
+
+### Clone the repository
+
 ```bash
 git clone https://github.com/your-username/askito.git
 cd askito
 ```
 
-### 2. Go Dependencies Setup
-Download and tidy all Go module dependencies:
+### Install Go dependencies
+
 ```bash
-go mod tidy
 go mod download
 ```
 
-### 3. Python Virtual Environment & Dependencies Setup
-Askito communicates with a persistent Python worker pool ([`internal/youtube/metadata/ytdlp/python/python_worker_single.py`](internal/youtube/metadata/ytdlp/python/python_worker_single.py)) which requires specialized Python packages (`yt-dlp` and `orjson`).
-
-Set up your virtual environment and install the required dependencies:
+### Create a Python virtual environment
 
 ```bash
-# Create a python virtual environment
 python3 -m venv venv
 
-# Activate the virtual environment
-# On Linux/macOS:
+# Linux/macOS
 source venv/bin/activate
-# On Windows (Command Prompt / PowerShell):
-# venv\Scripts\activate
 
-# Upgrade pip and install required packages
+# Windows
+venv\Scripts\activate
+```
+
+### Install Python dependencies
+
+```bash
 pip install --upgrade pip
 pip install yt-dlp orjson
 ```
 
-> **Important**: Ensure your environment uses the virtual environment so that `python3` resolves to the venv where `yt-dlp` and `orjson` are installed.
+Askito starts Python workers when the server launches. These workers require `yt-dlp` and `orjson`, so make sure they are installed inside the virtual environment.
+
+---
 
 ### 4. Configuration (`.env`)
+
 Copy the sample environment configuration file:
 ```bash
 cp .env.sample .env
@@ -74,14 +82,19 @@ YTDLP_CACHE_MAX_FILES=2000
 PYTHON_WORKERS=16
 ```
 
-### 5. Running the Application
 
-To run the application in development mode with live logs:
+---
+
+## Running
+
+Start the server:
+
 ```bash
 go run main.go
 ```
 
-To build and run a compiled binary:
+Or build a binary:
+
 ```bash
 go build -o askito main.go
 ./askito
