@@ -1,5 +1,4 @@
 # Askito
-------------
 
 Askito is a Go application for extracting and processing YouTube data.
 
@@ -9,7 +8,6 @@ The application uses Go for the HTTP API and request handling. It runs persisten
 
 
 # Performance & Architecture
-------------
 
 Askito uses **persistent Python workers** instead of spawning a new `yt-dlp` process for every request. This eliminates repeated Python startup and initialization overhead (~1.5s per request), enabling high-throughput parallel video processing.
 
@@ -24,7 +22,6 @@ Askito uses **persistent Python workers** instead of spawning a new `yt-dlp` pro
 See [BENCHMARK.md](BENCHMARK.md) for full architectural details and scaling metrics.
 
 # Requirements
-------------
 
 Before running Askito, install:
 
@@ -35,7 +32,7 @@ Before running Askito, install:
 - FFmpeg (recommended by `yt-dlp`)
 
 ## Installation
-------------
+
 
 ### Clone the repository
 
@@ -72,7 +69,7 @@ pip install yt-dlp orjson
 Askito starts Python workers when the server launches. These workers require `yt-dlp` and `orjson`, so make sure they are installed inside the virtual environment.
 
 ### Configuration ([`.env`](.env))
-------------
+
 
 Copy the sample environment configuration file:
 ```bash
@@ -98,7 +95,6 @@ PYTHON_WORKERS=16
 ```
 
 ## Running
--------
 
 Start the server:
 
@@ -114,7 +110,7 @@ go build -o askito main.go
 ```
 
 # API Endpoints, Parameters & Models Reference
----------------------------------------------
+
 
 Once the server is running at `http://localhost:8080`, you can access the following REST endpoints exposed by [`internal/api`](internal/api/):
 
