@@ -1,4 +1,4 @@
-Askito
+# Askito
 ------------
 
 Askito is a Go application for extracting and processing YouTube data.
@@ -7,7 +7,23 @@ It can fetch video and playlist metadata, download subtitles, generate transcrip
 
 The application uses Go for the HTTP API and request handling. It runs persistent Python workers that use `yt-dlp` to fetch data from YouTube. Keeping the workers alive avoids starting a new Python process for every request, which reduces overhead when processing many videos.
 
-Requirements
+
+# Performance & Architecture
+------------
+
+Askito uses **persistent Python workers** instead of spawning a new `yt-dlp` process for every request. This eliminates repeated Python startup and initialization overhead (~1.5s per request), enabling high-throughput parallel video processing.
+
+## Benchmark Summary (316 Videos Playlist Export)
+
+| Workers | Export Time | Speedup |
+|---------|------------:|--------:|
+| 1       | 417.10s     | 1.00x   |
+| 16      | 29.43s      | 14.17x  |
+| 128     | 15.63s      | 26.69x  |
+
+See [BENCHMARK.md](BENCHMARK.md) for full architectural details and scaling metrics.
+
+# Requirements
 ------------
 
 Before running Askito, install:
@@ -18,7 +34,7 @@ Before running Askito, install:
 - python3-venv
 - FFmpeg (recommended by `yt-dlp`)
 
-Installation
+## Installation
 ------------
 
 ### Clone the repository
@@ -56,6 +72,7 @@ pip install yt-dlp orjson
 Askito starts Python workers when the server launches. These workers require `yt-dlp` and `orjson`, so make sure they are installed inside the virtual environment.
 
 ### Configuration ([`.env`](.env))
+------------
 
 Copy the sample environment configuration file:
 ```bash
@@ -80,7 +97,7 @@ YTDLP_CACHE_MAX_FILES=2000
 PYTHON_WORKERS=16
 ```
 
-Running
+## Running
 -------
 
 Start the server:
@@ -96,7 +113,7 @@ go build -o askito main.go
 ./askito
 ```
 
-API Endpoints, Parameters & Models Reference
+# API Endpoints, Parameters & Models Reference
 ---------------------------------------------
 
 Once the server is running at `http://localhost:8080`, you can access the following REST endpoints exposed by [`internal/api`](internal/api/):
