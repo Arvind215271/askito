@@ -1,0 +1,139 @@
+'use client';
+
+import React, { useState } from 'react';
+import Header from '@/components/Header';
+import { theme } from '@/theme/theme';
+
+export default function TranscriptPage() {
+  const [inputs, setInputs] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [output, setOutput] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFetchTranscript = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const list = inputs.split('\n').map(s => s.trim()).filter(Boolean);
+    if (list.length === 0) {
+      alert('Please enter at least one YouTube link or ID.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setOutput(null);
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+      const res = await fetch(`${apiUrl}/transcript`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inputs: list })
+      });
+
+      const text = await res.text();
+      if (!res.ok) {
+        throw new Error(text || 'Failed to fetch transcript');
+      }
+
+      const parsed = JSON.parse(text);
+      setOutput(parsed);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ backgroundColor: theme.colors.bg, color: theme.colors.textMain, minHeight: '100vh', display: 'flex', flexDirection: 'column', fontFamily: theme.fonts.sans, width: '100%', margin: 0 }}>
+      <Header />
+      <div style={{ width: '100%', maxWidth: '1100px', margin: '0 auto', padding: '2.5rem 1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+        
+        <div>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>Transcript Viewer</h1>
+          <p style={{ color: theme.colors.textMuted, fontSize: '1.05rem' }}>
+            Fetch raw JSON3/structured transcripts directly from YouTube videos using high-performance internal pipelines.
+          </p>
+        </div>
+
+        <form onSubmit={handleFetchTranscript} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
+          <div style={{ backgroundColor: theme.colors.panelBg, border: `1px solid ${theme.colors.borderColor}`, borderRadius: theme.spacing.borderRadius, padding: '2rem' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem' }}>Enter YouTube Links or IDs</h2>
+            <p style={{ color: theme.colors.textMuted, fontSize: '0.9rem', marginBottom: '1rem' }}>
+              Paste one or more video links or IDs (one per line):
+            </p>
+            <textarea
+              value={inputs}
+              onChange={(e) => setInputs(e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=..."
+              style={{
+                width: '100%',
+                minHeight: '150px',
+                backgroundColor: theme.colors.bg,
+                border: `1px solid ${theme.colors.borderColor}`,
+                borderRadius: '6px',
+                padding: '1.25rem',
+                fontFamily: theme.fonts.mono,
+                fontSize: '0.95rem',
+                color: theme.colors.textMain,
+                resize: 'vertical',
+                lineHeight: '1.6',
+                marginBottom: '1.5rem'
+              }}
+            />
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                backgroundColor: theme.colors.primaryRed,
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '0.9rem 2rem',
+                fontWeight: 700,
+                fontSize: '1rem',
+                cursor: 'pointer',
+                opacity: loading ? 0.7 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                boxShadow: `0 4px 14px ${theme.colors.accentGlow}`
+              }}
+            >
+              {loading && <div style={{ width: '1rem', height: '1rem', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s infinite linear' }}></div>}
+              <span>Fetch Transcripts</span>
+            </button>
+          </div>
+        </form>
+
+        {error && (
+          <div style={{ backgroundColor: 'rgba(255, 30, 30, 0.1)', border: `1px solid ${theme.colors.primaryRed}`, borderRadius: '6px', padding: '1rem', color: theme.colors.primaryRed }}>
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+
+        {output && (
+          <div style={{ backgroundColor: theme.colors.panelBg, border: `1px solid ${theme.colors.borderColor}`, borderRadius: theme.spacing.borderRadius, padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Transcript Result</h2>
+            <pre style={{
+              backgroundColor: theme.colors.bg,
+              border: `1px solid ${theme.colors.borderColor}`,
+              padding: '1.25rem',
+              borderRadius: '6px',
+              fontFamily: theme.fonts.mono,
+              fontSize: '0.85rem',
+              color: theme.colors.outputCode,
+              overflowX: 'auto',
+              maxHeight: '500px',
+              lineHeight: '1.5'
+            }}>
+              {JSON.stringify(output, null, 2)}
+            </pre>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}

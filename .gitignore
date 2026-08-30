@@ -26,8 +26,10 @@ go.work.sum
 testdata/
 # env file
 .env
+frontend/.env
+frontend/.env.local
 
-# this is for storing cache for YTDLP  
+# this is for storing cache for YTDLP
 .cache/
 
 # Editor/IDE
@@ -43,3 +45,9 @@ myenv
 debug/yt_bench/debug/
 debug/yt_bench/docs/
 debug/yt_bench/output/
+
+# Frontend node modules
+frontend/node_modules
+
+# Frontend Next modules
+frontend/.next

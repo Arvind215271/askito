@@ -50,7 +50,7 @@ func ProcessPlaylist(
 	needsPipeline := true
 	if req != nil && req.ExecutionPlan != nil {
 		plan := req.ExecutionPlan
-		if !plan.NeedsDescription() && !plan.NeedsSubtitle() && !plan.NeedsTranscript() && !plan.NeedsSignal() {
+		if !plan.NeedsMetadata() && !plan.NeedsDescription() && !plan.NeedsSubtitle() && !plan.NeedsTranscript() && !plan.NeedsSignal() {
 			needsPipeline = false
 		}
 	}
