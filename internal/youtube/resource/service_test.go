@@ -234,3 +234,39 @@ func TestProcessResourcesWithStats_PartialFailure(t *testing.T) {
 		t.Errorf("expected 1 success and 1 failure, got succeeded=%d, failures=%d", processStats.ResourcesSucceeded, processStats.ResourceFailures)
 	}
 }
+
+func TestProcessResourcesWithStats_Cancellation(t *testing.T) {
+	metaProv := &mockMetaProvider{
+		getVideoFunc: func(ctx context.Context, videoID string, st *stats.MetadataStats) (youtube.Video, error) {
+			return youtube.Video{ID: videoID, Title: "Should Not Run"}, nil
+		},
+	}
+	svc := setupResourceService(t, metaProv, &mockSubFetcher{}, 1)
+
+	fp, _ := fields.NewPlanner([]string{fields.FieldTitle})
+	inputs := []youtubeurl.YouTubeInput{
+		{InputType: youtubeurl.InputTypeVideo, ID: "vid1"},
+		{InputType: youtubeurl.InputTypeVideo, ID: "vid2"},
+	}
+	ep := planner.Build(inputs, fp)
+	req := &pipeline.Request{
+		FieldPlanner:  fp,
+		ExecutionPlan: ep,
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // cancel immediately
+
+	resources, processStats := svc.ProcessResourcesWithStats(ctx, inputs, req)
+	if len(resources) != 2 {
+		t.Fatalf("expected 2 resource slots, got %d", len(resources))
+	}
+	for i, res := range resources {
+		if res.ID != "" || res.Video != nil {
+			t.Errorf("expected empty resource at index %d, got %+v", i, res)
+		}
+	}
+	if processStats.ResourcesRequested != 0 || processStats.ResourceFailures != 0 || processStats.VideosProcessed != 0 {
+		t.Errorf("expected zero stats on immediate cancellation, got %+v", processStats)
+	}
+}

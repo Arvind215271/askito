@@ -55,11 +55,18 @@ func (s *Service) ProcessResourcesWithStats(
 	req *pipeline.Request,
 ) ([]youtube.Resource, stats.ProcessStats) {
 	var processStats stats.ProcessStats
+	resources := make([]youtube.Resource, len(inputs))
+	if ctx.Err() != nil {
+		if s.logger != nil {
+			s.logger.Debug("resource batch processing cancelled before start", "error", ctx.Err())
+		}
+		return resources, processStats
+	}
+
 	if len(inputs) == 0 {
 		return nil, processStats
 	}
 
-	resources := make([]youtube.Resource, len(inputs))
 	concurrency := s.concurrency
 	if concurrency <= 0 {
 		concurrency = 1
@@ -70,30 +77,39 @@ func (s *Service) ProcessResourcesWithStats(
 	var mu sync.Mutex
 
 	for i, inputItem := range inputs {
+		if ctx.Err() != nil {
+			if s.logger != nil {
+				s.logger.Debug("resource batch item unstarted skipped due to cancellation", "index", i, "error", ctx.Err())
+			}
+			break
+		}
 		wg.Add(1)
 		go func(index int, inp youtubeurl.YouTubeInput) {
 			defer wg.Done()
 
+			if ctx.Err() != nil {
+				if s.logger != nil {
+					s.logger.Debug("resource item skipped at goroutine start due to cancellation", "error", ctx.Err())
+				}
+				return
+			}
+
 			select {
 			case sem <- struct{}{}:
 			case <-ctx.Done():
-				resources[index] = youtube.Resource{
-					ID:   inp.ID,
-					Type: youtube.ResourceTypeVideo,
-					Video: &youtube.Video{
-						ID:     inp.ID,
-						Errors: []youtube.Error{{Message: "context cancelled"}},
-					},
+				if s.logger != nil {
+					s.logger.Debug("resource item skipped waiting for semaphore due to cancellation", "error", ctx.Err())
 				}
-				mu.Lock()
-				processStats.ResourcesRequested++
-				processStats.ResourceFailures++
-				processStats.VideosProcessed++
-				processStats.Metadata.Failures++
-				mu.Unlock()
 				return
 			}
 			defer func() { <-sem }()
+
+			if ctx.Err() != nil {
+				if s.logger != nil {
+					s.logger.Debug("resource item skipped after semaphore due to cancellation", "error", ctx.Err())
+				}
+				return
+			}
 
 			var res youtube.Resource
 			var localProcessStats stats.ProcessStats
@@ -107,7 +123,14 @@ func (s *Service) ProcessResourcesWithStats(
 					inp.ID,
 					req,
 					concurrency,
+					s.logger,
 				)
+				if playlist == nil {
+					if ctx.Err() != nil && s.logger != nil {
+						s.logger.Debug("playlist resource operation completed during cancellation", "id", inp.ID, "error", ctx.Err())
+					}
+					return
+				}
 				res = youtube.Resource{
 					ID:       inp.ID,
 					Type:     youtube.ResourceTypePlaylist,
@@ -116,7 +139,7 @@ func (s *Service) ProcessResourcesWithStats(
 				localProcessStats.VideosProcessed += playlistResStats.VideosProcessed
 				localProcessStats.Metadata.Add(playlistResStats.Metadata)
 				localProcessStats.Subtitle.Add(playlistResStats.Subtitle)
-				if playlist != nil && len(playlist.Errors) > 0 {
+				if len(playlist.Errors) > 0 {
 					localProcessStats.ResourceFailures++
 				} else {
 					localProcessStats.ResourcesSucceeded++
@@ -131,7 +154,10 @@ func (s *Service) ProcessResourcesWithStats(
 					req,
 				)
 				if video == nil {
-					video = &youtube.Video{ID: inp.ID}
+					if ctx.Err() != nil && s.logger != nil {
+						s.logger.Debug("video resource operation completed during cancellation", "id", inp.ID, "error", ctx.Err())
+					}
+					return
 				}
 				res = youtube.Resource{
 					ID:    inp.ID,
@@ -141,7 +167,7 @@ func (s *Service) ProcessResourcesWithStats(
 				localProcessStats.VideosProcessed += videoResStats.VideosProcessed
 				localProcessStats.Metadata.Add(videoResStats.Metadata)
 				localProcessStats.Subtitle.Add(videoResStats.Subtitle)
-				if video != nil && len(video.Errors) > 0 {
+				if len(video.Errors) > 0 {
 					localProcessStats.ResourceFailures++
 				} else {
 					localProcessStats.ResourcesSucceeded++
@@ -163,14 +189,24 @@ func (s *Service) ProcessResourcesWithStats(
 
 	wg.Wait()
 	if s.logger != nil {
-		s.logger.Debug("resource batch processing completed",
-			"requested", processStats.ResourcesRequested,
-			"succeeded", processStats.ResourcesSucceeded,
-			"failed", processStats.ResourceFailures,
-			"videos_processed", processStats.VideosProcessed,
-			"metadata_upstream", processStats.Metadata.UpstreamFetches,
-			"subtitle_upstream", processStats.Subtitle.UpstreamFetches,
-		)
+		if ctx.Err() != nil {
+			s.logger.Debug("resource batch processing completed as cancelled",
+				"requested", processStats.ResourcesRequested,
+				"succeeded", processStats.ResourcesSucceeded,
+				"failed", processStats.ResourceFailures,
+				"videos_processed", processStats.VideosProcessed,
+				"error", ctx.Err(),
+			)
+		} else {
+			s.logger.Debug("resource batch processing completed",
+				"requested", processStats.ResourcesRequested,
+				"succeeded", processStats.ResourcesSucceeded,
+				"failed", processStats.ResourceFailures,
+				"videos_processed", processStats.VideosProcessed,
+				"metadata_upstream", processStats.Metadata.UpstreamFetches,
+				"subtitle_upstream", processStats.Subtitle.UpstreamFetches,
+			)
+		}
 	}
 	return resources, processStats
 }

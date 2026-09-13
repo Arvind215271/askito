@@ -83,11 +83,29 @@ func (s *Service) ProcessResourceWithStats(
 	faultTolerant bool,
 ) (*youtube.Video, stats.PipelineStats) {
 	var pipelineStats stats.PipelineStats
+	videoID := ""
+	if rc != nil && rc.Video != nil {
+		videoID = rc.Video.ID
+	}
+
+	if ctx.Err() != nil {
+		if s.logger != nil {
+			s.logger.Debug("pipeline processing cancelled before start", "videoID", videoID, "error", ctx.Err())
+		}
+		if faultTolerant {
+			if rc != nil && rc.Video != nil {
+				return rc.Video, pipelineStats
+			}
+			return &youtube.Video{}, pipelineStats
+		}
+		return nil, pipelineStats
+	}
 
 	if rc.Video == nil {
 		rc.Video = &youtube.Video{}
 	}
 	video := rc.Video
+	videoID = video.ID
 
 	if rc.Request == nil || rc.Request.ExecutionPlan == nil {
 		err := fmt.Errorf("pipeline request or execution plan is nil")
@@ -101,33 +119,76 @@ func (s *Service) ProcessResourceWithStats(
 	plan := rc.Request.ExecutionPlan
 
 	// 1. Metadata Stage
+	if ctx.Err() != nil {
+		if s.logger != nil {
+			s.logger.Debug("pipeline stage skipped due to cancellation", "videoID", videoID, "stage", "metadata", "error", ctx.Err())
+		}
+		if faultTolerant {
+			return video, pipelineStats
+		}
+		return nil, pipelineStats
+	}
 	if plan.NeedsMetadata() {
 		metaStats, err := ProcessMetadata(ctx, rc, s.metadataService)
 		pipelineStats.Metadata.Add(metaStats)
 		if err != nil {
-			s.logError("metadata processing failed", "videoID", video.ID, "error", err)
+			if ctx.Err() != nil {
+				if s.logger != nil {
+					s.logger.Warn("metadata operation failed during cancellation", "videoID", videoID, "error", err)
+				}
+			} else {
+				s.logError("metadata processing failed", "videoID", videoID, "error", err)
+			}
 			if faultTolerant {
 				video.Errors = append(video.Errors, youtube.Error{Message: fmt.Sprintf("metadata fetch failed: %s", cleanErrorMessage(err))})
 				return video, pipelineStats
 			}
 			return nil, pipelineStats
+		} else if ctx.Err() != nil && s.logger != nil {
+			s.logger.Debug("metadata operation finished successfully during cancellation", "videoID", videoID)
 		}
 	}
 
 	// 2. Description Stage
+	if ctx.Err() != nil {
+		if s.logger != nil {
+			s.logger.Debug("pipeline stage skipped due to cancellation", "videoID", videoID, "stage", "description", "error", ctx.Err())
+		}
+		if faultTolerant {
+			return video, pipelineStats
+		}
+		return nil, pipelineStats
+	}
 	if plan.NeedsDescription() {
 		err := ProcessDescription(ctx, rc, s.descriptionService)
 		if err != nil {
-			s.logError("description processing failed", "videoID", video.ID, "error", err)
+			if ctx.Err() != nil {
+				if s.logger != nil {
+					s.logger.Warn("description operation failed during cancellation", "videoID", videoID, "error", err)
+				}
+			} else {
+				s.logError("description processing failed", "videoID", videoID, "error", err)
+			}
 			if faultTolerant {
 				video.Errors = append(video.Errors, youtube.Error{Message: fmt.Sprintf("description processing failed: %s", cleanErrorMessage(err))})
 			} else {
 				return nil, pipelineStats
 			}
+		} else if ctx.Err() != nil && s.logger != nil {
+			s.logger.Debug("description operation finished successfully during cancellation", "videoID", videoID)
 		}
 	}
 
 	// 3. Subtitle + Transcript Stage
+	if ctx.Err() != nil {
+		if s.logger != nil {
+			s.logger.Debug("pipeline stage skipped due to cancellation", "videoID", videoID, "stage", "subtitle_transcript", "error", ctx.Err())
+		}
+		if faultTolerant {
+			return video, pipelineStats
+		}
+		return nil, pipelineStats
+	}
 	var trans *transcript.Transcript
 	if plan.NeedsSubtitle() || plan.NeedsTranscript() || plan.NeedsSignal() {
 		var subStats stats.SubtitleStats
@@ -135,26 +196,55 @@ func (s *Service) ProcessResourceWithStats(
 		trans, subStats, err = ProcessSubtitleAndTranscript(ctx, rc, s.subtitleService, s.transcriptService)
 		pipelineStats.Subtitle.Add(subStats)
 		if err != nil {
-			s.logError("subtitle/transcript processing failed", "videoID", video.ID, "error", err)
+			if ctx.Err() != nil {
+				if s.logger != nil {
+					s.logger.Warn("subtitle/transcript operation failed during cancellation", "videoID", videoID, "error", err)
+				}
+			} else {
+				s.logError("subtitle/transcript processing failed", "videoID", videoID, "error", err)
+			}
 			if faultTolerant {
 				video.Errors = append(video.Errors, youtube.Error{Message: fmt.Sprintf("subtitle/transcript processing failed: %s", cleanErrorMessage(err))})
 			} else {
 				return nil, pipelineStats
 			}
+		} else if ctx.Err() != nil && s.logger != nil {
+			s.logger.Debug("subtitle/transcript operation finished successfully during cancellation", "videoID", videoID)
 		}
 	}
 
 	// 4. Signal Stage
+	if ctx.Err() != nil {
+		if s.logger != nil {
+			s.logger.Debug("pipeline stage skipped due to cancellation", "videoID", videoID, "stage", "signal", "error", ctx.Err())
+		}
+		if faultTolerant {
+			return video, pipelineStats
+		}
+		return nil, pipelineStats
+	}
 	if plan.NeedsSignal() && trans != nil {
 		err := ProcessSignal(ctx, rc, s.signalService, trans)
 		if err != nil {
-			s.logError("signal processing failed", "videoID", video.ID, "error", err)
+			if ctx.Err() != nil {
+				if s.logger != nil {
+					s.logger.Warn("signal operation failed during cancellation", "videoID", videoID, "error", err)
+				}
+			} else {
+				s.logError("signal processing failed", "videoID", videoID, "error", err)
+			}
 			if faultTolerant {
 				video.Errors = append(video.Errors, youtube.Error{Message: fmt.Sprintf("signal processing failed: %s", cleanErrorMessage(err))})
 			} else {
 				return nil, pipelineStats
 			}
+		} else if ctx.Err() != nil && s.logger != nil {
+			s.logger.Debug("signal operation finished successfully during cancellation", "videoID", videoID)
 		}
+	}
+
+	if ctx.Err() != nil && s.logger != nil {
+		s.logger.Debug("pipeline processing completed as cancelled", "videoID", videoID, "error", ctx.Err(), "metadata_fetches", pipelineStats.Metadata.UpstreamFetches, "subtitle_fetches", pipelineStats.Subtitle.UpstreamFetches)
 	}
 
 	return video, pipelineStats
@@ -250,26 +340,52 @@ func (s *Service) ProcessVideos(
 	var wg sync.WaitGroup
 
 	for i, videoID := range videoIDs {
+		if ctx.Err() != nil {
+			if s.logger != nil {
+				s.logger.Debug("videos batch item unstarted skipped due to cancellation", "index", i, "error", ctx.Err())
+			}
+			break
+		}
 		wg.Add(1)
 		go func(index int, id string) {
 			defer wg.Done()
 
+			if ctx.Err() != nil {
+				if s.logger != nil {
+					s.logger.Debug("video item skipped at goroutine start due to cancellation", "videoID", id, "error", ctx.Err())
+				}
+				return
+			}
+
 			select {
 			case sem <- struct{}{}:
 			case <-ctx.Done():
-				results[index] = &youtube.Video{
-					ID:     id,
-					Errors: []youtube.Error{{Message: "context cancelled"}},
+				if s.logger != nil {
+					s.logger.Debug("video item skipped waiting for semaphore due to cancellation", "videoID", id, "error", ctx.Err())
 				}
 				return
 			}
 			defer func() { <-sem }()
+
+			if ctx.Err() != nil {
+				if s.logger != nil {
+					s.logger.Debug("video item skipped after semaphore due to cancellation", "videoID", id, "error", ctx.Err())
+				}
+				return
+			}
 
 			results[index] = s.ProcessFaultTolerant(ctx, id, req)
 		}(i, videoID)
 	}
 
 	wg.Wait()
+	if s.logger != nil {
+		if ctx.Err() != nil {
+			s.logger.Debug("videos batch processing completed as cancelled", "error", ctx.Err())
+		} else {
+			s.logger.Debug("videos batch processing completed")
+		}
+	}
 	return results
 }
 

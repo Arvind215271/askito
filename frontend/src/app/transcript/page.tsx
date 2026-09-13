@@ -10,6 +10,17 @@ export default function TranscriptPage() {
   const [output, setOutput] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setLoading(false);
+    setError('Request cancelled by user.');
+  };
+
   const handleFetchTranscript = async (e: React.FormEvent) => {
     e.preventDefault();
     const list = inputs.split('\n').map(s => s.trim()).filter(Boolean);
@@ -22,12 +33,16 @@ export default function TranscriptPage() {
     setError(null);
     setOutput(null);
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
       const res = await fetch(`${apiUrl}/transcript`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputs: list })
+        body: JSON.stringify({ inputs: list }),
+        signal: controller.signal
       });
 
       const text = await res.text();
@@ -38,9 +53,14 @@ export default function TranscriptPage() {
       const parsed = JSON.parse(text);
       setOutput(parsed);
     } catch (err: any) {
-      setError(err.message);
+      if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+        setError('Transcript request cancelled by user.');
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -82,28 +102,49 @@ export default function TranscriptPage() {
               }}
             />
 
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                backgroundColor: theme.colors.primaryRed,
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '0.9rem 2rem',
-                fontWeight: 700,
-                fontSize: '1rem',
-                cursor: 'pointer',
-                opacity: loading ? 0.7 : 1,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                boxShadow: `0 4px 14px ${theme.colors.accentGlow}`
-              }}
-            >
-              {loading && <div style={{ width: '1rem', height: '1rem', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s infinite linear' }}></div>}
-              <span>Fetch Transcripts</span>
-            </button>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  backgroundColor: theme.colors.primaryRed,
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '0.9rem 2rem',
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  opacity: loading ? 0.7 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  boxShadow: `0 4px 14px ${theme.colors.accentGlow}`
+                }}
+              >
+                {loading && <div style={{ width: '1rem', height: '1rem', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s infinite linear' }}></div>}
+                <span>Fetch Transcripts</span>
+              </button>
+
+              {loading && (
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: theme.colors.primaryRed,
+                    border: `1px solid ${theme.colors.primaryRed}`,
+                    borderRadius: '6px',
+                    padding: '0.9rem 1.5rem',
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           </div>
         </form>
 

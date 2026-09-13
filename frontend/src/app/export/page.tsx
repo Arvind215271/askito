@@ -17,6 +17,18 @@ export default function ExportPage() {
   const [lastBlob, setLastBlob] = useState<Blob | null>(null);
   const [filename, setFilename] = useState('export.json');
 
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setLoading(false);
+    setSubtitleOptionsLoading(false);
+    setOutput('Request cancelled by user.');
+  };
+
   // Subtitle options integration using /subtitle/options endpoint
   const [subtitleOptionsLoading, setSubtitleOptionsLoading] = useState(false);
   const [rawSubtitleOptions, setRawSubtitleOptions] = useState<any>(null);
@@ -34,12 +46,16 @@ export default function ExportPage() {
     setRawSubtitleOptions(null);
     setSelectedSubtitlePrefs([]);
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
       const res = await fetch(`${apiUrl}/subtitle/options`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputs: list })
+        body: JSON.stringify({ inputs: list }),
+        signal: controller.signal
       });
 
       const text = await res.text();
@@ -50,9 +66,14 @@ export default function ExportPage() {
       const parsed = JSON.parse(text);
       setRawSubtitleOptions(parsed);
     } catch (err: any) {
-      alert('Error fetching subtitle options: ' + err.message);
+      if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+        setOutput('Subtitle options fetch cancelled.');
+      } else {
+        alert('Error fetching subtitle options: ' + err.message);
+      }
     } finally {
       setSubtitleOptionsLoading(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -172,12 +193,16 @@ export default function ExportPage() {
       preferences: selectedSubtitlePrefs.length > 0 ? selectedSubtitlePrefs : undefined
     };
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
       const res = await fetch(`${apiUrl}/export`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller.signal
       });
 
       if (!res.ok) {
@@ -210,9 +235,14 @@ export default function ExportPage() {
         setOutput(text.slice(0, 5000) + (text.length > 5000 ? '\n\n[Output truncated for preview]' : ''));
       }
     } catch (err: any) {
-      setOutput('Error: ' + err.message);
+      if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+        setOutput('Export request was cancelled by user.');
+      } else {
+        setOutput('Error: ' + err.message);
+      }
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -503,12 +533,12 @@ export default function ExportPage() {
             )}
           </div>
 
-          <div style={{ marginTop: '1rem' }}>
+          <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
             <button
               type="submit"
               disabled={loading}
               style={{
-                width: '100%',
+                flex: 1,
                 backgroundColor: theme.colors.primaryRed,
                 color: '#ffffff',
                 border: 'none',
@@ -528,6 +558,29 @@ export default function ExportPage() {
               {loading && <div style={{ width: '1.2rem', height: '1.2rem', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s infinite linear' }}></div>}
               <span>Start Export Now</span>
             </button>
+
+            {(loading || subtitleOptionsLoading) && (
+              <button
+                type="button"
+                onClick={handleCancel}
+                style={{
+                  backgroundColor: 'transparent',
+                  color: theme.colors.textMain,
+                  border: `1px solid ${theme.colors.borderColor}`,
+                  borderRadius: '6px',
+                  padding: '1.1rem 1.5rem',
+                  fontWeight: 600,
+                  fontSize: '1.05rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem'
+                }}
+              >
+                Cancel Export
+              </button>
+            )}
           </div>
         </form>
 

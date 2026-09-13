@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/Arvind215271/askito/internal/logger"
 	"github.com/Arvind215271/askito/internal/youtube"
 	"github.com/Arvind215271/askito/internal/youtube/metadata"
 	"github.com/Arvind215271/askito/internal/youtube/pipeline"
@@ -20,8 +21,9 @@ func ProcessPlaylist(
 	playlistID string,
 	req *pipeline.Request,
 	concurrency int,
+	logger *logger.Logger,
 ) *youtube.Playlist {
-	playlist, _ := ProcessPlaylistWithStats(ctx, metadataService, pipelineService, playlistID, req, concurrency)
+	playlist, _ := ProcessPlaylistWithStats(ctx, metadataService, pipelineService, playlistID, req, concurrency, logger)
 	return playlist
 }
 
@@ -33,11 +35,19 @@ func ProcessPlaylistWithStats(
 	playlistID string,
 	req *pipeline.Request,
 	concurrency int,
+	logger *logger.Logger,
 ) (*youtube.Playlist, stats.ResourceStats) {
 	playlist := &youtube.Playlist{
 		ID: playlistID,
 	}
 	var resourceStats stats.ResourceStats
+
+	if ctx.Err() != nil {
+		if logger != nil {
+			logger.Debug("playlist processing cancelled before start", "playlistID", playlistID, "error", ctx.Err())
+		}
+		return playlist, resourceStats
+	}
 
 	if metadataService == nil {
 		playlist.Errors = append(playlist.Errors, youtube.Error{Message: "metadata service is nil"})
@@ -48,12 +58,20 @@ func ProcessPlaylistWithStats(
 	items, metaStats, err := metadataService.GetPlaylistItemsWithStats(ctx, playlistID, metadata.ProviderYTDLP)
 	resourceStats.Metadata.Add(metaStats)
 	if err != nil {
+		if ctx.Err() != nil && logger != nil {
+			logger.Warn("playlist items fetch failed during cancellation (ytdlp)", "playlistID", playlistID, "error", err)
+		}
 		items, metaStats, err = metadataService.GetPlaylistItemsWithStats(ctx, playlistID, metadata.ProviderAPI)
 		resourceStats.Metadata.Add(metaStats)
 		if err != nil {
+			if ctx.Err() != nil && logger != nil {
+				logger.Warn("playlist items fetch failed during cancellation (api)", "playlistID", playlistID, "error", err)
+			}
 			playlist.Errors = append(playlist.Errors, youtube.Error{Message: fmt.Sprintf("failed to fetch playlist items: %v", err)})
 			return playlist, resourceStats
 		}
+	} else if ctx.Err() != nil && logger != nil {
+		logger.Debug("playlist items fetch finished successfully during cancellation", "playlistID", playlistID)
 	}
 
 	playlist.Items = items
@@ -76,6 +94,12 @@ func ProcessPlaylistWithStats(
 
 	if !needsPipeline {
 		for i, item := range items {
+			if ctx.Err() != nil {
+				if logger != nil {
+					logger.Debug("playlist item skipped (no pipeline) due to cancellation", "playlistID", playlistID, "index", i, "error", ctx.Err())
+				}
+				break
+			}
 			video := ItemToVideo(item)
 			playlistVideos[i] = youtube.PlaylistVideo{
 				Video:    video,
@@ -97,27 +121,39 @@ func ProcessPlaylistWithStats(
 	var mu sync.Mutex
 
 	for i, item := range items {
+		if ctx.Err() != nil {
+			if logger != nil {
+				logger.Debug("playlist item unstarted skipped due to cancellation", "playlistID", playlistID, "index", i, "error", ctx.Err())
+			}
+			break
+		}
 		wg.Add(1)
 		go func(index int, pi youtube.PlaylistItem) {
 			defer wg.Done()
 
+			if ctx.Err() != nil {
+				if logger != nil {
+					logger.Debug("playlist item skipped at goroutine start due to cancellation", "playlistID", playlistID, "error", ctx.Err())
+				}
+				return
+			}
+
 			select {
 			case sem <- struct{}{}:
 			case <-ctx.Done():
-				baseVideo := ItemToVideo(pi)
-				baseVideo.Errors = append(baseVideo.Errors, youtube.Error{Message: "context cancelled"})
-				playlistVideos[index] = youtube.PlaylistVideo{
-					Video:    baseVideo,
-					Position: pi.Position,
-					AddedAt:  pi.AddedAt,
+				if logger != nil {
+					logger.Debug("playlist item skipped waiting for semaphore due to cancellation", "playlistID", playlistID, "error", ctx.Err())
 				}
-				mu.Lock()
-				resourceStats.VideosProcessed++
-				resourceStats.VideoFailures++
-				mu.Unlock()
 				return
 			}
 			defer func() { <-sem }()
+
+			if ctx.Err() != nil {
+				if logger != nil {
+					logger.Debug("playlist item skipped after semaphore due to cancellation", "playlistID", playlistID, "error", ctx.Err())
+				}
+				return
+			}
 
 			baseVideo := ItemToVideo(pi)
 			var processedVideo *youtube.Video
@@ -159,5 +195,10 @@ func ProcessPlaylistWithStats(
 
 	wg.Wait()
 	playlist.Videos = playlistVideos
+
+	if ctx.Err() != nil && logger != nil {
+		logger.Debug("playlist processing completed as cancelled", "playlistID", playlistID, "error", ctx.Err(), "videos_processed", resourceStats.VideosProcessed)
+	}
+
 	return playlist, resourceStats
 }

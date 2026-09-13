@@ -39,6 +39,18 @@ export default function SubtitlePage() {
   // Drag and drop state
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setLoading(false);
+    setDownloading(false);
+    setError('Request cancelled by user.');
+  };
+
   const handleFetchOptions = async (e: React.FormEvent) => {
     e.preventDefault();
     const list = inputs.split('\n').map(s => s.trim()).filter(Boolean);
@@ -52,12 +64,16 @@ export default function SubtitlePage() {
     setRawResponseData(null);
     setSelectedPrefs([]);
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
       const res = await fetch(`${apiUrl}/subtitle/options`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inputs: list })
+        body: JSON.stringify({ inputs: list }),
+        signal: controller.signal
       });
 
       const text = await res.text();
@@ -68,9 +84,14 @@ export default function SubtitlePage() {
       const parsed = JSON.parse(text);
       setRawResponseData(parsed);
     } catch (err: any) {
-      setError(err.message);
+      if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+        setError('Subtitle options fetch cancelled.');
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -270,6 +291,9 @@ export default function SubtitlePage() {
     }
 
     setDownloading(true);
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
       const payload = {
@@ -284,7 +308,8 @@ export default function SubtitlePage() {
       const res = await fetch(`${apiUrl}/subtitle/download`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller.signal
       });
 
       if (!res.ok) {
@@ -302,9 +327,14 @@ export default function SubtitlePage() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (err: any) {
-      alert('Error downloading subtitles: ' + err.message);
+      if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+        setError('Subtitle download cancelled by user.');
+      } else {
+        alert('Error downloading subtitles: ' + err.message);
+      }
     } finally {
       setDownloading(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -346,7 +376,7 @@ export default function SubtitlePage() {
               }}
             />
 
-            <div style={{ marginTop: '1.5rem' }}>
+            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <button
                 type="submit"
                 disabled={loading}
@@ -369,6 +399,25 @@ export default function SubtitlePage() {
                 {loading && <div style={{ width: '1rem', height: '1rem', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s infinite linear' }}></div>}
                 <span>Analyze Subtitle Options & Frequencies</span>
               </button>
+
+              {loading && (
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: theme.colors.primaryRed,
+                    border: `1px solid ${theme.colors.primaryRed}`,
+                    borderRadius: '6px',
+                    padding: '0.9rem 1.5rem',
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
             </div>
           </div>
         </form>
@@ -644,7 +693,7 @@ export default function SubtitlePage() {
                 </div>
               </div>
 
-              <div style={{ marginTop: '1rem' }}>
+              <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <button
                   type="submit"
                   disabled={downloading}
@@ -667,6 +716,25 @@ export default function SubtitlePage() {
                   {downloading && <div style={{ width: '1rem', height: '1rem', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s infinite linear' }}></div>}
                   <span>Download Subtitles ZIP Package</span>
                 </button>
+
+                {downloading && (
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: theme.colors.primaryRed,
+                      border: `1px solid ${theme.colors.primaryRed}`,
+                      borderRadius: '6px',
+                      padding: '1rem 1.5rem',
+                      fontWeight: 700,
+                      fontSize: '1rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                )}
               </div>
             </form>
           </div>
