@@ -4,6 +4,7 @@ import gc
 import os
 import struct
 import sys
+import time
 
 import orjson
 import yt_dlp
@@ -68,6 +69,35 @@ def send(obj):
     stdout.flush()
 
 
+def extract_with_retry(ydl, url, download=False, max_retries=3, initial_delay=2.0):
+    delay = initial_delay
+    for attempt in range(max_retries):
+        try:
+            return ydl.extract_info(url, download=download)
+        except Exception as e:
+            err_msg = str(e)
+            is_rate_limit = "429" in err_msg or "Too Many Requests" in err_msg or "HTTP Error" in err_msg
+            if attempt == max_retries - 1 or not is_rate_limit:
+                raise
+            time.sleep(delay)
+            delay *= 2.0
+
+
+def download_with_retry(ydl, url_list, max_retries=3, initial_delay=2.0):
+    delay = initial_delay
+    for attempt in range(max_retries):
+        try:
+            ydl.download(url_list)
+            return
+        except Exception as e:
+            err_msg = str(e)
+            is_rate_limit = "429" in err_msg or "Too Many Requests" in err_msg or "HTTP Error" in err_msg
+            if attempt == max_retries - 1 or not is_rate_limit:
+                raise
+            time.sleep(delay)
+            delay *= 2.0
+
+
 def main():
     ydl = yt_dlp.YoutubeDL(YDL_OPTS)
 
@@ -104,7 +134,8 @@ def main():
                 try:
                     ydl.params["extract_flat"] = True
 
-                    info = ydl.extract_info(
+                    info = extract_with_retry(
+                        ydl,
                         playlist_url,
                         download=False,
                     )
@@ -125,7 +156,7 @@ def main():
                 continue
 
             if cmd == "warmup":
-                ydl.extract_info(WARMUP_URL, download=False)
+                extract_with_retry(ydl, WARMUP_URL, download=False)
                 send({"ok": True})
                 continue
 
@@ -155,7 +186,7 @@ def main():
                     ydl.params["subtitlesformat"] = fmt
                     ydl.params["outtmpl"] = outtmpl
 
-                    ydl.download([YT_URL + video_id])
+                    download_with_retry(ydl, [YT_URL + video_id])
 
                 finally:
                     ydl.params["outtmpl"] = old_outtmpl
@@ -166,7 +197,8 @@ def main():
 
                 continue
 
-            info = ydl.extract_info(
+            info = extract_with_retry(
+                ydl,
                 YT_URL + req["video_id"],
                 download=False,
             )

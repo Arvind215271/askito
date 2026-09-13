@@ -8,6 +8,7 @@ import (
 
 	"github.com/Arvind215271/askito/internal/cache"
 	"github.com/Arvind215271/askito/internal/logger"
+	"github.com/Arvind215271/askito/internal/youtube/stats"
 )
 
 type WorkerExecution struct {
@@ -49,7 +50,11 @@ func (p *SinglePool) WarmUp(ctx context.Context) error {
 func (p *SinglePool) GetVideo(
 	ctx context.Context,
 	videoID string,
+	st *stats.MetadataStats,
 ) (map[string]any, error) {
+	if st != nil {
+		st.YTDLPRequests++
+	}
 	key := p.cache.VideoKey()
 
 	data, err := p.cache.Get(videoID, key)
@@ -57,8 +62,16 @@ func (p *SinglePool) GetVideo(
 		var result map[string]any
 
 		if err := json.Unmarshal(data, &result); err == nil {
+			if st != nil {
+				st.CacheHits++
+			}
 			return result, nil
 		}
+	}
+
+	if st != nil {
+		st.CacheMisses++
+		st.UpstreamFetches++
 	}
 
 	result, err := p.manager.GetVideo(ctx, videoID)
@@ -87,7 +100,7 @@ func (p *SinglePool) GetVideos(
 		go func(index int, id string) {
 			defer wg.Done()
 
-			result, err := p.GetVideo(ctx, id)
+			result, err := p.GetVideo(ctx, id, nil)
 			if err != nil {
 				select {
 				case errCh <- err:
@@ -113,7 +126,11 @@ func (p *SinglePool) GetVideos(
 func (p *SinglePool) GetPlaylist(
 	ctx context.Context,
 	playlistID string,
+	st *stats.MetadataStats,
 ) (map[string]any, error) {
+	if st != nil {
+		st.YTDLPRequests++
+	}
 	key := p.cache.PlaylistKey()
 
 	data, err := p.cache.Get(playlistID, key)
@@ -121,8 +138,16 @@ func (p *SinglePool) GetPlaylist(
 		var result map[string]any
 
 		if err := json.Unmarshal(data, &result); err == nil {
+			if st != nil {
+				st.CacheHits++
+			}
 			return result, nil
 		}
+	}
+
+	if st != nil {
+		st.CacheMisses++
+		st.UpstreamFetches++
 	}
 
 	result, err := p.manager.GetPlaylist(ctx, playlistID)

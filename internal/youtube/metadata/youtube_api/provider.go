@@ -7,6 +7,7 @@ import (
 
 	"github.com/Arvind215271/askito/internal/logger"
 	youtube "github.com/Arvind215271/askito/internal/youtube"
+	"github.com/Arvind215271/askito/internal/youtube/stats"
 )
 
 type Provider struct {
@@ -27,7 +28,13 @@ func NewProvider(
 func (p *Provider) GetPlaylistMetadata(
 	ctx context.Context,
 	playlistID string,
+	st *stats.MetadataStats,
 ) (youtube.Playlist, error) {
+	if st != nil {
+		st.APIRequests++
+		st.CacheMisses++
+		st.UpstreamFetches++
+	}
 
 	// contain playlist metadata only not any videoID in it.
 	playlist, err := p.client.GetPlaylist(
@@ -69,7 +76,13 @@ func (p *Provider) GetPlaylistMetadata(
 func (p *Provider) GetVideo(
 	ctx context.Context,
 	videoID string,
+	st *stats.MetadataStats,
 ) (youtube.Video, error) {
+	if st != nil {
+		st.APIRequests++
+		st.CacheMisses++
+		st.UpstreamFetches++
+	}
 
 	videoList, err := p.client.GetVideos(
 		ctx,
@@ -91,7 +104,13 @@ func (p *Provider) GetVideo(
 func (p *Provider) GetPlaylistItems(
 	ctx context.Context,
 	playlistID string,
+	st *stats.MetadataStats,
 ) ([]youtube.PlaylistItem, error) {
+	if st != nil {
+		st.APIRequests++
+		st.CacheMisses++
+		st.UpstreamFetches++
+	}
 	items, err := p.client.GetPlaylistItems(ctx, playlistID)
 	if err != nil {
 		return nil, err

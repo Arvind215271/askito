@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Arvind215271/askito/internal/youtube"
+	"github.com/Arvind215271/askito/internal/youtube/stats"
 )
 
 type Service struct {
@@ -21,16 +22,83 @@ func NewService(
 	}
 }
 
+func (s *Service) GetPlaylistMetadataWithStats(
+	ctx context.Context,
+	playlistID string,
+	providerType ProviderType,
+) (youtube.Playlist, stats.MetadataStats, error) {
+	var st stats.MetadataStats
+	st.Attempts++
+
+	var playlist youtube.Playlist
+	var err error
+
+	useAPI := (providerType == ProviderAPI)
+	if useAPI && s.apiProvider != nil {
+		playlist, err = s.apiProvider.GetPlaylistMetadata(ctx, playlistID, &st)
+	} else if s.ytdlpProvider != nil {
+		playlist, err = s.ytdlpProvider.GetPlaylistMetadata(ctx, playlistID, &st)
+		if err != nil && s.apiProvider != nil {
+			st.Fallbacks++
+			playlist, err = s.apiProvider.GetPlaylistMetadata(ctx, playlistID, &st)
+		}
+	} else if s.apiProvider != nil {
+		playlist, err = s.apiProvider.GetPlaylistMetadata(ctx, playlistID, &st)
+	} else {
+		err = youtube.Err.Playlist.FetchFailed()
+	}
+
+	if err != nil {
+		st.Failures++
+		return youtube.Playlist{}, st, err
+	}
+
+	st.Successes++
+	return playlist, st, nil
+}
+
 func (s *Service) GetPlaylistMetadata(
 	ctx context.Context,
 	playlistID string,
 	providerType ProviderType,
 ) (youtube.Playlist, error) {
-	if providerType == ProviderAPI && s.apiProvider != nil {
-		return s.apiProvider.GetPlaylistMetadata(ctx, playlistID)
+	playlist, _, err := s.GetPlaylistMetadataWithStats(ctx, playlistID, providerType)
+	return playlist, err
+}
+
+func (s *Service) GetPlaylistItemsWithStats(
+	ctx context.Context,
+	playlistID string,
+	providerType ProviderType,
+) ([]youtube.PlaylistItem, stats.MetadataStats, error) {
+	var st stats.MetadataStats
+	st.Attempts++
+
+	var items []youtube.PlaylistItem
+	var err error
+
+	useAPI := (providerType == ProviderAPI)
+	if useAPI && s.apiProvider != nil {
+		items, err = s.apiProvider.GetPlaylistItems(ctx, playlistID, &st)
+	} else if s.ytdlpProvider != nil {
+		items, err = s.ytdlpProvider.GetPlaylistItems(ctx, playlistID, &st)
+		if err != nil && s.apiProvider != nil {
+			st.Fallbacks++
+			items, err = s.apiProvider.GetPlaylistItems(ctx, playlistID, &st)
+		}
+	} else if s.apiProvider != nil {
+		items, err = s.apiProvider.GetPlaylistItems(ctx, playlistID, &st)
+	} else {
+		err = youtube.Err.Playlist.FetchFailed()
 	}
 
-	return s.ytdlpProvider.GetPlaylistMetadata(ctx, playlistID)
+	if err != nil {
+		st.Failures++
+		return nil, st, err
+	}
+
+	st.Successes++
+	return items, st, nil
 }
 
 func (s *Service) GetPlaylistItems(
@@ -38,11 +106,43 @@ func (s *Service) GetPlaylistItems(
 	playlistID string,
 	providerType ProviderType,
 ) ([]youtube.PlaylistItem, error) {
-	if providerType == ProviderAPI && s.apiProvider != nil {
-		return s.apiProvider.GetPlaylistItems(ctx, playlistID)
+	items, _, err := s.GetPlaylistItemsWithStats(ctx, playlistID, providerType)
+	return items, err
+}
+
+func (s *Service) GetVideoWithStats(
+	ctx context.Context,
+	videoID string,
+	providerType ProviderType,
+) (youtube.Video, stats.MetadataStats, error) {
+	var st stats.MetadataStats
+	st.Attempts++
+
+	var video youtube.Video
+	var err error
+
+	useAPI := (providerType == ProviderAPI)
+	if useAPI && s.apiProvider != nil {
+		video, err = s.apiProvider.GetVideo(ctx, videoID, &st)
+	} else if s.ytdlpProvider != nil {
+		video, err = s.ytdlpProvider.GetVideo(ctx, videoID, &st)
+		if err != nil && s.apiProvider != nil {
+			st.Fallbacks++
+			video, err = s.apiProvider.GetVideo(ctx, videoID, &st)
+		}
+	} else if s.apiProvider != nil {
+		video, err = s.apiProvider.GetVideo(ctx, videoID, &st)
+	} else {
+		err = youtube.Err.Video.FetchFailed()
 	}
 
-	return s.ytdlpProvider.GetPlaylistItems(ctx, playlistID)
+	if err != nil {
+		st.Failures++
+		return youtube.Video{}, st, err
+	}
+
+	st.Successes++
+	return video, st, nil
 }
 
 func (s *Service) GetVideo(
@@ -50,9 +150,6 @@ func (s *Service) GetVideo(
 	videoID string,
 	providerType ProviderType,
 ) (youtube.Video, error) {
-	if providerType == ProviderAPI && s.apiProvider != nil {
-		return s.apiProvider.GetVideo(ctx, videoID)
-	}
-
-	return s.ytdlpProvider.GetVideo(ctx, videoID)
+	video, _, err := s.GetVideoWithStats(ctx, videoID, providerType)
+	return video, err
 }

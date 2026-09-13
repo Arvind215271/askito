@@ -8,6 +8,7 @@ import (
 	"github.com/Arvind215271/askito/internal/youtube"
 	"github.com/Arvind215271/askito/internal/youtube/metadata"
 	"github.com/Arvind215271/askito/internal/youtube/pipeline"
+	"github.com/Arvind215271/askito/internal/youtube/stats"
 )
 
 // ProcessPlaylist fetches playlist items, decides whether the pipeline is needed based on execution plan,
@@ -20,22 +21,38 @@ func ProcessPlaylist(
 	req *pipeline.Request,
 	concurrency int,
 ) *youtube.Playlist {
+	playlist, _ := ProcessPlaylistWithStats(ctx, metadataService, pipelineService, playlistID, req, concurrency)
+	return playlist
+}
+
+// ProcessPlaylistWithStats fetches playlist items and processes them, returning playlist and resource stats.
+func ProcessPlaylistWithStats(
+	ctx context.Context,
+	metadataService *metadata.Service,
+	pipelineService *pipeline.Service,
+	playlistID string,
+	req *pipeline.Request,
+	concurrency int,
+) (*youtube.Playlist, stats.ResourceStats) {
 	playlist := &youtube.Playlist{
 		ID: playlistID,
 	}
+	var resourceStats stats.ResourceStats
 
 	if metadataService == nil {
 		playlist.Errors = append(playlist.Errors, youtube.Error{Message: "metadata service is nil"})
-		return playlist
+		return playlist, resourceStats
 	}
 
-	// 1. Fetch playlist items
-	items, err := metadataService.GetPlaylistItems(ctx, playlistID, metadata.ProviderYTDLP)
+	// 1. Fetch playlist items with stats
+	items, metaStats, err := metadataService.GetPlaylistItemsWithStats(ctx, playlistID, metadata.ProviderYTDLP)
+	resourceStats.Metadata.Add(metaStats)
 	if err != nil {
-		items, err = metadataService.GetPlaylistItems(ctx, playlistID, metadata.ProviderAPI)
+		items, metaStats, err = metadataService.GetPlaylistItemsWithStats(ctx, playlistID, metadata.ProviderAPI)
+		resourceStats.Metadata.Add(metaStats)
 		if err != nil {
 			playlist.Errors = append(playlist.Errors, youtube.Error{Message: fmt.Sprintf("failed to fetch playlist items: %v", err)})
-			return playlist
+			return playlist, resourceStats
 		}
 	}
 
@@ -43,7 +60,7 @@ func ProcessPlaylist(
 	playlist.ItemCount = len(items)
 
 	if len(items) == 0 {
-		return playlist
+		return playlist, resourceStats
 	}
 
 	// Determine if pipeline processing is needed
@@ -67,7 +84,8 @@ func ProcessPlaylist(
 			}
 		}
 		playlist.Videos = playlistVideos
-		return playlist
+		resourceStats.VideosProcessed += len(items)
+		return playlist, resourceStats
 	}
 
 	if concurrency <= 0 {
@@ -76,6 +94,7 @@ func ProcessPlaylist(
 
 	sem := make(chan struct{}, concurrency)
 	var wg sync.WaitGroup
+	var mu sync.Mutex
 
 	for i, item := range items {
 		wg.Add(1)
@@ -92,21 +111,34 @@ func ProcessPlaylist(
 					Position: pi.Position,
 					AddedAt:  pi.AddedAt,
 				}
+				mu.Lock()
+				resourceStats.VideosProcessed++
+				resourceStats.VideoFailures++
+				mu.Unlock()
 				return
 			}
 			defer func() { <-sem }()
 
 			baseVideo := ItemToVideo(pi)
 			var processedVideo *youtube.Video
+			var videoResStats stats.ResourceStats
 			if pipelineService != nil {
 				rc := &pipeline.ResourceContext{
 					Video:   &baseVideo,
 					Request: req,
 					Plan:    req.ExecutionPlan,
 				}
-				processedVideo = pipelineService.ProcessResource(ctx, rc, true)
+				pVideo, pStats := pipelineService.ProcessResourceWithStats(ctx, rc, true)
+				processedVideo = pVideo
+				videoResStats.VideosProcessed++
+				videoResStats.Metadata.Add(pStats.Metadata)
+				videoResStats.Subtitle.Add(pStats.Subtitle)
+				if pVideo != nil && len(pVideo.Errors) > 0 {
+					videoResStats.VideoFailures++
+				}
 			} else {
 				processedVideo = &baseVideo
+				videoResStats.VideosProcessed++
 			}
 
 			if processedVideo == nil {
@@ -118,10 +150,14 @@ func ProcessPlaylist(
 				Position: pi.Position,
 				AddedAt:  pi.AddedAt,
 			}
+
+			mu.Lock()
+			resourceStats.Add(videoResStats)
+			mu.Unlock()
 		}(i, item)
 	}
 
 	wg.Wait()
 	playlist.Videos = playlistVideos
-	return playlist
+	return playlist, resourceStats
 }

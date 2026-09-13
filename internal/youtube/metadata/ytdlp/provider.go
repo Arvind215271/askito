@@ -6,6 +6,7 @@ import (
 
 	"github.com/Arvind215271/askito/internal/logger"
 	"github.com/Arvind215271/askito/internal/youtube"
+	"github.com/Arvind215271/askito/internal/youtube/stats"
 )
 
 type Provider struct {
@@ -20,9 +21,9 @@ func NewProvider(client *Client, logger *logger.Logger) *Provider {
 	}
 }
 
-func (p *Provider) GetVideo(ctx context.Context, videoID string) (youtube.Video, error) {
+func (p *Provider) GetVideo(ctx context.Context, videoID string, st *stats.MetadataStats) (youtube.Video, error) {
 	p.logger.Debug("getting video from ytdlp provider", "videoID", videoID)
-	meta, err := p.client.GetVideo(ctx, videoID)
+	meta, err := p.client.GetVideo(ctx, videoID, st)
 	if err != nil {
 		p.logger.Error("failed to get video from ytdlp provider", "error", err, "videoID", videoID)
 		return youtube.Video{}, err
@@ -30,9 +31,9 @@ func (p *Provider) GetVideo(ctx context.Context, videoID string) (youtube.Video,
 	return MapVideo(meta), nil
 }
 
-func (p *Provider) GetPlaylistMetadata(ctx context.Context, playlistID string) (youtube.Playlist, error) {
+func (p *Provider) GetPlaylistMetadata(ctx context.Context, playlistID string, st *stats.MetadataStats) (youtube.Playlist, error) {
 	p.logger.Debug("getting playlist from ytdlp provider", "playlistID", playlistID)
-	meta, err := p.client.GetPlaylist(ctx, playlistID)
+	meta, err := p.client.GetPlaylist(ctx, playlistID, st)
 	if err != nil {
 		p.logger.Error("failed to get playlist from ytdlp provider", "error", err, "playlistID", playlistID)
 		return youtube.Playlist{}, err
@@ -40,8 +41,8 @@ func (p *Provider) GetPlaylistMetadata(ctx context.Context, playlistID string) (
 	return MapPlaylist(meta), nil
 }
 
-func (p *Provider) GetPlaylistItems(ctx context.Context, playlistID string) ([]youtube.PlaylistItem, error) {
-	meta, err := p.client.GetPlaylist(ctx, playlistID)
+func (p *Provider) GetPlaylistItems(ctx context.Context, playlistID string, st *stats.MetadataStats) ([]youtube.PlaylistItem, error) {
+	meta, err := p.client.GetPlaylist(ctx, playlistID, st)
 	if err != nil {
 		return nil, err
 	}

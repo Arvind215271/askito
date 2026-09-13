@@ -3,6 +3,7 @@ package pipeline
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/Arvind215271/askito/internal/logger"
@@ -10,6 +11,7 @@ import (
 	"github.com/Arvind215271/askito/internal/youtube/description"
 	"github.com/Arvind215271/askito/internal/youtube/metadata"
 	"github.com/Arvind215271/askito/internal/youtube/signal"
+	"github.com/Arvind215271/askito/internal/youtube/stats"
 	"github.com/Arvind215271/askito/internal/youtube/subtitle"
 	"github.com/Arvind215271/askito/internal/youtube/transcript"
 )
@@ -49,11 +51,39 @@ func NewService(
 	}
 }
 
-func (s *Service) ProcessResource(
+func cleanErrorMessage(err error) string {
+	if err == nil {
+		return ""
+	}
+	s := err.Error()
+	lines := strings.Split(s, "\n")
+	var result []string
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "File \"") ||
+			strings.HasPrefix(trimmed, "Traceback") ||
+			strings.HasPrefix(trimmed, "During handling") ||
+			strings.HasPrefix(trimmed, "The above exception") ||
+			(strings.HasPrefix(line, "    ") && !strings.Contains(trimmed, "Error")) {
+			continue
+		}
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	if len(result) > 0 {
+		return strings.Join(result, " — ")
+	}
+	return s
+}
+
+func (s *Service) ProcessResourceWithStats(
 	ctx context.Context,
 	rc *ResourceContext,
 	faultTolerant bool,
-) *youtube.Video {
+) (*youtube.Video, stats.PipelineStats) {
+	var pipelineStats stats.PipelineStats
+
 	if rc.Video == nil {
 		rc.Video = &youtube.Video{}
 	}
@@ -62,24 +92,25 @@ func (s *Service) ProcessResource(
 	if rc.Request == nil || rc.Request.ExecutionPlan == nil {
 		err := fmt.Errorf("pipeline request or execution plan is nil")
 		if faultTolerant {
-			video.Errors = append(video.Errors, youtube.Error{Message: err.Error()})
-			return video
+			video.Errors = append(video.Errors, youtube.Error{Message: cleanErrorMessage(err)})
+			return video, pipelineStats
 		}
-		return nil
+		return nil, pipelineStats
 	}
 
 	plan := rc.Request.ExecutionPlan
 
 	// 1. Metadata Stage
 	if plan.NeedsMetadata() {
-		err := ProcessMetadata(ctx, rc, s.metadataService)
+		metaStats, err := ProcessMetadata(ctx, rc, s.metadataService)
+		pipelineStats.Metadata.Add(metaStats)
 		if err != nil {
 			s.logError("metadata processing failed", "videoID", video.ID, "error", err)
 			if faultTolerant {
-				video.Errors = append(video.Errors, youtube.Error{Message: fmt.Sprintf("metadata fetch failed: %v", err)})
-				return video
+				video.Errors = append(video.Errors, youtube.Error{Message: fmt.Sprintf("metadata fetch failed: %s", cleanErrorMessage(err))})
+				return video, pipelineStats
 			}
-			return nil
+			return nil, pipelineStats
 		}
 	}
 
@@ -89,9 +120,9 @@ func (s *Service) ProcessResource(
 		if err != nil {
 			s.logError("description processing failed", "videoID", video.ID, "error", err)
 			if faultTolerant {
-				video.Errors = append(video.Errors, youtube.Error{Message: fmt.Sprintf("description processing failed: %v", err)})
+				video.Errors = append(video.Errors, youtube.Error{Message: fmt.Sprintf("description processing failed: %s", cleanErrorMessage(err))})
 			} else {
-				return nil
+				return nil, pipelineStats
 			}
 		}
 	}
@@ -99,14 +130,16 @@ func (s *Service) ProcessResource(
 	// 3. Subtitle + Transcript Stage
 	var trans *transcript.Transcript
 	if plan.NeedsSubtitle() || plan.NeedsTranscript() || plan.NeedsSignal() {
+		var subStats stats.SubtitleStats
 		var err error
-		trans, err = ProcessSubtitleAndTranscript(ctx, rc, s.subtitleService, s.transcriptService)
+		trans, subStats, err = ProcessSubtitleAndTranscript(ctx, rc, s.subtitleService, s.transcriptService)
+		pipelineStats.Subtitle.Add(subStats)
 		if err != nil {
 			s.logError("subtitle/transcript processing failed", "videoID", video.ID, "error", err)
 			if faultTolerant {
-				video.Errors = append(video.Errors, youtube.Error{Message: fmt.Sprintf("subtitle/transcript processing failed: %v", err)})
+				video.Errors = append(video.Errors, youtube.Error{Message: fmt.Sprintf("subtitle/transcript processing failed: %s", cleanErrorMessage(err))})
 			} else {
-				return nil
+				return nil, pipelineStats
 			}
 		}
 	}
@@ -117,14 +150,46 @@ func (s *Service) ProcessResource(
 		if err != nil {
 			s.logError("signal processing failed", "videoID", video.ID, "error", err)
 			if faultTolerant {
-				video.Errors = append(video.Errors, youtube.Error{Message: fmt.Sprintf("signal processing failed: %v", err)})
+				video.Errors = append(video.Errors, youtube.Error{Message: fmt.Sprintf("signal processing failed: %s", cleanErrorMessage(err))})
 			} else {
-				return nil
+				return nil, pipelineStats
 			}
 		}
 	}
 
+	return video, pipelineStats
+}
+
+func (s *Service) ProcessResource(
+	ctx context.Context,
+	rc *ResourceContext,
+	faultTolerant bool,
+) *youtube.Video {
+	video, _ := s.ProcessResourceWithStats(ctx, rc, faultTolerant)
 	return video
+}
+
+func (s *Service) ProcessWithStats(
+	ctx context.Context,
+	videoID string,
+	req *Request,
+) (*youtube.Video, stats.PipelineStats, error) {
+	if req == nil || req.ExecutionPlan == nil {
+		return nil, stats.PipelineStats{}, fmt.Errorf("pipeline request or execution plan is nil for video %s", videoID)
+	}
+
+	rc := &ResourceContext{
+		Video:   &youtube.Video{ID: videoID},
+		Request: req,
+		Plan:    req.ExecutionPlan,
+	}
+
+	video, pipelineStats := s.ProcessResourceWithStats(ctx, rc, false)
+	if video == nil || len(video.Errors) > 0 {
+		return nil, pipelineStats, fmt.Errorf("failed to process video %s", videoID)
+	}
+
+	return video, pipelineStats, nil
 }
 
 func (s *Service) Process(
@@ -132,8 +197,20 @@ func (s *Service) Process(
 	videoID string,
 	req *Request,
 ) (*youtube.Video, error) {
+	video, _, err := s.ProcessWithStats(ctx, videoID, req)
+	return video, err
+}
+
+func (s *Service) ProcessFaultTolerantWithStats(
+	ctx context.Context,
+	videoID string,
+	req *Request,
+) (*youtube.Video, stats.PipelineStats) {
 	if req == nil || req.ExecutionPlan == nil {
-		return nil, fmt.Errorf("pipeline request or execution plan is nil for video %s", videoID)
+		return &youtube.Video{
+			ID:     videoID,
+			Errors: []youtube.Error{{Message: "pipeline request or execution plan is nil"}},
+		}, stats.PipelineStats{}
 	}
 
 	rc := &ResourceContext{
@@ -142,12 +219,7 @@ func (s *Service) Process(
 		Plan:    req.ExecutionPlan,
 	}
 
-	video := s.ProcessResource(ctx, rc, false)
-	if video == nil || len(video.Errors) > 0 {
-		return nil, fmt.Errorf("failed to process video %s", videoID)
-	}
-
-	return video, nil
+	return s.ProcessResourceWithStats(ctx, rc, true)
 }
 
 func (s *Service) ProcessFaultTolerant(
@@ -155,20 +227,8 @@ func (s *Service) ProcessFaultTolerant(
 	videoID string,
 	req *Request,
 ) *youtube.Video {
-	if req == nil || req.ExecutionPlan == nil {
-		return &youtube.Video{
-			ID: videoID,
-			Errors: []youtube.Error{{Message: "pipeline request or execution plan is nil"}},
-		}
-	}
-
-	rc := &ResourceContext{
-		Video:   &youtube.Video{ID: videoID},
-		Request: req,
-		Plan:    req.ExecutionPlan,
-	}
-
-	return s.ProcessResource(ctx, rc, true)
+	video, _ := s.ProcessFaultTolerantWithStats(ctx, videoID, req)
+	return video
 }
 
 func (s *Service) ProcessVideos(

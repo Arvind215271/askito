@@ -9,6 +9,7 @@ import (
 
 	"github.com/Arvind215271/askito/internal/logger"
 	"github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp/python"
+	"github.com/Arvind215271/askito/internal/youtube/stats"
 )
 
 type Client struct {
@@ -66,8 +67,8 @@ func (c *Client) Fetch(ctx context.Context, args ...string) ([]byte, error) {
 	return nil, fmt.Errorf("failed after %d retries: %w", maxRetries, lastErr)
 }
 
-func (c *Client) GetVideo(ctx context.Context, videoID string) (YTOutput, error) {
-	result, err := c.pool.GetVideo(ctx, videoID)
+func (c *Client) GetVideo(ctx context.Context, videoID string, st *stats.MetadataStats) (YTOutput, error) {
+	result, err := c.pool.GetVideo(ctx, videoID, st)
 	if err != nil {
 		return YTOutput{}, err
 	}
@@ -82,8 +83,8 @@ func (c *Client) GetVideo(ctx context.Context, videoID string) (YTOutput, error)
 	return meta, err
 }
 
-func (c *Client) GetPlaylist(ctx context.Context, playlistID string) (YTPlaylistOutput, error) {
-	result, err := c.pool.GetPlaylist(ctx, playlistID)
+func (c *Client) GetPlaylist(ctx context.Context, playlistID string, st *stats.MetadataStats) (YTPlaylistOutput, error) {
+	result, err := c.pool.GetPlaylist(ctx, playlistID, st)
 	if err != nil {
 		return YTPlaylistOutput{}, err
 	}

@@ -6,19 +6,23 @@ import (
 
 	"github.com/Arvind215271/askito/internal/cache"
 	"github.com/Arvind215271/askito/internal/logger"
-	"github.com/Arvind215271/askito/internal/youtube/metadata/ytdlp/python"
+	"github.com/Arvind215271/askito/internal/youtube/stats"
 )
+
+type SubtitleFetcher interface {
+	GetSubtitle(ctx context.Context, videoID, language, subType, format string) ([]byte, error)
+}
 
 type SubtitleService struct {
 	cache  *cache.Manager
 	logger *logger.Logger
-	pool   *python.SinglePool
+	pool   SubtitleFetcher
 }
 
 func NewSubtitleService(
 	cache *cache.Manager,
 	logger *logger.Logger,
-	pool *python.SinglePool,
+	pool SubtitleFetcher,
 ) *SubtitleService {
 	return &SubtitleService{
 		cache:  cache,
@@ -50,11 +54,13 @@ func (s *SubtitleService) ResolveDownloadRequest(
 	}, nil
 }
 
-func (s *SubtitleService) DownloadSubtitle(
+func (s *SubtitleService) DownloadSubtitleWithStats(
 	ctx context.Context,
 	req DownloadRequest,
 	meta SubtitleMetadata,
-) (*SubtitleResult, error) {
+) (*SubtitleResult, stats.SubtitleStats, error) {
+	var st stats.SubtitleStats
+	st.Attempts++
 
 	s.logger.Debug(
 		"subtitle download requested",
@@ -66,6 +72,7 @@ func (s *SubtitleService) DownloadSubtitle(
 
 	req, err := validateRequest(req)
 	if err != nil {
+		st.Failures++
 		s.logger.Warn(
 			"subtitle request validation failed",
 			"videoID", req.VideoID,
@@ -75,7 +82,13 @@ func (s *SubtitleService) DownloadSubtitle(
 			"error", err,
 		)
 
-		return nil, err
+		return nil, st, err
+	}
+
+	if req.Type == "manual" {
+		st.ManualRequests++
+	} else if req.Type == "automatic" {
+		st.AutomaticRequests++
 	}
 
 	s.logger.Debug(
@@ -87,6 +100,7 @@ func (s *SubtitleService) DownloadSubtitle(
 	)
 
 	if err := validateTrack(req, meta); err != nil {
+		st.Failures++
 		s.logger.Warn(
 			"subtitle track validation failed",
 			"videoID", req.VideoID,
@@ -96,7 +110,7 @@ func (s *SubtitleService) DownloadSubtitle(
 			"error", err,
 		)
 
-		return nil, err
+		return nil, st, err
 	}
 
 	s.logger.Debug(
@@ -116,6 +130,8 @@ func (s *SubtitleService) DownloadSubtitle(
 	)
 
 	if cached, err := s.cache.Get(req.VideoID, cacheKey); err == nil {
+		st.CacheHits++
+		st.Successes++
 
 		s.logger.Debug(
 			"subtitle cache hit",
@@ -130,10 +146,10 @@ func (s *SubtitleService) DownloadSubtitle(
 			Content:  cached,
 			Format:   req.Format,
 			Language: req.Language,
-		}, nil
+		}, st, nil
 
 	} else {
-
+		st.CacheMisses++
 		s.logger.Debug(
 			"subtitle cache miss",
 			"videoID", req.VideoID,
@@ -142,6 +158,7 @@ func (s *SubtitleService) DownloadSubtitle(
 		)
 	}
 
+	st.UpstreamFetches++
 	s.logger.Debug(
 		"downloading subtitle",
 		"videoID", req.VideoID,
@@ -158,7 +175,7 @@ func (s *SubtitleService) DownloadSubtitle(
 		req.Format,
 	)
 	if err != nil {
-
+		st.Failures++
 		s.logger.Warn(
 			"subtitle download failed",
 			"videoID", req.VideoID,
@@ -168,7 +185,7 @@ func (s *SubtitleService) DownloadSubtitle(
 			"error", err,
 		)
 
-		return nil, err
+		return nil, st, err
 	}
 
 	s.logger.Debug(
@@ -198,6 +215,7 @@ func (s *SubtitleService) DownloadSubtitle(
 		)
 	}
 
+	st.Successes++
 	s.logger.Debug(
 		"subtitle download completed",
 		"videoID", req.VideoID,
@@ -211,7 +229,16 @@ func (s *SubtitleService) DownloadSubtitle(
 		Content:  data,
 		Format:   req.Format,
 		Language: req.Language,
-	}, nil
+	}, st, nil
+}
+
+func (s *SubtitleService) DownloadSubtitle(
+	ctx context.Context,
+	req DownloadRequest,
+	meta SubtitleMetadata,
+) (*SubtitleResult, error) {
+	res, _, err := s.DownloadSubtitleWithStats(ctx, req, meta)
+	return res, err
 }
 
 func validateRequest(req DownloadRequest) (DownloadRequest, error) {
