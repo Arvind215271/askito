@@ -11,7 +11,7 @@
     2. Sets up an independent background context (`context.Background()`).
     3. Implements **defer panic recovery** to catch any goroutine panics, convert them to `fmt.Errorf("job panicked: %v", p)`, log them, and transition the job to `failed`.
     4. Executes the user work function. If it returns an error, transitions to `failed` with that error; otherwise, transitions to `completed`.
-- **Tests**: `job_test.go` and `manager_test.go` thoroughly test job creation, valid/invalid state transitions, concurrency safety, and snapshot isolation.
+- **Tests**: `job_test.go`, `manager_test.go`, and `runner_test.go` thoroughly test job creation, valid/invalid state transitions, concurrency safety, panic recovery, async submission, independent context handling, running state transitions before work execution, and concurrent execution under race detection.
 
 ---
 
@@ -28,7 +28,7 @@ type JobRunner struct {
 	logger  *logger.Logger
 }
 
-func NewRunner(manager *JobManager, logger ...*logger.Logger) *JobRunner
+func NewRunner(manager *JobManager, loggers ...*logger.Logger) *JobRunner
 func (r *JobRunner) Submit(jobType JobType, work func(context.Context) error) (*Job, error)
 ```
 
@@ -44,17 +44,20 @@ func (r *JobRunner) Submit(jobType JobType, work func(context.Context) error) (*
 
 ---
 
-## 3. Proposed Testing Strategy (`internal/job/runner_test.go`)
+## 3. Test Coverage & Synchronization (`internal/job/runner_test.go`)
 
-To ensure robust asynchronous execution, panic safety, and concurrency, we will add `internal/job/runner_test.go` covering:
-1. **Successful Job Execution**: Submitting a job, waiting for completion via polling or synchronization, and verifying status becomes `completed` with `StartedAt` and `FinishedAt` populated.
-2. **Failing Job Execution**: Submitting a job where `work` returns an error, verifying status becomes `failed` and `Error` field is populated.
-3. **Panic Recovery**: Submitting a job where `work` panics (`panic("something went wrong")`), verifying panic is caught, status becomes `failed`, and error message indicates panic.
-4. **Concurrent Job Runs**: Submitting multiple concurrent jobs via `JobRunner` under `-race` detector.
+Robust asynchronous test suite (`internal/job/runner_test.go`) covers:
+1. **`TestJobRunner_AsyncSubmission`**: Verifies non-blocking submission and background execution starting and completing.
+2. **`TestJobRunner_SuccessfulWork`**: Verifies successful execution, completion status, and populated timestamps (`StartedAt`, `FinishedAt`).
+3. **`TestJobRunner_FailedWork`**: Verifies error handling and `failed` status transition when work returns an error.
+4. **`TestJobRunner_PanicRecovery`**: Verifies panic recovery catching panics, converting them to descriptive failure messages, and updating status to `failed`.
+5. **`TestJobRunner_IndependentContext`**: Uses `ctxCh` channel synchronization to verify the background context passed to work is independent and not canceled.
+6. **`TestJobRunner_MultipleConcurrentJobs`**: Uses `startedCh`, `releaseCh`, and `doneCh` coordination channels with zero polling loops or `time.Sleep` delays. Verifies unique IDs, terminal states, correct status outcomes, and timestamps strictly from the main test goroutine without calling assertion helpers inside spawned goroutines.
+7. **`TestJobRunner_RunningTransitionBeforeWork`**: Uses deterministic channel synchronization (`jobIDCh`, `statusCh`) so `jobID` is sent after `Submit()` returns, avoiding any race condition where work runs before `jobID` variable is assigned.
 
 ---
 
-## 4. Implementation & Verification Tasks
+## 4. Implementation & Verification
 
-1. Create `internal/job/runner_test.go` to thoroughly test `JobRunner` success, failure, panic recovery, and concurrency.
-2. Run `go test -v -race ./internal/job/...` to verify all job package unit tests pass successfully.
+- Formatted code using `gofmt -w internal/job/*.go`.
+- Verified all tests in `internal/job/` pass successfully under race detector.

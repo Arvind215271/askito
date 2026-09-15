@@ -56,13 +56,25 @@ func (r *JobRunner) execute(jobID string, work func(context.Context) error) {
 			if r.logger != nil {
 				r.logger.Error("job panicked during execution", "job_id", jobID, "panic", p, "error", err)
 			}
-			_, _ = r.manager.Transition(jobID, StatusFailed, err)
+			if _, transitionErr := r.manager.Transition(jobID, StatusFailed, err); transitionErr != nil {
+				if r.logger != nil {
+					r.logger.Error("failed to transition job to failed", "job_id", jobID, "error", transitionErr)
+				}
+			}
 		}
 	}()
 
 	if err := work(ctx); err != nil {
-		_, _ = r.manager.Transition(jobID, StatusFailed, err)
+		if _, transitionErr := r.manager.Transition(jobID, StatusFailed, err); transitionErr != nil {
+			if r.logger != nil {
+				r.logger.Error("failed to transition job to failed", "job_id", jobID, "error", transitionErr)
+			}
+		}
 	} else {
-		_, _ = r.manager.Transition(jobID, StatusCompleted, nil)
+		if _, transitionErr := r.manager.Transition(jobID, StatusCompleted, nil); transitionErr != nil {
+			if r.logger != nil {
+				r.logger.Error("failed to transition job to completed", "job_id", jobID, "error", transitionErr)
+			}
+		}
 	}
 }

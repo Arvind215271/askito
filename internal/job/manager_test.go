@@ -13,7 +13,7 @@ func TestJobManager_Concurrency(t *testing.T) {
 	const jobsPerGoroutine = 20
 
 	var wg sync.WaitGroup
-	wg.Add(goroutines * 2)
+	wg.Add(goroutines)
 
 	// Concurrent creation
 	jobIDsChan := make(chan string, goroutines*jobsPerGoroutine)

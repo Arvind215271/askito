@@ -3,7 +3,6 @@ package job
 import (
 	"context"
 	"errors"
-	"sync"
 	"testing"
 	"time"
 
@@ -104,28 +103,24 @@ func TestJobRunner_IndependentContext(t *testing.T) {
 	manager := NewManager()
 	runner := NewRunner(manager)
 
-	var receivedCtx context.Context
-	done := make(chan struct{})
+	ctxCh := make(chan context.Context, 1)
 
 	_, err := runner.Submit(JobTypeExport, func(ctx context.Context) error {
-		receivedCtx = ctx
-		close(done)
+		ctxCh <- ctx
 		return nil
 	})
 	require.NoError(t, err)
 
 	select {
-	case <-done:
+	case receivedCtx := <-ctxCh:
+		require.NotNil(t, receivedCtx)
+		select {
+		case <-receivedCtx.Done():
+			t.Fatal("independent background context should not be canceled")
+		default:
+		}
 	case <-time.After(2 * time.Second):
 		t.Fatal("timed out waiting for context capture")
-	}
-
-	require.NotNil(t, receivedCtx)
-	// Verify context is not already cancelled
-	select {
-	case <-receivedCtx.Done():
-		t.Fatal("independent background context should not be canceled")
-	default:
 	}
 }
 
@@ -156,48 +151,65 @@ func TestJobRunner_MultipleConcurrentJobs(t *testing.T) {
 	runner := NewRunner(manager)
 
 	const numJobs = 20
-	var wg sync.WaitGroup
-	wg.Add(numJobs)
-
 	jobIDs := make([]string, numJobs)
-	var mu sync.Mutex
+	startedCh := make(chan struct{}, numJobs)
+	releaseCh := make(chan struct{})
+	doneCh := make(chan struct{}, numJobs)
 
 	for i := 0; i < numJobs; i++ {
 		idx := i
 		job, err := runner.Submit(JobTypeExport, func(ctx context.Context) error {
-			time.Sleep(10 * time.Millisecond)
+			startedCh <- struct{}{}
+			<-releaseCh
+			defer func() {
+				doneCh <- struct{}{}
+			}()
 			if idx%3 == 0 {
 				return errors.New("even-index failure")
 			}
 			return nil
 		})
 		require.NoError(t, err)
-		mu.Lock()
-		jobIDs[idx] = job.ID
-		mu.Unlock()
+		jobIDs[i] = job.ID
 	}
 
-	// Verify all jobs finish and reach terminal state
-	for _, id := range jobIDs {
-		go func(jobID string) {
-			defer wg.Done()
-			require.Eventually(t, func() bool {
-				j, err := manager.Get(jobID)
-				return err == nil && j.Status.IsTerminal()
-			}, 3*time.Second, 10*time.Millisecond)
-		}(id)
+	// Wait for all jobs to start
+	for i := 0; i < numJobs; i++ {
+		select {
+		case <-startedCh:
+		case <-time.After(2 * time.Second):
+			t.Fatal("timed out waiting for job to start")
+		}
 	}
 
-	wg.Wait()
+	// Release all jobs
+	close(releaseCh)
 
-	// Verify uniqueness and states
+	// Wait for all jobs to finish work
+	for i := 0; i < numJobs; i++ {
+		select {
+		case <-doneCh:
+		case <-time.After(3 * time.Second):
+			t.Fatal("timed out waiting for job completion")
+		}
+	}
+
+	// Verify uniqueness, terminal states, status correctness, timestamps from main goroutine
 	seenIDs := make(map[string]bool)
 	for idx, id := range jobIDs {
 		assert.False(t, seenIDs[id], "job IDs should be unique")
 		seenIDs[id] = true
 
-		j, err := manager.Get(id)
-		require.NoError(t, err)
+		var j Job
+		require.Eventually(t, func() bool {
+			var err error
+			j, err = manager.Get(id)
+			return err == nil && j.Status.IsTerminal()
+		}, 2*time.Second, time.Millisecond)
+
+		assert.NotNil(t, j.StartedAt)
+		assert.NotNil(t, j.FinishedAt)
+
 		if idx%3 == 0 {
 			assert.Equal(t, StatusFailed, j.Status)
 		} else {
@@ -210,26 +222,28 @@ func TestJobRunner_RunningTransitionBeforeWork(t *testing.T) {
 	manager := NewManager()
 	runner := NewRunner(manager)
 
-	statusAtStartChan := make(chan JobStatus, 1)
+	jobIDCh := make(chan string, 1)
+	statusCh := make(chan JobStatus, 1)
 	done := make(chan struct{})
 
-	var jobID string
 	job, err := runner.Submit(JobTypeExport, func(ctx context.Context) error {
-		// Check job status in manager at the very beginning of work execution
+		jobID := <-jobIDCh
 		j, err := manager.Get(jobID)
 		if err == nil {
-			statusAtStartChan <- j.Status
+			statusCh <- j.Status
 		} else {
-			statusAtStartChan <- StatusQueued
+			statusCh <- StatusQueued
 		}
 		close(done)
 		return nil
 	})
 	require.NoError(t, err)
-	jobID = job.ID
+
+	// Send job ID after Submit() has returned and assigned job
+	jobIDCh <- job.ID
 
 	select {
-	case status := <-statusAtStartChan:
+	case status := <-statusCh:
 		assert.Equal(t, StatusRunning, status)
 	case <-time.After(2 * time.Second):
 		t.Fatal("timed out waiting for work execution check")
