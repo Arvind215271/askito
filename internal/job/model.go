@@ -35,6 +35,7 @@ type Job struct {
 	ID         string     `json:"id"`
 	Type       JobType    `json:"type"`
 	Status     JobStatus  `json:"status"`
+	OwnerID    string     `json:"owner_id"`
 	CreatedAt  time.Time  `json:"created_at"`
 	StartedAt  *time.Time `json:"started_at,omitempty"`
 	FinishedAt *time.Time `json:"finished_at,omitempty"`

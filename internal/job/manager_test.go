@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestJobManager_Concurrency(t *testing.T) {
@@ -29,7 +30,7 @@ func TestJobManager_Concurrency(t *testing.T) {
 					jType = JobTypeTranscript
 				}
 
-				job, err := manager.Create(jType)
+				job, err := manager.Create(jType, "owner-concurrency")
 				if err == nil && job != nil {
 					jobIDsChan <- job.ID
 				}
@@ -66,4 +67,38 @@ func TestJobManager_Concurrency(t *testing.T) {
 
 	// Verify manager store is clean and no race conditions triggered under -race
 	assert.True(t, true)
+}
+
+func TestJobManager_OwnerIsolation(t *testing.T) {
+	manager := NewManager()
+
+	// 1. Created job stores owner ID
+	job, err := manager.Create(JobTypeExport, "user-alpha")
+	require.NoError(t, err)
+	require.NotNil(t, job)
+	assert.Equal(t, "user-alpha", job.OwnerID)
+
+	// 2. Same owner can retrieve job via GetForUser
+	retrieved, err := manager.GetForUser(job.ID, "user-alpha")
+	require.NoError(t, err)
+	require.NotNil(t, retrieved)
+	assert.Equal(t, job.ID, retrieved.ID)
+	assert.Equal(t, "user-alpha", retrieved.OwnerID)
+
+	// 3. Different owner cannot retrieve job (returns ErrJobNotFound)
+	unauthorized, err := manager.GetForUser(job.ID, "user-beta")
+	assert.ErrorIs(t, err, ErrJobNotFound)
+	assert.Nil(t, unauthorized)
+
+	// 4. Unknown job returns ErrJobNotFound
+	unknown, err := manager.GetForUser("non-existent", "user-alpha")
+	assert.ErrorIs(t, err, ErrJobNotFound)
+	assert.Nil(t, unknown)
+
+	// 5. Get remains unrestricted regardless of owner
+	unrestricted, err := manager.Get(job.ID)
+	require.NoError(t, err)
+	require.NotNil(t, unrestricted)
+	assert.Equal(t, job.ID, unrestricted.ID)
+	assert.Equal(t, "user-alpha", unrestricted.OwnerID)
 }

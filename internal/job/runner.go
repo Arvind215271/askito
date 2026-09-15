@@ -27,8 +27,8 @@ func NewRunner(manager *JobManager, loggers ...*logger.Logger) *JobRunner {
 
 // Submit creates a new job in queued state and spawns a background goroutine to execute the work.
 // It returns the created Job snapshot immediately without waiting for execution to complete.
-func (r *JobRunner) Submit(jobType JobType, work func(context.Context) error) (*Job, error) {
-	job, err := r.manager.Create(jobType)
+func (r *JobRunner) Submit(jobType JobType, ownerID string, work func(context.Context) error) (*Job, error) {
+	job, err := r.manager.Create(jobType, ownerID)
 	if err != nil {
 		return nil, err
 	}

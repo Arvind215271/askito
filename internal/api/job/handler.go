@@ -23,7 +23,12 @@ func NewHandler(manager *domainJob.JobManager) *Handler {
 func (h *Handler) GetUserJob(c *echo.Context) error {
 	id := (*c).Param("id")
 
-	job, err := h.manager.Get(id)
+	userID, ok := GetUserIDFromContext((*c).Request().Context())
+	if !ok || userID == "" {
+		return Err.MissingOrInvalidUserID()
+	}
+
+	job, err := h.manager.GetForUser(id, userID)
 	if err != nil {
 		if errors.Is(err, domainJob.ErrJobNotFound) {
 			return Err.JobNotFound()

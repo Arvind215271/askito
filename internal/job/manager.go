@@ -20,9 +20,9 @@ func NewManager() *JobManager {
 	}
 }
 
-// Create creates a new job of the specified type, assigns a UUID, sets status to queued,
+// Create creates a new job of the specified type and owner ID, assigns a UUID, sets status to queued,
 // records CreatedAt in UTC, stores it, and returns a snapshot copy.
-func (m *JobManager) Create(jobType JobType) (*Job, error) {
+func (m *JobManager) Create(jobType JobType, ownerID string) (*Job, error) {
 	id := uuid.New().String()
 	now := time.Now().UTC()
 
@@ -30,6 +30,7 @@ func (m *JobManager) Create(jobType JobType) (*Job, error) {
 		ID:        id,
 		Type:      jobType,
 		Status:    StatusQueued,
+		OwnerID:   ownerID,
 		CreatedAt: now,
 	}
 
@@ -48,6 +49,24 @@ func (m *JobManager) Get(id string) (*Job, error) {
 	m.mu.RUnlock()
 
 	if !exists {
+		return nil, ErrJobNotFound
+	}
+
+	snapshot := job
+	return &snapshot, nil
+}
+
+// GetForUser retrieves a job by ID for a specific owner, returning a snapshot copy if found and owned.
+func (m *JobManager) GetForUser(id string, ownerID string) (*Job, error) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	job, exists := m.jobs[id]
+	if !exists {
+		return nil, ErrJobNotFound
+	}
+
+	if job.OwnerID != ownerID {
 		return nil, ErrJobNotFound
 	}
 

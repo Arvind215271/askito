@@ -12,13 +12,14 @@ import (
 func TestJobCreation(t *testing.T) {
 	manager := NewManager()
 
-	job, err := manager.Create(JobTypeExport)
+	job, err := manager.Create(JobTypeExport, "owner-123")
 	require.NoError(t, err)
 	require.NotNil(t, job)
 
 	assert.NotEmpty(t, job.ID)
 	assert.Equal(t, JobTypeExport, job.Type)
 	assert.Equal(t, StatusQueued, job.Status)
+	assert.Equal(t, "owner-123", job.OwnerID)
 	assert.False(t, job.CreatedAt.IsZero())
 	assert.Equal(t, time.UTC, job.CreatedAt.Location())
 	assert.Nil(t, job.StartedAt)
@@ -78,7 +79,7 @@ func TestJobStateTransitions_HappyPaths(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			manager := NewManager()
-			job, err := manager.Create(JobTypeTranscript)
+			job, err := manager.Create(JobTypeTranscript, "owner-123")
 			require.NoError(t, err)
 
 			prevTime := job.CreatedAt
@@ -120,7 +121,7 @@ func TestJobStateTransitions_HappyPaths(t *testing.T) {
 func TestJobStateTransitions_InvalidTransitions(t *testing.T) {
 	manager := NewManager()
 
-	job, err := manager.Create(JobTypeSubtitle)
+	job, err := manager.Create(JobTypeSubtitle, "owner-123")
 	require.NoError(t, err)
 
 	// Invalid jump from Queued -> Completed
@@ -168,7 +169,7 @@ func TestJobManager_NotFound(t *testing.T) {
 
 func TestJobManager_SnapshotIsolation(t *testing.T) {
 	manager := NewManager()
-	job, err := manager.Create(JobTypeExport)
+	job, err := manager.Create(JobTypeExport, "owner-123")
 	require.NoError(t, err)
 
 	// Modify the returned snapshot directly
