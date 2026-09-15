@@ -9,6 +9,7 @@ import (
 
 	// config
 	"github.com/Arvind215271/askito/internal/config"
+	"github.com/Arvind215271/askito/internal/job"
 
 	// logger
 	"github.com/Arvind215271/askito/internal/logger"
@@ -16,6 +17,7 @@ import (
 	// api
 	"github.com/Arvind215271/askito/internal/api"
 	"github.com/Arvind215271/askito/internal/api/export"
+	apiJob "github.com/Arvind215271/askito/internal/api/job"
 	apiPlaylist "github.com/Arvind215271/askito/internal/api/playlist"
 	apiSubtitle "github.com/Arvind215271/askito/internal/api/subtitle"
 	apiTranscript "github.com/Arvind215271/askito/internal/api/transcript"
@@ -203,6 +205,10 @@ func main() {
 
 	playlistHandler := apiPlaylist.NewHandler(youtubeService)
 	apiPlaylist.RegisterPlaylistRoutes(e.Group("/playlist"), playlistHandler)
+
+	jobManager := job.NewManager()
+	jobHandler := apiJob.NewHandler(jobManager)
+	apiJob.RegisterRoutes(e.Group("/jobs"), jobHandler)
 
 	// only run debug in development
 	if config.Env == "dev" {
