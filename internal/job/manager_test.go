@@ -102,3 +102,46 @@ func TestJobManager_OwnerIsolation(t *testing.T) {
 	assert.Equal(t, job.ID, unrestricted.ID)
 	assert.Equal(t, "user-alpha", unrestricted.OwnerID)
 }
+
+func TestJobManager_OneActiveJobPerUser(t *testing.T) {
+	manager := NewManager()
+	ownerID := "user-active-test"
+
+	// 1. Create first job -> should succeed (queued)
+	job1, err := manager.Create(JobTypeExport, ownerID)
+	require.NoError(t, err)
+	require.NotNil(t, job1)
+	assert.Equal(t, StatusQueued, job1.Status)
+
+	// 2. Try creating second job while first is queued -> should return ErrActiveJobExists
+	job2, err := manager.Create(JobTypeSubtitle, ownerID)
+	assert.ErrorIs(t, err, ErrActiveJobExists)
+	assert.Nil(t, job2)
+
+	// 3. Transition first job to running
+	runningJob, err := manager.Transition(job1.ID, StatusRunning, nil)
+	require.NoError(t, err)
+	assert.Equal(t, StatusRunning, runningJob.Status)
+
+	// 4. Try creating job while first is running -> should return ErrActiveJobExists
+	job3, err := manager.Create(JobTypeTranscript, ownerID)
+	assert.ErrorIs(t, err, ErrActiveJobExists)
+	assert.Nil(t, job3)
+
+	// 5. Transition first job to completed (terminal)
+	_, err = manager.Transition(job1.ID, StatusCompleted, nil)
+	require.NoError(t, err)
+
+	// 6. Now creation should succeed since previous job is terminal
+	job4, err := manager.Create(JobTypeExport, ownerID)
+	require.NoError(t, err)
+	require.NotNil(t, job4)
+	assert.Equal(t, StatusQueued, job4.Status)
+
+	// 7. Different user should be able to create a job independently
+	otherOwner := "other-user"
+	jobOther, err := manager.Create(JobTypeExport, otherOwner)
+	require.NoError(t, err)
+	require.NotNil(t, jobOther)
+	assert.Equal(t, otherOwner, jobOther.OwnerID)
+}

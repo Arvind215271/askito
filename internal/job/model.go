@@ -46,4 +46,5 @@ type Job struct {
 var (
 	ErrJobNotFound       = errors.New("job not found")
 	ErrInvalidTransition = errors.New("invalid job status transition")
+	ErrActiveJobExists   = errors.New("user already has an active job")
 )

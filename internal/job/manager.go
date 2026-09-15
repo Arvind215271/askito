@@ -23,6 +23,15 @@ func NewManager() *JobManager {
 // Create creates a new job of the specified type and owner ID, assigns a UUID, sets status to queued,
 // records CreatedAt in UTC, stores it, and returns a snapshot copy.
 func (m *JobManager) Create(jobType JobType, ownerID string) (*Job, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	for _, j := range m.jobs {
+		if j.OwnerID == ownerID && (j.Status == StatusQueued || j.Status == StatusRunning) {
+			return nil, ErrActiveJobExists
+		}
+	}
+
 	id := uuid.New().String()
 	now := time.Now().UTC()
 
@@ -34,9 +43,7 @@ func (m *JobManager) Create(jobType JobType, ownerID string) (*Job, error) {
 		CreatedAt: now,
 	}
 
-	m.mu.Lock()
 	m.jobs[id] = job
-	m.mu.Unlock()
 
 	snapshot := job
 	return &snapshot, nil

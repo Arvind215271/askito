@@ -284,3 +284,53 @@ func TestJobRunner_RunningTransitionBeforeWork(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, ownerID, j.OwnerID)
 }
+
+func TestJobRunner_OneActiveJobPerUser(t *testing.T) {
+	manager := NewManager()
+	runner := NewRunner(manager)
+	ownerID := "runner-active-user"
+
+	blockCh := make(chan struct{})
+	startedCh := make(chan struct{})
+
+	job1, err := runner.Submit(JobTypeExport, ownerID, func(ctx context.Context) error {
+		close(startedCh)
+		<-blockCh
+		return nil
+	})
+	require.NoError(t, err)
+	require.NotNil(t, job1)
+
+	// Wait for job1 to start running
+	select {
+	case <-startedCh:
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for job1 to start")
+	}
+
+	// Try submitting second job via runner -> should return ErrActiveJobExists and not run work
+	workExecuted := false
+	job2, err := runner.Submit(JobTypeSubtitle, ownerID, func(ctx context.Context) error {
+		workExecuted = true
+		return nil
+	})
+	assert.ErrorIs(t, err, ErrActiveJobExists)
+	assert.Nil(t, job2)
+	assert.False(t, workExecuted)
+
+	// Unblock job1
+	close(blockCh)
+
+	// Wait for job1 to complete
+	require.Eventually(t, func() bool {
+		j, err := manager.Get(job1.ID)
+		return err == nil && j.Status == StatusCompleted
+	}, 2*time.Second, 10*time.Millisecond)
+
+	// Now submitting should succeed
+	job3, err := runner.Submit(JobTypeTranscript, ownerID, func(ctx context.Context) error {
+		return nil
+	})
+	require.NoError(t, err)
+	require.NotNil(t, job3)
+}

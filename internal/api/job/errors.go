@@ -25,3 +25,11 @@ func (JobErrors) MissingOrInvalidUserID() *api.AppError {
 		http.StatusBadRequest,
 	)
 }
+
+func (JobErrors) ActiveJobExists() *api.AppError {
+	return api.NewError(
+		"ACTIVE_JOB_EXISTS",
+		"User already has an active job",
+		http.StatusConflict,
+	)
+}
