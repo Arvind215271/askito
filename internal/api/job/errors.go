@@ -17,3 +17,11 @@ func (JobErrors) JobNotFound() *api.AppError {
 		http.StatusNotFound,
 	)
 }
+
+func (JobErrors) MissingOrInvalidUserID() *api.AppError {
+	return api.NewError(
+		"INVALID_USER_ID",
+		"Missing or invalid X-User-ID header",
+		http.StatusBadRequest,
+	)
+}

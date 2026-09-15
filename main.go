@@ -208,7 +208,7 @@ func main() {
 
 	jobManager := job.NewManager()
 	jobHandler := apiJob.NewHandler(jobManager)
-	apiJob.RegisterRoutes(e.Group("/jobs"), jobHandler)
+	apiJob.RegisterRoutes(e.Group("/jobs", apiJob.UserIdentityMiddleware()), jobHandler)
 
 	// only run debug in development
 	if config.Env == "dev" {
