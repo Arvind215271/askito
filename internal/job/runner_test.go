@@ -200,7 +200,7 @@ func TestJobRunner_MultipleConcurrentJobs(t *testing.T) {
 		assert.False(t, seenIDs[id], "job IDs should be unique")
 		seenIDs[id] = true
 
-		var j Job
+		var j *Job
 		require.Eventually(t, func() bool {
 			var err error
 			j, err = manager.Get(id)

@@ -18,7 +18,7 @@ import (
 	"github.com/Arvind215271/askito/internal/logger"
 )
 
-func TestJobHandler_Get(t *testing.T) {
+func TestJobHandler_GetUserJob(t *testing.T) {
 	manager := domainJob.NewManager()
 	h := NewHandler(manager)
 
@@ -176,14 +176,14 @@ func TestJobHandler_Get(t *testing.T) {
 	}
 }
 
-func TestUserIDFromContext(t *testing.T) {
+func TestGetUserIDFromContext(t *testing.T) {
 	ctx := context.Background()
-	_, ok := UserIDFromContext(ctx)
+	_, ok := GetUserIDFromContext(ctx)
 	assert.False(t, ok)
 
 	uid := uuid.New().String()
 	ctx = context.WithValue(ctx, userIDKey, uid)
-	val, ok := UserIDFromContext(ctx)
+	val, ok := GetUserIDFromContext(ctx)
 	assert.True(t, ok)
 	assert.Equal(t, uid, val)
 }

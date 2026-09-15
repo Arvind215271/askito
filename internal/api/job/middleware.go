@@ -33,8 +33,13 @@ func UserIdentityMiddleware() echo.MiddlewareFunc {
 	}
 }
 
-// UserIDFromContext retrieves the validated user ID from the context.
-func UserIDFromContext(ctx context.Context) (string, bool) {
+// GetUserIDFromContext retrieves the validated user ID from the context.
+func GetUserIDFromContext(ctx context.Context) (string, bool) {
 	id, ok := ctx.Value(userIDKey).(string)
 	return id, ok
+}
+
+// UserIDFromContext is deprecated; use GetUserIDFromContext.
+func UserIDFromContext(ctx context.Context) (string, bool) {
+	return GetUserIDFromContext(ctx)
 }

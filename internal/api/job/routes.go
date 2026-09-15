@@ -5,5 +5,5 @@ import (
 )
 
 func RegisterRoutes(e *echo.Group, h *Handler) {
-	e.GET("/:id", h.Get)
+	e.GET("/:id", h.GetUserJob)
 }

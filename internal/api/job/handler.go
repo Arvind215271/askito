@@ -20,7 +20,7 @@ func NewHandler(manager *domainJob.JobManager) *Handler {
 	}
 }
 
-func (h *Handler) Get(c *echo.Context) error {
+func (h *Handler) GetUserJob(c *echo.Context) error {
 	id := (*c).Param("id")
 
 	job, err := h.manager.Get(id)
