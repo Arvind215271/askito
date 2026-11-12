@@ -3,6 +3,7 @@ package ytdlp
 import (
 	"context"
 	"time"
+	"strings"
 
 	"github.com/Arvind215271/yt2bulk/internal/logger"
 	"github.com/Arvind215271/yt2bulk/internal/youtube"
@@ -147,6 +148,7 @@ func (p *Provider) GetChannelItems(ctx context.Context, channelURL string, limit
 	allowedTabs := map[string]bool{
 		"Videos": true,
 		"Shorts": true,
+		"Live":   true,
 	}
 
 	var flattenEntries func([]YTPlaylistEntry, bool) []youtube.PlaylistItem
@@ -155,8 +157,20 @@ func (p *Provider) GetChannelItems(ctx context.Context, channelURL string, limit
 		for _, entry := range entries {
 			// If it's a top-level entry (like a tab/container), check if it's allowed
 			if isTopLevel && entry.Type == "playlist" {
-				if _, ok := allowedTabs[entry.Title]; !ok {
-					p.logger.Debug("channel extraction: skipping top-level container", "title", entry.Title)
+				tabName := entry.Title
+
+				// yt-dlp may return "Channel Name - Videos"
+				// instead of simply "Videos".
+				if i := strings.LastIndex(tabName, " - "); i >= 0 {
+					tabName = tabName[i+3:]
+				}
+
+				if !allowedTabs[tabName] {
+					p.logger.Debug(
+						"channel extraction: skipping top-level container",
+						"title", entry.Title,
+						"normalized_tab", tabName,
+					)
 					continue
 				}
 				p.logger.Debug("channel extraction: flattening allowed top-level container", "title", entry.Title)
